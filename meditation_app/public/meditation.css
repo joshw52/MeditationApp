@@ -1,0 +1,177 @@
+/*https://coolors.co/192320-037728-1d2114-04721a-4e8c70*/
+body {
+	background-color: #192319;
+	color: #FFFFFF;
+	text-align: center;
+	font-family: "Muli", Verdana;
+}
+
+#menubar {
+	background-color: #000000;
+	padding: 10px;
+	position: fixed;
+	top: 0;
+	width: 100%;
+}
+
+#menubar ul {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+}
+
+#menubar li {
+	color: #CCCCCC;
+	padding: 10px;
+	padding-left: 20px;
+	padding-right: 20px;
+	display: block;
+	display: inline-block;
+	font-size: 20px;
+	transition: all .3s ease-in-out;
+}
+
+#menubar li:hover {
+	color: #FFFFFF;
+}
+
+#meditationTimer {
+	margin-top: 120px;
+}
+
+#timerAdjust {
+	margin-left: auto;
+	margin-right: auto;
+	font-family: "Muli", Verdana;
+}
+
+button {
+	font-family: "Muli", Verdana;
+	font-size: 26px;
+	background-color: #969B99;
+	color: #000000;
+	border: 0px;
+	border-radius: 10px;
+	margin: 35px 20px 35px 20px;
+	padding: 10px 15px 10px 15px;
+}
+
+button:hover {
+	background-color: #ABAFAD;
+	color: #000000;
+}
+
+table {
+	font-size: 36px;
+	color: #FFFFFF;
+}
+
+#hrup, #minup, #secup {
+	width: 0px;
+	height: 0px;
+	border-left: 50px solid transparent;
+	border-right: 50px solid transparent;
+	border-bottom: 36px solid #969B99;
+}
+
+#hrdown, #mindown, #secdown {
+	width: 0px;
+	height: 0px;
+	border-left: 50px solid transparent;
+	border-right: 50px solid transparent;
+	border-top: 36px solid #969B99;
+}
+
+#hrInput, #minInput, #secInput {
+	background-color: #000000;
+	color: #ABAFAD;
+	width: 100px;
+	height: 40px;
+	text-align: center;
+}
+
+#colonspacer {
+	width: 30px;
+}
+
+#buddhaFill {
+    background-color: #000000;
+	color: #FFFFFF;
+	border: 8px solid #969B99;
+	width: 400px;
+	height: 400px;
+	border-radius: 400px;
+	margin: auto;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#buddhaFillImg {
+	height: 280px;
+	margin: 50px;
+	filter: invert(0%);	
+	transition: all .9999999s ease-in-out;
+}
+
+#journalEntry {
+	height: 500px;
+	width: 500px;
+	background-color: #000000;
+	color: #ABAFAD;
+	border: 5px solid #969B99;
+	font-size: 24px;
+	padding: 15px;
+}
+
+#logJournal {
+	font-family: "Muli", Verdana;
+	font-size: 26px;
+	background-color: #969B99;
+	color: #000000;
+	border: 0px;
+	border-radius: 10px;
+	margin: 35px 20px 35px 20px;
+	padding: 10px 15px 10px 15px;	
+}
+
+#logJournal:hover {
+	background-color: #ABAFAD;
+	color: #000000;
+}
+
+/* Account Creation Page */
+
+#accountCreate, #loginTable {
+	margin-left: auto;
+	margin-right: auto;
+	font-size: 24px;
+	text-align: left;
+}
+
+#accountCreate td, #loginTable td {
+	padding: 5px;
+}
+
+#accountCreate input, #loginTable input {
+	background-color: #000000;
+	color: #ABAFAD;
+	border-radius: 10px;
+	padding: 5px;
+}
+
+#accountCreate input[type="submit"], #loginTable input[type="submit"] {
+	font-family: "Muli", Verdana;
+	font-size: 26px;
+	background-color: #969B99;
+	color: #000000;
+	border: 0px;
+	border-radius: 10px;
+	margin: 5px;
+	padding: 10px 15px 10px 15px;
+}
+
+#accountCreate input[type="submit"]:hover, #loginTable input[type="submit"]:hover {
+	background-color: #ABAFAD;
+	color: #000000;
+}
