@@ -2,6 +2,7 @@ var express = require('express');
 var path = require('path');
 var parser = require('body-parser');
 var mongo = require('mongodb').MongoClient;
+var session = require('client-sessions');
 
 var app = express();
 var port = 8080;
@@ -15,20 +16,35 @@ app.use(express.static(path.join(__dirname + '/public')));
 app.use(parser.json());
 app.use(parser.urlencoded({ extended: true }));
 
+// https://stormpath.com/blog/everything-you-ever-wanted-to-know-about-node-dot-js-sessions
+app.use(session({
+	cookieName: 'session',
+	secret: 'thisisthesecretkey',
+	duration: (1000 * 60 * 60),
+	activeDuration: (1000 * 60 * 30)
+}));
+
 app.set('view engine', 'ejs');
 
 app.get('/home', function(req, res) {
-	res.render('index');
+	if (req.session.user)
+		res.render('index');
+	else
+		res.render('login', { lerr: false });
 });
 
 
 
 app.get('/progress', function(req, res) {
-	res.render('progress');
+	if (req.session.user)
+		res.render('progress');
+	else
+		res.render('login', { lerr: false });
 });
 
 app.get('/logout', function(req, res) {
-	res.render('logout');
+	req.session.reset();
+	res.render('login', { lerr: false });
 });
 
 app.get('/account', function(req, res) {
@@ -36,7 +52,10 @@ app.get('/account', function(req, res) {
 });
 
 app.get('/timer', function(req, res) {
-	res.render('timer');
+	if (req.session.user)
+		res.render('timer');
+	else
+		res.render('login', { lerr: false });
 });
 
 app.post('/timer', function(req, res) {
@@ -47,17 +66,14 @@ app.post('/timer', function(req, res) {
 	if (d < 10) d = "0" + String(d);
 	
 	var entryDate = dt.getFullYear() + "-" + m + "-" + d;
-	console.log(entryDate);
-	
-	console.log(req.body);
-	
+		
 	var mlog = {
-		username: "joebob",
+		username: req.session.user,
 		date: entryDate,
 		time: req.body.meditationTime,
 		entry: req.body.journalEntry
 	}
-
+	
 	mongo.connect(url, function(err, db) {
 		db.collection('meditationrecord').insert(mlog, function(err, docs) {
 			if (err) console.log(err);
@@ -130,6 +146,7 @@ app.post('/', function(req, res) {
 					res.render('login', { lerr: true });
 				} else {
 					console.log("The entry is correct!\n");
+					req.session.user = req.body.loginUname;
 					res.redirect('/home');
 				}
 			}
