@@ -15,86 +15,127 @@ app.use(express.static(path.join(__dirname + '/public')));
 app.use(parser.json());
 app.use(parser.urlencoded({ extended: true }));
 
-app.get('/', function(req, res) {
-	res.sendFile(path.join(__dirname+'/login.html'));
-});
+app.set('view engine', 'ejs');
 
 app.get('/home', function(req, res) {
-	res.sendFile(path.join(__dirname+'/index.html'));
+	res.render('index');
 });
 
-app.get('/timer', function(req, res) {
-	res.sendFile(path.join(__dirname+'/timer.html'));
-});
+
 
 app.get('/progress', function(req, res) {
-	res.sendFile(path.join(__dirname+'/progress.html'));
+	res.render('progress');
 });
 
 app.get('/logout', function(req, res) {
-	res.sendFile(path.join(__dirname+'/logout.html'));
+	res.render('logout');
 });
 
 app.get('/account', function(req, res) {
-	res.sendFile(path.join(__dirname+'/account.html'));
+	res.render('account', { unerr: false });
 });
 
-app.post('/meditationEntry', function(req, res) {
-    
+app.get('/timer', function(req, res) {
+	res.render('timer');
 });
 
-app.post('/accountCreation', function(req, res) {
-	var isErr = false;
+app.post('/timer', function(req, res) {
+	var dt = new Date();
+	var m = dt.getMonth() + 1;
+	if (m < 10) m = "0" + String(m);
+	var d = dt.getDate();
+	if (d < 10) d = "0" + String(d);
 	
-	// Validate first and last name
-	if (String(req.body.firstname).length > 0 && String(req.body.lastname).length > 0) {
+	var entryDate = dt.getFullYear() + "-" + m + "-" + d;
+	console.log(entryDate);
 	
-	} else {
-		isErr = true;
+	console.log(req.body);
+	
+	var mlog = {
+		username: "joebob",
+		date: entryDate,
+		time: req.body.meditationTime,
+		entry: req.body.journalEntry
 	}
-	
-	// Make sure passwords match
-	if (String(req.body.password) !== String(req.body.confirmPass)) {
-		isErr = true;
-	}
-	
-	// Make sure username isn't taken
+
 	mongo.connect(url, function(err, db) {
-		db.collection('users').find({
-			username: req.body.username
-		}).toArray(function(err, docs) {
-			if (docs) isErr = true;
+		db.collection('meditationrecord').insert(mlog, function(err, docs) {
+			if (err) console.log(err);
+			else console.log("Entry made\n");
+			
+			db.close();
 		});
 	});
 	
-	// Make sure zip code is 5 digits
-	if (Number(req.body.zipcode) && String(req.body.zipcode).length === 5) {
-	
-	} else {
-		isErr = true;
-	}
-	
+	res.redirect('/home');
+});
 
-	if (isErr === false) {
-		// Put the fields into an object
-		var user = {
-			firstname: req.body.firstname,
-			lastname: req.body.lastname,
-			username: req.body.username,
-			password: req.body.password,
-			zipcode: req.body.zipcode
-		}
+app.post('/account', function(req, res) {
 	
-		mongo.connect(url, function(err, db) {
-			db.collection('users').insert(user, function(err, docs) {
-				db.close();
-			});
+	// Make sure username isn't taken
+	mongo.connect(url, function(err, db) {
+		
+		db.collection('users').findOne({
+			username: req.body.username
+		}, function(err, item) {
+			if (item === null) {
+				console.log("Item not found\n");
+
+				var user = {
+					firstname: req.body.firstname,
+					lastname: req.body.lastname,
+					username: req.body.username,
+					password: req.body.password,
+					zipcode: req.body.zipcode
+				}
+	
+				mongo.connect(url, function(err, db) {
+					db.collection('users').insert(user, function(err, docs) {
+						db.close();
+					});
+				});
+				
+				res.render('login', { lerr: false });
+			} else {
+				console.log("Item found\n");
+				res.render('account', { unerr: true });
+			}		
+			db.close();
 		});
-	
-	    res.sendFile(path.join(__dirname+'/login.html'));
-	} else {
-		console.log("There was an error in your query");
-	}
+	});
 })
+
+app.get('/', function(req, res) {
+	res.render('login', { lerr: false });
+});
+
+app.post('/', function(req, res) {	
+	mongo.connect(url, function(err, db) {
+		// Look for username
+		db.collection('users').findOne({
+			username: req.body.loginUname,
+		}, function(err, item) {
+			if (err) {
+				console.log("Error");
+				return res.send({lerr: false});
+			}
+
+			// If the username is not found or the login password doesn't match the user's password
+			if (!item) {
+				console.log("The username is not valid\n");
+				res.render('login', { lerr: true });
+			} else {
+				if (req.body.loginPword !== item.password) {
+					console.log("The password is not correct\n");
+					res.render('login', { lerr: true });
+				} else {
+					console.log("The entry is correct!\n");
+					res.redirect('/home');
+				}
+			}
+			db.close();
+		});
+	});
+});
 
 app.listen(8080);

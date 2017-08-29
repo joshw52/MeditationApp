@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' integrity='sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u' crossorigin='anonymous'>
+<link href='https://fonts.googleapis.com/css?family=Muli' rel='stylesheet'>
+<link rel='stylesheet' href='/meditation.css'>
+</head>
+<body>
+
+	<h1>Login</h1>
+  
+	<table id='loginTable'>
+		<form action='/' method='POST' id='loginForm' onsubmit='loginMeditation(); return false;'>
+				<tr><td>Username</td><td><input type='text' name='loginUname' id='loginUname'></td></tr>
+				<tr><td>Password</td><td><input type='password' name='loginPword' id='loginPword'></td></tr>
+				<tr><td></td><td><% if (lerr) { %><span style='color: #FF5555;'>Incorrect username/password combo</span><% } %></td></tr>
+				<tr><td></td><td><input type='submit' id='loginSite' value='Login'></td></tr>
+		</form>
+	</table>
+  
+<script src='https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js'></script>
+<script src='/meditation.js'></script>
+</body>
+</html>

@@ -4,20 +4,31 @@ var incrementFraction = -1;
 var currentBrightness = 0;
 var gong = new Audio('https://soundbible.com/grab.php?id=1815&type=mp3');
 
-
-// Send the meditation time and journal entry to the server
-function sendMeditateTimeJournal() {
-	//var secs = document.getElementById('meditationTime').value;
-	//var journal = document.getElementById('journalEntry').value;
-
-	var insertQuery = {
-		timeMeditated: document.getElementById('meditationTime').value,
-		journalMeditation: document.getElementById('journalEntry').value
+// Log in
+function loginMeditation() {
+	var loginQuery = {
+		loginUname: document.getElementById('loginUname').value,
+		loginPword: document.getElementById('loginPword').value
 	};
 			
 	// Ajax/vanilla JS insert request
 	var req = new XMLHttpRequest();
-	req.open("POST", '/meditationEntry', true);
+	req.open("POST", '/', true);
+	req.setRequestHeader('Content-Type', 'application/json');
+	req.send(JSON.stringify(loginQuery));
+	event.preventDefault();
+}
+
+// Send the meditation time and journal entry to the server
+function sendMeditateTimeJournal() {
+	var insertQuery = {
+		meditationTime: document.getElementById('meditationTime').value,
+		journalEntry: document.getElementById('journalEntry').value
+	};
+			
+	// Ajax/vanilla JS insert request
+	var req = new XMLHttpRequest();
+	req.open("POST", '/timer', true);
 	req.setRequestHeader('Content-Type', 'application/json');
 	req.send(JSON.stringify(insertQuery));
 	event.preventDefault();
@@ -25,24 +36,84 @@ function sendMeditateTimeJournal() {
 	document.getElementById('meditationEntry').reset();
 }
 
-function createAccount() {
-	var accountQuery = {
-		firstname: document.getElementById('firstname').value,
-		lastname: document.getElementById('lastname').value,
-		username: document.getElementById('username').value,
-		password: document.getElementById('password').value,
-		cpassword: document.getElementById('confirmPass').value,
-		zipcode: document.getElementById('zipcode').value
+function createAccount() {	
+	var isErr = false;
+
+	// Validate first and last name
+	if (document.getElementById('firstname').value === "") {
+		document.getElementById('fnameErr').innerHTML = "<span style='color: #FF5555;'>First name is empty!</span>";
+		isErr = true;
+	} else {
+		document.getElementById('fnameErr').innerHTML = "";
+	}
+	
+	if (document.getElementById('lastname').value === "") {
+		document.getElementById('lnameErr').innerHTML = "<span style='color: #FF5555;'>Last name is empty!</span>";
+		isErr = true;
+	} else {
+		document.getElementById('lnameErr').innerHTML = "";
 	}
 
-	// Ajax/vanilla JS insert request
-	var req = new XMLHttpRequest();
-	req.open("POST", '/accountCreation', true);
-	req.setRequestHeader('Content-Type', 'application/json');
-	req.send(JSON.stringify(accountQuery));
-	event.preventDefault();
+	if (document.getElementById('username').value === "") {
+		document.getElementById('unameErr').innerHTML = "<span style='color: #FF5555;'>Username can NOT be empty!</span>";
+		isErr = true;
+	} else {
+		document.getElementById('unameErr').innerHTML = "";
+	}
+	
+	// Validate the passwords (make sure at least 8 characters and that they match)
+	if (String(document.getElementById('password').value).length < 8) {
+		document.getElementById('passErr').innerHTML = "<span style='color: #FF5555;'>Password must be at least 8 characters long!</span>";
+		isErr = true;
+	} else {
+		document.getElementById('passErr').innerHTML = "";
+	}
+	if (String(document.getElementById('confirmPass').value).length < 8) {
+		document.getElementById('cpassErr').innerHTML = "<span style='color: #FF5555;'>Password must be at least 8 characters long!</span>";
+		isErr = true;
+	} else {
+		document.getElementById('cpassErr').innerHTML = "";
+	}
+	
+	// Make sure the passwords match
+	if (document.getElementById('password').value !== document.getElementById('confirmPass').value) {
+		document.getElementById('passErr').innerHTML = "<span style='color: #FF5555;'>Passwords must match!</span>";
+		document.getElementById('cpassErr').innerHTML = "<span style='color: #FF5555;'>Passwords must match!</span>";
+		isErr = true;
+	} else if (String(document.getElementById('password').value).length > 7 && String(document.getElementById('confirmPass').value).length > 7) {
+		document.getElementById('passErr').innerHTML = "";
+		document.getElementById('cpassErr').innerHTML = "";
+	
+	}
+	
+	// Make sure zip code is 5 digits
+	if (String(document.getElementById('zipcode').value).length !== 5) {
+		document.getElementById('zipErr').innerHTML = "<span style='color: #FF5555;'>Zip code should be 5 digits!</span>";
+		isErr = true;
+	} else {
+		document.getElementById('zipErr').innerHTML = "";
+	}
 
-	document.getElementById('accountCreate').reset();
+	if (isErr === true) {
+		event.preventDefault();
+	}
+	else {		
+		var accountQuery = {
+			firstname: document.getElementById('firstname').value,
+			lastname: document.getElementById('lastname').value,
+			username: document.getElementById('username').value,
+			password: document.getElementById('password').value,
+			cpassword: document.getElementById('confirmPass').value,
+			zipcode: document.getElementById('zipcode').value
+		}
+
+		// Ajax/vanilla JS insert request
+		var req = new XMLHttpRequest();
+		req.open("POST", '/account', true);
+		req.setRequestHeader('Content-Type', 'application/json');
+		req.send(JSON.stringify(accountQuery));
+		event.preventDefault();
+	}
 }
 
 
