@@ -33,8 +33,6 @@ app.get('/home', function(req, res) {
 		res.render('login', { lerr: false });
 });
 
-
-
 app.get('/progress', function(req, res) {
 	if (req.session.user)
 		res.render('progress');

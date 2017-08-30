@@ -1,9 +1,10 @@
-/*https://coolors.co/192320-037728-1d2114-04721a-4e8c70*/
 body {
-	background-color: #192319;
+	background-color: #000000;
+	background: url('/images/ocean_at_night.jpg') center center fixed;
 	color: #FFFFFF;
 	text-align: center;
 	font-family: "Muli", Verdana;
+	font-size: 20px;
 }
 
 #menubar {
@@ -22,7 +23,7 @@ body {
 }
 
 #menubar li {
-	color: #CCCCCC;
+	color: #A8A6A8;
 	padding: 10px;
 	padding-left: 20px;
 	padding-right: 20px;
@@ -35,6 +36,35 @@ body {
 #menubar li:hover {
 	color: #FFFFFF;
 }
+
+a {
+	color: #FFFFFF;
+}
+
+a:hover {
+	color: #77BEFB;
+	text-decoration: none;
+	transition: all .3s ease-in-out;
+}
+
+/* Home page */
+
+#homePage {
+	background-color: rgba(0, 0, 0, 0.3);
+	border-radius: 5px;
+	margin-top: 120px;
+	margin-left: auto;
+	margin-right: auto;
+	padding: 20px;
+	width: 50%;
+	font-size: 20px;
+}
+
+#homeQuote {
+	color: #CAC8CA;
+}
+
+/* Meditation Page */
 
 #meditationTimer {
 	margin-top: 120px;
@@ -49,17 +79,18 @@ body {
 button {
 	font-family: "Muli", Verdana;
 	font-size: 26px;
-	background-color: #969B99;
+	background-color: #A8A6A8;
 	color: #000000;
 	border: 0px;
-	border-radius: 10px;
+	border-radius: 5px;
 	margin: 35px 20px 35px 20px;
 	padding: 10px 15px 10px 15px;
 }
 
 button:hover {
-	background-color: #ABAFAD;
+	background-color: #CAC8CA;
 	color: #000000;
+	transition: all .3s ease-in-out;
 }
 
 table {
@@ -72,7 +103,7 @@ table {
 	height: 0px;
 	border-left: 50px solid transparent;
 	border-right: 50px solid transparent;
-	border-bottom: 36px solid #969B99;
+	border-bottom: 36px solid #A8A6A8;
 }
 
 #hrdown, #mindown, #secdown {
@@ -80,12 +111,31 @@ table {
 	height: 0px;
 	border-left: 50px solid transparent;
 	border-right: 50px solid transparent;
-	border-top: 36px solid #969B99;
+	border-top: 36px solid #A8A6A8;
+}
+
+#hrup:hover, #secup:hover, #minup:hover {
+	color: #CAC8CA;
+	width: 0px;
+	height: 0px;
+	border-left: 50px solid transparent;
+	border-right: 50px solid transparent;
+	border-bottom: 36px solid #CAC8CA;
+	transition: all .3s ease-in-out;
+}
+
+#hrdown:hover, #mindown:hover, #secdown:hover {
+	width: 0px;
+	height: 0px;
+	border-left: 50px solid transparent;
+	border-right: 50px solid transparent;
+	border-top: 36px solid #CAC8CA;
+	transition: all .3s ease-in-out;
 }
 
 #hrInput, #minInput, #secInput {
 	background-color: #000000;
-	color: #ABAFAD;
+	color: #CAC8CA;
 	width: 100px;
 	height: 40px;
 	text-align: center;
@@ -98,7 +148,7 @@ table {
 #buddhaFill {
     background-color: #000000;
 	color: #FFFFFF;
-	border: 8px solid #969B99;
+	border: 8px solid #A8A6A8;
 	width: 400px;
 	height: 400px;
 	border-radius: 400px;
@@ -122,26 +172,28 @@ table {
 	height: 500px;
 	width: 500px;
 	background-color: #000000;
-	color: #ABAFAD;
-	border: 5px solid #969B99;
-	font-size: 24px;
+	color: #A8A6A8;
+	border: 5px solid #A8A6A8;
+	border-radius: 5px;
+	font-size: 20px;
 	padding: 15px;
 }
 
 #logJournal {
 	font-family: "Muli", Verdana;
 	font-size: 26px;
-	background-color: #969B99;
+	background-color: #A8A6A8;
 	color: #000000;
 	border: 0px;
-	border-radius: 10px;
+	border-radius: 5px;
 	margin: 35px 20px 35px 20px;
 	padding: 10px 15px 10px 15px;	
 }
 
 #logJournal:hover {
-	background-color: #ABAFAD;
+	background-color: #CAC8CA;
 	color: #000000;
+	transition: all .3s ease-in-out;
 }
 
 /* Account Creation Page */
@@ -159,23 +211,24 @@ table {
 
 #accountCreate input, #loginTable input {
 	background-color: #000000;
-	color: #ABAFAD;
-	border-radius: 10px;
+	color: #CAC8CA;
+	border-radius: 5px;
 	padding: 5px;
 }
 
 #accountCreate input[type="submit"], #loginTable input[type="submit"] {
 	font-family: "Muli", Verdana;
 	font-size: 26px;
-	background-color: #969B99;
+	background-color: #B9B7B9;
 	color: #000000;
 	border: 0px;
-	border-radius: 10px;
+	border-radius: 5px;
 	margin: 5px;
 	padding: 10px 15px 10px 15px;
 }
 
 #accountCreate input[type="submit"]:hover, #loginTable input[type="submit"]:hover {
-	background-color: #ABAFAD;
+	background-color: #CAC8CA;
 	color: #000000;
+	transition: all .3s ease-in-out;
 }
