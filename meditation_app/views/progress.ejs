@@ -15,8 +15,40 @@
 			<a href='logout'><li>Logout</li></a>
 		</ul>
 	</div>
-  
+	
+	<br><br><br><br><br>
+	
+	<form action='/progress' method='POST' id='progressDisplay' onsubmit='displayProgress();'>
+		<select name='progressMonth' id='progressMonth'>
+			<option value='0'>January</option>
+			<option value='1'>February</option>
+			<option value='2'>March</option>
+			<option value='3'>April</option>
+			<option value='4'>May</option>
+			<option value='5'>June</option>
+			<option value='6'>July</option>
+			<option value='7'>August</option>
+			<option value='8'>September&nbsp&nbsp&nbsp</option>
+			<option value='9'>October</option>
+			<option value='10'>November</option>
+			<option value='11'>December</option>
+		</select>
+	
+		<select name='progressYear' id='progressYear'>
+			<option value='2017'>2017&nbsp&nbsp&nbsp</option>
+		</select>
+		<br>
+		<br>
+		<input type='submit' value='Check Progress'>
+	</form>
+
+	<%= progCal %>
+ 
 <script src='https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js'></script>
 <script src='/meditation.js'></script>
+<script>
+	var d = new Date();
+	document.getElementById('progressMonth').value = d.getMonth();
+</script>
 </body>
 </html>

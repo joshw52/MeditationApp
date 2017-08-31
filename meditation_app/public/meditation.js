@@ -36,6 +36,20 @@ function sendMeditateTimeJournal() {
 	document.getElementById('meditationEntry').reset();
 }
 
+function displayProgress() {
+	var displayQuery = {
+		progressMonth: document.getElementById('progressMonth').value,
+		progressYear: document.getElementById('progressYear').value
+	};
+	
+	// Ajax/vanilla JS insert request
+	var req = new XMLHttpRequest();
+	req.open("POST", '/progress', true);
+	req.setRequestHeader('Content-Type', 'application/json');
+	req.send(JSON.stringify(displayQuery));
+}
+
+// Create an account
 function createAccount() {	
 	var isErr = false;
 
@@ -115,7 +129,6 @@ function createAccount() {
 		event.preventDefault();
 	}
 }
-
 
 // Increments or decrements the hour
 function modifyHour(sign) {

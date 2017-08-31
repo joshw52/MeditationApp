@@ -47,6 +47,12 @@ a:hover {
 	transition: all .3s ease-in-out;
 }
 
+select {
+	color: #000000;
+	padding: 5px;
+	font-size: 20px;
+}
+
 /* Home page */
 
 #homePage {
@@ -78,7 +84,7 @@ a:hover {
 
 button {
 	font-family: "Muli", Verdana;
-	font-size: 26px;
+	font-size: 20px;
 	background-color: #A8A6A8;
 	color: #000000;
 	border: 0px;
@@ -216,9 +222,9 @@ table {
 	padding: 5px;
 }
 
-#accountCreate input[type="submit"], #loginTable input[type="submit"] {
+input[type="submit"], #loginSite {
 	font-family: "Muli", Verdana;
-	font-size: 26px;
+	font-size: 20px;
 	background-color: #B9B7B9;
 	color: #000000;
 	border: 0px;
@@ -227,7 +233,7 @@ table {
 	padding: 10px 15px 10px 15px;
 }
 
-#accountCreate input[type="submit"]:hover, #loginTable input[type="submit"]:hover {
+input[type="submit"]:hover, #loginSite:hover {
 	background-color: #CAC8CA;
 	color: #000000;
 	transition: all .3s ease-in-out;

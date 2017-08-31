@@ -33,11 +33,73 @@ app.get('/home', function(req, res) {
 		res.render('login', { lerr: false });
 });
 
+function getDates(user, month, year, callback) {
+	var monthYear = String(year) + "-";
+	if (month < 10) monthYear += "0";
+	monthYear += String(Number(month)+1);
+
+	mongo.connect(url, function(err, db) {
+		db.collection('meditationrecord').find({
+			username: {
+				$eq: user
+			},
+			date: new RegExp(monthYear)
+		}).toArray(function(err, docs) {
+			printCalendar(month, year, docs);
+			db.close();
+		});
+	});
+}
+
+function printCalendar(month, year, dates) {
+	var cal = "<table style='border: 1px solid white;'><thead><tr><th>Sunday</th><th>Monday</th><th>Tuesday</th><th>Wednesday</th><th>Thursday</th><th>Friday</th><th>Saturday</th></tr>";
+
+	// Get the number of days in the month
+	var numDays = new Date(year, month, 0);
+	var firstDay = new Date(year, month-1);
+	var start = 0 - firstDay.getDay();
+	var end = numDays.getDate() + (7 - numDays.getDay());
+
+	var count = 0;
+	for (var d = start+1; d < end; d++) {
+		if (count === 0) cal += "<tr>";
+		cal += "<td>";
+
+		if (d > 0 && d <= numDays.getDate())
+			cal += String(d) + "<br>";
+
+		for (logs in dates) {
+			var loggedDay = String(dates[logs].date).split("-")[2];
+			if (Number(loggedDay) === d) {
+				cal += "Time: " + String(dates[logs].time) + " seconds  |  ";
+				cal += "Record<br>";
+			}
+		}
+
+		cal += "</td>";
+
+		count++;
+		if (count > 6) {
+			count = 0;
+			cal += "</tr>";
+		}
+	}
+
+	return cal;
+}
+
 app.get('/progress', function(req, res) {
 	if (req.session.user)
-		res.render('progress');
+		res.render('progress', { progCal: "" });
 	else
 		res.render('login', { lerr: false });
+});
+
+app.post('/progress', function(req, res) {	
+	getDates(req.session.user, req.body.progressMonth, req.body.progressYear, function(err, dates) {
+		console.log(dates);
+		res.render('progress', { progCal: dates });
+	});	
 });
 
 app.get('/logout', function(req, res) {
@@ -123,7 +185,7 @@ app.get('/', function(req, res) {
 	res.render('login', { lerr: false });
 });
 
-app.post('/', function(req, res) {	
+app.post('/', function(req, res) {
 	mongo.connect(url, function(err, db) {
 		// Look for username
 		db.collection('users').findOne({
