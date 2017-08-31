@@ -45,7 +45,8 @@ function getDates(user, month, year, callback) {
 			},
 			date: new RegExp(monthYear)
 		}).toArray(function(err, docs) {
-			printCalendar(month, year, docs);
+			var dates = printCalendar(month, year, docs);
+			callback(dates);
 			db.close();
 		});
 	});
@@ -96,8 +97,7 @@ app.get('/progress', function(req, res) {
 });
 
 app.post('/progress', function(req, res) {	
-	getDates(req.session.user, req.body.progressMonth, req.body.progressYear, function(err, dates) {
-		console.log(dates);
+	getDates(req.session.user, req.body.progressMonth, req.body.progressYear, function(dates) {
 		res.render('progress', { progCal: dates });
 	});	
 });
