@@ -42,10 +42,15 @@
 		<input type='submit' value='Check Progress'>
 	</form>
 
-	<%- progCal %>
+	<div id='progDiv'>
+		<%- progCal %>
+	</div>
+
+	<br><br><br>
  
 <script src='https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js'></script>
 <script src='/meditation.js'></script>
+<script src='https://use.fontawesome.com/c25bf22fda.js'></script>
 <script>
 	var d = new Date();
 	document.getElementById('progressMonth').value = d.getMonth();

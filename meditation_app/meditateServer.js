@@ -53,7 +53,7 @@ function getDates(user, month, year, callback) {
 }
 
 function printCalendar(month, year, dates) {
-	var cal = "<table style='border: 1px solid white;'><thead><tr><th>Sunday</th><th>Monday</th><th>Tuesday</th><th>Wednesday</th><th>Thursday</th><th>Friday</th><th>Saturday</th></tr>";
+	var cal = "<table id='progressCalendar'><thead><tr><th>Sun</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th></tr>";
 
 	// Get the number of days in the month
 	var numDays = new Date(year, month, 0);
@@ -67,17 +67,16 @@ function printCalendar(month, year, dates) {
 		cal += "<td>";
 
 		if (d > 0 && d <= numDays.getDate())
-			cal += String(d) + "<br>";
+			cal += "<div id='monthDay'>" + String(d) + "</div><br><div id='dayRecord'>";
 
 		for (logs in dates) {
 			var loggedDay = String(dates[logs].date).split("-")[2];
 			if (Number(loggedDay) === d) {
-				cal += "Time: " + String(dates[logs].time) + " seconds  |  ";
-				cal += "Record<br>";
+				cal += "<div id='logResult'>" + String(dates[logs].time) + " &nbsp<a href=''><i class='fa fa-book' aria-hidden='true'></i></a></div><br>";
 			}
 		}
 
-		cal += "</td>";
+		cal += "</div></td>";
 
 		count++;
 		if (count > 6) {

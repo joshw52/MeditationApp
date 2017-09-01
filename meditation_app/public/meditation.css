@@ -202,8 +202,55 @@ table {
 	transition: all .3s ease-in-out;
 }
 
-/* Account Creation Page */
+/* Progress */
 
+#progressCalendar {
+	border: 2px solid #CCCCCC;
+	border-collapse: separate;
+	border-spacing: 0px;
+	font-size: 16px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#progressCalendar th, #progressCalendar td {
+	border: 2px solid #CCCCCC;
+	text-align: center;
+	width: 125px;
+}
+
+#progressCalendar th {
+	background-color: rgba(0, 0, 0, 0.6);
+	color: #FFFFFF;
+	height: 50px;
+	font-size: 20px;
+}
+
+#progressCalendar td {
+	background-color: rgba(0, 0, 0, 0.3);
+	position: relative;
+	height: 75px;
+}
+
+#monthDay {
+	background-color: rgba(0, 0, 0, 0.4);
+	width: 100%;
+	padding: 5px;
+	text-align: right;
+	position: absolute;
+	top: 0;
+}
+
+#dayRecord {
+	text-align: left;
+}
+
+#logResult {
+	padding: 10px;
+	margin: 10px;
+}
+
+/* Account Creation Page */
 #accountCreate, #loginTable {
 	margin-left: auto;
 	margin-right: auto;

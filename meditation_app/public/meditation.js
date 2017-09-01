@@ -1,5 +1,5 @@
 var timerOn = null;	// Indicates if timer is running or not
-var secondsMeditated = -1;
+var timeMeditated = -1;
 var incrementFraction = -1;
 var currentBrightness = 0;
 var gong = new Audio('https://soundbible.com/grab.php?id=1815&type=mp3');
@@ -16,7 +16,6 @@ function loginMeditation() {
 	req.open("POST", '/', true);
 	req.setRequestHeader('Content-Type', 'application/json');
 	req.send(JSON.stringify(loginQuery));
-	event.preventDefault();
 }
 
 // Send the meditation time and journal entry to the server
@@ -31,7 +30,6 @@ function sendMeditateTimeJournal() {
 	req.open("POST", '/timer', true);
 	req.setRequestHeader('Content-Type', 'application/json');
 	req.send(JSON.stringify(insertQuery));
-	event.preventDefault();
 
 	document.getElementById('meditationEntry').reset();
 }
@@ -223,11 +221,11 @@ function endTimer() {
 	gong.play();
 	
 	// Put the time meditated into the form field
-	document.getElementById('meditationTime').value = secondsMeditated;
+	document.getElementById('meditationTime').value = timeMeditated;
 	
 	// Stop timer
 	stopTimer();
-	secondsMeditated = -1;
+	timeMeditated = -1;
 	incrementFraction = -1;
 	currentBrightness = 0;
 
@@ -248,11 +246,9 @@ function endTimer() {
 // Start the timer
 function startTimer() {
 	// Log the total time the user is supposed to meditate in seconds
-	if (secondsMeditated === -1 && incrementFraction === -1) {
-		secondsMeditated = Number(document.getElementById("adjustHr").innerHTML) * 60 * 60 
-						 + Number(document.getElementById("adjustMin").innerHTML) * 60 
-						 + Number(document.getElementById("adjustSec").innerHTML);
-		incrementFraction = 100 / secondsMeditated;
+	if (timeMeditated === -1 && incrementFraction === -1) {
+		timeMeditated = String(document.getElementById("adjustHr").innerHTML) + ":" + String(document.getElementById("adjustMin").innerHTML) + ":" + String(document.getElementById("adjustSec").innerHTML);
+		incrementFraction = 100 / (Number(document.getElementById("adjustHr").innerHTML)*60*60 + Number(document.getElementById("adjustMin").innerHTML)*60 + Number(document.getElementById("adjustSec").innerHTML));
 	}
 	
 	// Only start if the timer is not on & there are not values waiting to be modified
@@ -264,7 +260,7 @@ function startTimer() {
 			var hrs = document.getElementById("adjustHr").innerHTML;
 			var min = document.getElementById("adjustMin").innerHTML;
 			var sec = document.getElementById("adjustSec").innerHTML;
-			
+
 			// If the timer is up
 			if (hrs === "0" && min === "0" && sec === "00") {
 				endTimer();
@@ -316,7 +312,7 @@ function stopTimer() {
 // Reset the timer
 function resetTimer() {
 	stopTimer();
-	secondsMeditated = -1;
+	timeMeditated = -1;
 	incrementFraction = -1;
 	currentBrightness = 0;
 	document.getElementById("adjustHr").innerHTML = "0";
