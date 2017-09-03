@@ -10,17 +10,10 @@
 	<h1>Create an Account</h1>
   	<br><br>
 	<table id='accountCreate'>
-		<form action='/account' method='POST' id='accountCreation' onsubmit='createAccount();'>
+		<form action='/account' method='POST' id='accountCreation' onsubmit='return createAccount();'>
 				<tr><td>First Name</td><td><input type='text' name='firstname' id='firstname'></td><td><div id='fnameErr'></div></td></tr>
 				<tr><td>Last Name</td><td><input type='text' name='lastname' id='lastname'></td><td><div id='lnameErr'></div></td></tr>
-				<tr><td>Username</td><td><input type='text' name='username' id='username'></td>
-					<td>
-						<% if (unerr) { %>
-							<div><span style='color: #FF5555;'>Username is taken!</span></div>
-						<% } else { %>
-							<div id='unameErr'></div>
-						<% } %>
-					</td></tr>
+				<tr><td>Username</td><td><input type='text' name='username' id='username'></td><td><div id='unameErr'></div></td></tr>
 				<tr><td>Password</td><td><input type='password' name='password' id='password'></td><td><div id='passErr'></div></td></tr>
 				<tr><td>Confirm Password</td><td><input type='password' name='confirmPass' id='confirmPass'></td><td><div id='cpassErr'></div></td></tr>
 				<tr><td>Zip Code</td><td><input type='text' name='zipcode' id='zipcode'></td><td><div id='zipErr'></div></td></tr>
@@ -29,6 +22,7 @@
 	</table>
   
 <script src='https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js'></script>
+<script src="/socket.io/socket.io.js"></script>
 <script src='/meditation.js'></script>
 </body>
 </html>

@@ -5,6 +5,10 @@ var mongo = require('mongodb').MongoClient;
 var session = require('client-sessions');
 
 var app = express();
+/* https://www.npmjs.com/package/socket.io */
+var server = require('http').createServer(app);
+var io = require('socket.io')(server);
+
 var port = 8080;
 var db = 'meditation';
 var url = 'mongodb://localhost:27017/' + db;
@@ -106,9 +110,7 @@ app.get('/logout', function(req, res) {
 	res.render('login', { lerr: false });
 });
 
-app.get('/account', function(req, res) {
-	res.render('account', { unerr: false });
-});
+/* Timer code */
 
 app.get('/timer', function(req, res) {
 	if (req.session.user)
@@ -145,73 +147,97 @@ app.post('/timer', function(req, res) {
 	res.redirect('/home');
 });
 
-app.post('/account', function(req, res) {
-	
-	// Make sure username isn't taken
-	mongo.connect(url, function(err, db) {
-		
-		db.collection('users').findOne({
-			username: req.body.username
-		}, function(err, item) {
-			if (item === null) {
-				console.log("Item not found\n");
+/* Set up the account */
 
-				var user = {
-					firstname: req.body.firstname,
-					lastname: req.body.lastname,
-					username: req.body.username,
-					password: req.body.password,
-					zipcode: req.body.zipcode
-				}
+io.on('connection', function(sock) {
+	console.log('Client connected...');
 	
-				mongo.connect(url, function(err, db) {
-					db.collection('users').insert(user, function(err, docs) {
-						db.close();
-					});
-				});
+	sock.on('unameCheck', function(uname) {		
+		mongo.connect(url, function(err, db) {
+			db.collection('users').findOne({
+				username: uname.username
+			}, function(err, item) {
+				if (item === null) {
+					console.log("Username available\n");
+					sock.emit('unameCheckResponse', { unameFree: true });
+				} else {
+					console.log("Username not available\n");
+					sock.emit('unameCheckResponse', { unameFree: false });
+				}		
+				db.close();
+			});
+		});
+	});
+	
+	sock.on('loginCheck', function(login) {
+		console.log(login);
+		
+		mongo.connect(url, function(err, db) {
+		
+		
+			// Look for username
+			db.collection('users').findOne({
+				username: login.loginUname,
+			}, function(err, item) {
+				console.log(item);
 				
-				res.render('login', { lerr: false });
-			} else {
-				console.log("Item found\n");
-				res.render('account', { unerr: true });
-			}		
+				// If the username is not found or the login password doesn't match the user's password
+				if (!item) {
+					console.log("The username is not valid\n");
+					sock.emit('loginCheckResponse', { loginAccepted: false });
+				} else {
+					if (login.loginPword !== item.password) {
+						console.log("The password is not correct\n");
+						sock.emit('loginCheckResponse', { loginAccepted: false });
+					} else {
+						console.log("The entry is correct!\n");
+						sock.emit('loginCheckResponse', { loginAccepted: true });
+					}
+				}
+				db.close();
+			});
+		
+		
+		});
+	});
+});
+
+app.get('/account', function(req, res) {
+	res.render('account');
+});
+
+app.post('/account', function(req, res) {
+	console.log("User added\n");
+
+	var user = {
+		firstname: req.body.firstname,
+		lastname: req.body.lastname,
+		username: req.body.username,
+		password: req.body.password,
+		zipcode: req.body.zipcode
+	}
+
+	mongo.connect(url, function(err, db) {
+		db.collection('users').insert(user, function(err, docs) {
 			db.close();
 		});
 	});
+	
+	res.render('login', { lerr: false });
 })
+
+/* Log in */
 
 app.get('/', function(req, res) {
 	res.render('login', { lerr: false });
 });
 
 app.post('/', function(req, res) {
-	mongo.connect(url, function(err, db) {
-		// Look for username
-		db.collection('users').findOne({
-			username: req.body.loginUname,
-		}, function(err, item) {
-			if (err) {
-				console.log("Error");
-				return res.send({lerr: false});
-			}
-
-			// If the username is not found or the login password doesn't match the user's password
-			if (!item) {
-				console.log("The username is not valid\n");
-				res.render('login', { lerr: true });
-			} else {
-				if (req.body.loginPword !== item.password) {
-					console.log("The password is not correct\n");
-					res.render('login', { lerr: true });
-				} else {
-					console.log("The entry is correct!\n");
-					req.session.user = req.body.loginUname;
-					res.redirect('/home');
-				}
-			}
-			db.close();
-		});
-	});
+	req.session.user = req.body.loginUname;
+	res.redirect('/home');
 });
 
-app.listen(8080);
+// Listen for an incoming connection
+server.listen(8080, function() {
+	console.log("Server is listening...\n");
+});

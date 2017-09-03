@@ -5,17 +5,36 @@ var currentBrightness = 0;
 var gong = new Audio('https://soundbible.com/grab.php?id=1815&type=mp3');
 
 // Log in
-function loginMeditation() {
-	var loginQuery = {
+function loginMeditation(event) {
+	var socket = io();
+
+	socket.emit('loginCheck', {
 		loginUname: document.getElementById('loginUname').value,
 		loginPword: document.getElementById('loginPword').value
-	};
+	});
+	
+	socket.on('loginCheckResponse', function(response) {
+		console.log("Login accepted: " + response.loginAccepted);
+
+		if (response.loginAccepted === true) {		
+			var loginQuery = {
+				loginUname: document.getElementById('loginUname').value,
+				loginPword: document.getElementById('loginPword').value
+			};
+
+			// Ajax/vanilla JS insert request
+			var req = new XMLHttpRequest();
+			req.open("POST", '/', true);
+			req.setRequestHeader('Content-Type', 'application/json');
+			req.send(JSON.stringify(loginQuery));
 			
-	// Ajax/vanilla JS insert request
-	var req = new XMLHttpRequest();
-	req.open("POST", '/', true);
-	req.setRequestHeader('Content-Type', 'application/json');
-	req.send(JSON.stringify(loginQuery));
+			document.getElementById('loginForm').submit();
+		} else {
+			document.getElementById('loginErr').innerHTML = "<span style='color: #FF5555;'>Username/password credentials are incorrect!</span>";
+		}
+	});
+	
+	event.preventDefault();
 }
 
 // Send the meditation time and journal entry to the server
@@ -107,25 +126,39 @@ function createAccount() {
 	}
 
 	if (isErr === true) {
-		event.preventDefault();
+		return false;
 	}
 	else {		
-		var accountQuery = {
-			firstname: document.getElementById('firstname').value,
-			lastname: document.getElementById('lastname').value,
-			username: document.getElementById('username').value,
-			password: document.getElementById('password').value,
-			cpassword: document.getElementById('confirmPass').value,
-			zipcode: document.getElementById('zipcode').value
-		}
+		var socket = io();
 
-		// Ajax/vanilla JS insert request
-		var req = new XMLHttpRequest();
-		req.open("POST", '/account', true);
-		req.setRequestHeader('Content-Type', 'application/json');
-		req.send(JSON.stringify(accountQuery));
-		event.preventDefault();
-	}
+		socket.emit('unameCheck', {
+			username: document.getElementById('username').value
+		});
+		
+		socket.on('unameCheckResponse', function(response) {			
+			if (response.unameFree === true) {
+				var accountQuery = {
+					firstname: document.getElementById('firstname').value,
+					lastname: document.getElementById('lastname').value,
+					username: document.getElementById('username').value,
+					password: document.getElementById('password').value,
+					cpassword: document.getElementById('confirmPass').value,
+					zipcode: document.getElementById('zipcode').value
+				}
+
+				// Ajax/vanilla JS insert request
+				var req = new XMLHttpRequest();
+				req.open("POST", '/account', true);
+				req.setRequestHeader('Content-Type', 'application/json');
+				req.send(JSON.stringify(accountQuery));
+		
+				return true;
+			} else {
+				document.getElementById('unameErr').innerHTML = "<span style='color: #FF5555;'>Username is taken!</span>";
+				return false;
+			}
+		});
+	};
 }
 
 // Increments or decrements the hour
