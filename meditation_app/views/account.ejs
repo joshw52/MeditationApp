@@ -10,7 +10,7 @@
 	<h1>Create an Account</h1>
   	<br><br>
 	<table id='accountCreate'>
-		<form action='/account' method='POST' id='accountCreation' onsubmit='return createAccount();'>
+		<form action='/account' method='POST' id='accountCreation' onsubmit='createAccount(event); return false;'>
 				<tr><td>First Name</td><td><input type='text' name='firstname' id='firstname'></td><td><div id='fnameErr'></div></td></tr>
 				<tr><td>Last Name</td><td><input type='text' name='lastname' id='lastname'></td><td><div id='lnameErr'></div></td></tr>
 				<tr><td>Username</td><td><input type='text' name='username' id='username'></td><td><div id='unameErr'></div></td></tr>

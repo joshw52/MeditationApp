@@ -91,11 +91,13 @@ button {
 	border-radius: 5px;
 	margin: 35px 20px 35px 20px;
 	padding: 10px 15px 10px 15px;
+	opacity: 0.7;
 }
 
 button:hover {
 	background-color: #CAC8CA;
 	color: #000000;
+	opacity: 0.8;
 	transition: all .3s ease-in-out;
 }
 
@@ -110,6 +112,7 @@ table {
 	border-left: 50px solid transparent;
 	border-right: 50px solid transparent;
 	border-bottom: 36px solid #A8A6A8;
+	opacity: 0.7;
 }
 
 #hrdown, #mindown, #secdown {
@@ -118,6 +121,7 @@ table {
 	border-left: 50px solid transparent;
 	border-right: 50px solid transparent;
 	border-top: 36px solid #A8A6A8;
+	opacity: 0.7;
 }
 
 #hrup:hover, #secup:hover, #minup:hover {
@@ -127,6 +131,7 @@ table {
 	border-left: 50px solid transparent;
 	border-right: 50px solid transparent;
 	border-bottom: 36px solid #CAC8CA;
+	opacity: 0.8;
 	transition: all .3s ease-in-out;
 }
 
@@ -136,6 +141,7 @@ table {
 	border-left: 50px solid transparent;
 	border-right: 50px solid transparent;
 	border-top: 36px solid #CAC8CA;
+	opacity: 0.8;
 	transition: all .3s ease-in-out;
 }
 
@@ -154,7 +160,7 @@ table {
 #buddhaFill {
     background-color: #000000;
 	color: #FFFFFF;
-	border: 8px solid #A8A6A8;
+	box-shadow: 0px 0px 2px 2px #000000;
 	width: 400px;
 	height: 400px;
 	border-radius: 400px;
@@ -174,13 +180,12 @@ table {
 	margin-top: 120px;
 }
 
-#journalEntry {
+#journalEntry, #jentryMod {
 	height: 500px;
 	width: 500px;
 	background-color: #000000;
 	color: #A8A6A8;
-	border: 5px solid #A8A6A8;
-	border-radius: 5px;
+	border: 0px;
 	font-size: 20px;
 	padding: 15px;
 }
@@ -194,12 +199,14 @@ table {
 	border-radius: 5px;
 	margin: 35px 20px 35px 20px;
 	padding: 10px 15px 10px 15px;	
+	opacity: 0.7;
 }
 
 #logJournal:hover {
 	background-color: #CAC8CA;
 	color: #000000;
 	transition: all .3s ease-in-out;
+	opacity: 0.8;
 }
 
 /* Progress */
@@ -246,9 +253,21 @@ table {
 }
 
 #logResult {
-	padding: 10px;
 	margin: 10px;
 }
+
+.journalMods {
+	display: inline;
+}
+
+#editJournal, #deleteJournal {
+	background: none;
+	border: 0;
+	color: #FFFFFF;
+	margin: 0px;
+	padding: 0px;
+}
+
 
 /* Account Creation Page */
 #accountCreate, #loginTable {
@@ -262,14 +281,18 @@ table {
 	padding: 5px;
 }
 
-#accountCreate input, #loginTable input {
+input[type="text"], input[type="password"] {
 	background-color: #000000;
 	color: #CAC8CA;
 	border-radius: 5px;
 	padding: 5px;
 }
 
-input[type="submit"], #loginSite {
+input {
+	border: 0px;
+}
+
+input[type="submit"], #loginSite, #makeAccount {
 	font-family: "Muli", Verdana;
 	font-size: 20px;
 	background-color: #B9B7B9;
@@ -278,10 +301,13 @@ input[type="submit"], #loginSite {
 	border-radius: 5px;
 	margin: 5px;
 	padding: 10px 15px 10px 15px;
+	opacity: 0.7;
 }
 
-input[type="submit"]:hover, #loginSite:hover {
+input[type="submit"]:hover, #loginSite:hover, #makeAccount:hover {
 	background-color: #CAC8CA;
 	color: #000000;
 	transition: all .3s ease-in-out;
+	opacity: 0.8;
 }
+

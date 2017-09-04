@@ -1,39 +1,47 @@
 var timerOn = null;	// Indicates if timer is running or not
-var timeMeditated = -1;
-var incrementFraction = -1;
-var currentBrightness = 0;
-var gong = new Audio('https://soundbible.com/grab.php?id=1815&type=mp3');
+var timeMeditated = -1;	// Hold the time meditated
+var incrementFraction = -1;	// The fraction that the image will be revealed in per second while the timer runs
+var currentBrightness = 0;	// The current brightness of the namaste image
+var gong = new Audio('https://soundbible.com/grab.php?id=1815&type=mp3');	// The gong sound to be played at the beginning and end
 
 // Log in
 function loginMeditation(event) {
+	// Create a socket
 	var socket = io();
 
+	// Send the username/password to the server
 	socket.emit('loginCheck', {
 		loginUname: document.getElementById('loginUname').value,
 		loginPword: document.getElementById('loginPword').value
 	});
 	
+	// check if the server approved of the username/password combo
 	socket.on('loginCheckResponse', function(response) {
 		console.log("Login accepted: " + response.loginAccepted);
 
+		// If the login was accepted, login to the site
 		if (response.loginAccepted === true) {		
 			var loginQuery = {
 				loginUname: document.getElementById('loginUname').value,
 				loginPword: document.getElementById('loginPword').value
 			};
 
-			// Ajax/vanilla JS insert request
+			// Send a POST request to the server
 			var req = new XMLHttpRequest();
 			req.open("POST", '/', true);
 			req.setRequestHeader('Content-Type', 'application/json');
 			req.send(JSON.stringify(loginQuery));
 			
+			// Now the form can be submitted
 			document.getElementById('loginForm').submit();
-		} else {
+		}
+		// If the login was not accepted, display an error
+		else {
 			document.getElementById('loginErr').innerHTML = "<span style='color: #FF5555;'>Username/password credentials are incorrect!</span>";
 		}
 	});
 	
+	// The form will not submit unless the login was accepted
 	event.preventDefault();
 }
 
@@ -43,23 +51,25 @@ function sendMeditateTimeJournal() {
 		meditationTime: document.getElementById('meditationTime').value,
 		journalEntry: document.getElementById('journalEntry').value
 	};
+	
+	console.log(insertQuery);
 			
-	// Ajax/vanilla JS insert request
+	// Send a POST request with the time and journal entry
 	var req = new XMLHttpRequest();
 	req.open("POST", '/timer', true);
 	req.setRequestHeader('Content-Type', 'application/json');
 	req.send(JSON.stringify(insertQuery));
-
-	document.getElementById('meditationEntry').reset();
 }
 
+// Will send the chosen month/year to the server to retrieve the
+// progress for that time period
 function displayProgress() {
 	var displayQuery = {
 		progressMonth: document.getElementById('progressMonth').value,
 		progressYear: document.getElementById('progressYear').value
 	};
 	
-	// Ajax/vanilla JS insert request
+	// POST request for month/year progress
 	var req = new XMLHttpRequest();
 	req.open("POST", '/progress', true);
 	req.setRequestHeader('Content-Type', 'application/json');
@@ -67,17 +77,18 @@ function displayProgress() {
 }
 
 // Create an account
-function createAccount() {	
-	var isErr = false;
+function createAccount(event) {	
+	var isErr = false;	// Indicates if there was an error in the form
 
-	// Validate first and last name
+	// Validate first name (can't be empty)
 	if (document.getElementById('firstname').value === "") {
 		document.getElementById('fnameErr').innerHTML = "<span style='color: #FF5555;'>First name is empty!</span>";
 		isErr = true;
 	} else {
 		document.getElementById('fnameErr').innerHTML = "";
 	}
-	
+
+	// Validate last name (can't be empty)	
 	if (document.getElementById('lastname').value === "") {
 		document.getElementById('lnameErr').innerHTML = "<span style='color: #FF5555;'>Last name is empty!</span>";
 		isErr = true;
@@ -85,6 +96,7 @@ function createAccount() {
 		document.getElementById('lnameErr').innerHTML = "";
 	}
 
+	// Validate username (can't be empty)
 	if (document.getElementById('username').value === "") {
 		document.getElementById('unameErr').innerHTML = "<span style='color: #FF5555;'>Username can NOT be empty!</span>";
 		isErr = true;
@@ -92,7 +104,7 @@ function createAccount() {
 		document.getElementById('unameErr').innerHTML = "";
 	}
 	
-	// Validate the passwords (make sure at least 8 characters and that they match)
+	// Validate the passwords (make sure at least 8 characters)
 	if (String(document.getElementById('password').value).length < 8) {
 		document.getElementById('passErr').innerHTML = "<span style='color: #FF5555;'>Password must be at least 8 characters long!</span>";
 		isErr = true;
@@ -114,7 +126,6 @@ function createAccount() {
 	} else if (String(document.getElementById('password').value).length > 7 && String(document.getElementById('confirmPass').value).length > 7) {
 		document.getElementById('passErr').innerHTML = "";
 		document.getElementById('cpassErr').innerHTML = "";
-	
 	}
 	
 	// Make sure zip code is 5 digits
@@ -125,17 +136,24 @@ function createAccount() {
 		document.getElementById('zipErr').innerHTML = "";
 	}
 
+	// The form wil not submit if there were errors
 	if (isErr === true) {
 		return false;
 	}
+	// Check if the username was chosen already first, and if not,
+	// then submit the account form
 	else {		
+		// Create a socket
 		var socket = io();
 
+		// Send the username to the server to see if it's been chosen
 		socket.emit('unameCheck', {
 			username: document.getElementById('username').value
 		});
 		
+		// The server will indicate if the username has already been picked
 		socket.on('unameCheckResponse', function(response) {			
+			// If the username has not already been picked
 			if (response.unameFree === true) {
 				var accountQuery = {
 					firstname: document.getElementById('firstname').value,
@@ -151,14 +169,19 @@ function createAccount() {
 				req.open("POST", '/account', true);
 				req.setRequestHeader('Content-Type', 'application/json');
 				req.send(JSON.stringify(accountQuery));
-		
-				return true;
-			} else {
+				
+				// Now the account form can be submitted
+				document.getElementById('accountCreation').submit();
+			}
+			// If the username is being used, display error
+			else {
 				document.getElementById('unameErr').innerHTML = "<span style='color: #FF5555;'>Username is taken!</span>";
-				return false;
 			}
 		});
 	};
+	
+	// Make sure the form doesn't submit
+	event.preventDefault();
 }
 
 // Increments or decrements the hour
