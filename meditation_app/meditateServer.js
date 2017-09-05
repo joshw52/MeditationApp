@@ -37,7 +37,7 @@ app.get('/home', function(req, res) {
 	if (req.session.user)
 		res.render('index');
 	else
-		res.render('login', { lerr: false });
+		res.render('login', { lerr: false, accountCreated: false });
 });
 
 // Get the records for a user for a month/year
@@ -67,7 +67,7 @@ function getDates(user, month, year, callback) {
 // showing the meditation time, a link to modify the journal entry,
 // and a button to delete the entry
 function printCalendar(month, year, dates) {
-	var cal = "<table id='progressCalendar'><thead><tr><th>Sun</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th></tr>";
+	var cal = "<table id='progressCalendar'><thead><tr><th>Sun</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th></tr><tbody>";
 
 	// Get the number of days in the month
 	var numDays = new Date(year, month, 0);
@@ -94,7 +94,7 @@ function printCalendar(month, year, dates) {
 				cal += "<input type='hidden' value='" + dates[logs]._id + "' name='jid'>";
 				cal += "<input type='hidden' value='" + dates[logs].entry + "' name='jentry'>";
 				cal += "<button type='submit' id='editJournal'><i class='fa fa-book' aria-hidden='true'></i></button></form>";
-				cal += "&nbsp<form method='POST' action='deleteJournalEntry' class='journalMods'>";
+				cal += "&nbsp<form method='POST' action='deleteJournalEntry' class='journalMods' onsubmit='return confirm(\"Confirm that you wish to delete this meditation entry\")'>";
 				cal += "<input type='hidden' value='" + dates[logs]._id + "' name='jdid'>";
 				cal += "<button type='submit' id='deleteJournal'><i class='fa fa-times-circle' aria-hidden='true'></i></button></form></div>";
 			}
@@ -108,6 +108,8 @@ function printCalendar(month, year, dates) {
 			cal += "</tr>";
 		}
 	}
+	
+	cal += "</tbody></table>";
 
 	// Return the constructed calendar
 	return cal;
@@ -119,7 +121,7 @@ app.get('/progress', function(req, res) {
 	if (req.session.user)
 		res.render('progress', { progCal: "" });
 	else
-		res.render('login', { lerr: false });
+		res.render('login', { lerr: false, accountCreated: false });
 });
 
 // Display the calendar of progress for a month/year
@@ -178,7 +180,7 @@ app.post('/deleteJournalEntry', function(req, res) {
 // Log out of the site
 app.get('/logout', function(req, res) {
 	req.session.reset();
-	res.render('login', { lerr: false });
+	res.render('login', { lerr: false, accountCreated: false });
 });
 
 /* Timer code */
@@ -188,7 +190,7 @@ app.get('/timer', function(req, res) {
 	if (req.session.user)
 		res.render('timer');
 	else
-		res.render('login', { lerr: false });
+		res.render('login', { lerr: false, accountCreated: false });
 });
 
 // Show the meditation timer
@@ -307,14 +309,14 @@ app.post('/account', function(req, res) {
 	});
 	
 	// Move to the login page
-	res.render('login', { lerr: false });
+	res.render('login', { lerr: false, accountCreated: true });
 })
 
 /* Log in */
 
 // Move to the login page
 app.get('/', function(req, res) {
-	res.render('login', { lerr: false });
+	res.render('login', { lerr: false, accountCreated: false });
 });
 
 // The logged in user will move to the home page

@@ -37,7 +37,7 @@ function loginMeditation(event) {
 		}
 		// If the login was not accepted, display an error
 		else {
-			document.getElementById('loginErr').innerHTML = "<span style='color: #FF5555;'>Username/password credentials are incorrect!</span>";
+			document.getElementById('loginErr').innerHTML = "<br><span style='color: #FF5555;'>Username/password credentials are incorrect!</span>";
 		}
 	});
 	
@@ -310,7 +310,10 @@ function startTimer() {
 	// Only start if the timer is not on & there are not values waiting to be modified
 	if (timerOn === null && document.getElementById("hrInput").style.display === "none" && document.getElementById("minInput").style.display === "none" && document.getElementById("secInput").style.display === "none") {
 		gong.play();
-					
+		
+		document.getElementById('buddhaFill').style.opacity = 0.85;
+		document.getElementById('buddhaFillImg').style.display = "initial";
+		
 		// Start the timer, counting down every second
 		timerOn = setInterval(function() {
 			var hrs = document.getElementById("adjustHr").innerHTML;
@@ -375,6 +378,8 @@ function resetTimer() {
 	document.getElementById("adjustMin").innerHTML = "10";
 	document.getElementById("adjustSec").innerHTML = "00";
 	document.getElementById('buddhaFillImg').style.filter = "invert(0%)";
+	document.getElementById('buddhaFill').style.opacity = 0.7;
+	document.getElementById('buddhaFillImg').style.display = "none";
 }
 
 function replaceHrVal(textId, inputId) {

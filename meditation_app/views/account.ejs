@@ -8,18 +8,18 @@
 <body>
 	<br><br>
 	<h1>Create an Account</h1>
-  	<br><br>
-	<table id='accountCreate'>
-		<form action='/account' method='POST' id='accountCreation' onsubmit='createAccount(event); return false;'>
-				<tr><td>First Name</td><td><input type='text' name='firstname' id='firstname'></td><td><div id='fnameErr'></div></td></tr>
-				<tr><td>Last Name</td><td><input type='text' name='lastname' id='lastname'></td><td><div id='lnameErr'></div></td></tr>
-				<tr><td>Username</td><td><input type='text' name='username' id='username'></td><td><div id='unameErr'></div></td></tr>
-				<tr><td>Password</td><td><input type='password' name='password' id='password'></td><td><div id='passErr'></div></td></tr>
-				<tr><td>Confirm Password</td><td><input type='password' name='confirmPass' id='confirmPass'></td><td><div id='cpassErr'></div></td></tr>
-				<tr><td>Zip Code</td><td><input type='text' name='zipcode' id='zipcode'></td><td><div id='zipErr'></div></td></tr>
-				<tr><td></td><td><input type='submit' id='makeAccount' value='Submit'></td></tr>
-		</form>
-	</table>
+  	<br>
+	<form action='/account' method='POST' id='accountCreation' onsubmit='createAccount(event); return false;'>
+		<table id='accountCreate'>
+				<tr><td><input type='text' name='firstname' id='firstname' placeholder='First Name'></td><td><div id='fnameErr'></div></td></tr>
+				<tr><td><input type='text' name='lastname' id='lastname' placeholder='Last Name'></td><td><div id='lnameErr'></div></td></tr>
+				<tr><td><input type='text' name='username' id='username' placeholder='Username'></td><td><div id='unameErr'></div></td></tr>
+				<tr><td><input type='password' name='password' id='password' placeholder='Password'></td><td><div id='passErr'></div></td></tr>
+				<tr><td><input type='password' name='confirmPass' id='confirmPass' placeholder='Confirm Password'></td><td><div id='cpassErr'></div></td></tr>
+				<tr><td><input type='text' name='zipcode' id='zipcode' placeholder='Zip Code'></td><td><div id='zipErr'></div></td></tr>
+				<tr><td style='text-align: center;'><input type='submit' id='makeAccount' value='Submit'></td></tr>
+		</table>
+	</form>
   
 <script src='https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js'></script>
 <script src="/socket.io/socket.io.js"></script>
