@@ -70,19 +70,41 @@ function printCalendar(month, year, dates) {
 	var cal = "<table id='progressCalendar'><thead><tr><th>Sun</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th></tr><tbody>";
 
 	// Get the number of days in the month
-	var numDays = new Date(year, month, 0);
-	var firstDay = new Date(year, month-1);
+	var numDays = 0;
+	switch (Number(month)) {
+		case 0:
+		case 2:
+		case 4:
+		case 6:
+		case 7:
+		case 9:
+		case 11:
+			numDays = 31;
+			break;
+		case 3:
+		case 5:
+		case 8:
+		case 10:
+			numDays = 30;
+			break;
+		case 1:
+			numDays = 28;
+			if (((Number(year) % 4 === 0) && (Number(year) % 100 !== 0)) || (Number(year) % 400 === 0)) numDays++;
+	}
+	
+	var firstDay = new Date(year, month);
 	var start = 0 - firstDay.getDay();
-	var end = numDays.getDate() + (7 - numDays.getDay());
-
+	var end = numDays;// + (7 - Math.abs(start));
+	while ((end + Math.abs(start)) % 7 !== 0) end++;
+	
 	// For each day of the month, if there's an entry, put it in
 	var count = 0;
-	for (var d = start+1; d < end; d++) {
+	for (var d = start+1; d <= end; d++) {
 		if (count === 0) cal += "<tr>";
 		cal += "<td>";
 
 		// Put the day of the month in 
-		if (d > 0 && d <= numDays.getDate())
+		if (d > 0 && d <= numDays)
 			cal += "<div id='monthDay'>" + String(d) + "</div><br><div id='dayRecord'>";
 
 		// Put the meditation entries in
@@ -91,6 +113,7 @@ function printCalendar(month, year, dates) {
 			if (Number(loggedDay) === d) {
 				cal += "<div id='logResult'>" + String(dates[logs].time);
 				cal += "&nbsp<form method='POST' action='journal' class='journalMods'>";
+				cal += "<input type='hidden' value='" + dates[logs].date + "' name='jdate'>";
 				cal += "<input type='hidden' value='" + dates[logs]._id + "' name='jid'>";
 				cal += "<input type='hidden' value='" + dates[logs].entry + "' name='jentry'>";
 				cal += "<button type='submit' id='editJournal'><i class='fa fa-book' aria-hidden='true'></i></button></form>";
@@ -135,7 +158,8 @@ app.post('/progress', function(req, res) {
 app.post('/journal', function(req, res) {
 	res.render('journal', {
 		jid: req.body.jid,
-		jentry: req.body.jentry
+		jentry: req.body.jentry,
+		jdate: req.body.jdate
 	});
 });
 

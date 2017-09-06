@@ -51,9 +51,7 @@ function sendMeditateTimeJournal() {
 		meditationTime: document.getElementById('meditationTime').value,
 		journalEntry: document.getElementById('journalEntry').value
 	};
-	
-	console.log(insertQuery);
-			
+				
 	// Send a POST request with the time and journal entry
 	var req = new XMLHttpRequest();
 	req.open("POST", '/timer', true);
