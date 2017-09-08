@@ -19,9 +19,9 @@
 	<div id='meditationTimer'>
 		<table id='timerAdjust'>
 			<tr><td><div id='hrup' onclick='modifyHour(1)'></div></td><td></td><td><div id='minup' onclick='modifyMinute(1)'></div></td><td></td><td><div id='secup' onclick='modifySecond(1)'></div></td></tr>
-			<tr><td><div id='adjustHr' onclick='changeTimeVal("adjustHr", "hrInput")'>0</div><input id='hrInput' value='' style='display: none;'></td><td id='colonspacer'>:</td>
-				<td><div id='adjustMin' onclick='changeTimeVal("adjustMin", "minInput")'>10</div><input id='minInput' value='' style='display: none;'></td><td id='colonspacer'>:</td>
-				<td><div id='adjustSec' onclick='changeTimeVal("adjustSec", "secInput")'>00</div><input id='secInput' value='' style='display: none;'></td>
+			<tr><td><div id='adjustHr' onclick='changeTimeVal("adjustHr", "hrInput")'><%- defaultHours %></div><input id='hrInput' value='' style='display: none;'></td><td id='colonspacer'>:</td>
+				<td><div id='adjustMin' onclick='changeTimeVal("adjustMin", "minInput")'><%- defaultMinutes %></div><input id='minInput' value='' style='display: none;'></td><td id='colonspacer'>:</td>
+				<td><div id='adjustSec' onclick='changeTimeVal("adjustSec", "secInput")'><%- defaultSeconds %></div><input id='secInput' value='' style='display: none;'></td>
 			</tr>
 			<tr><td><div id='hrdown' onclick='modifyHour(-1)'></div></td><td></td><td><div id='mindown' onclick='modifyMinute(-1)'></div></td><td></td><td><div id='secdown' onclick='modifySecond(-1)'></div></td></tr>
 		</table>
@@ -31,6 +31,9 @@
 			<button id='stop' onclick='stopTimer()'>Stop</button>
 			<button id='reset' onclick='resetTimer()'>Reset</button>
 		</div>
+
+		<button id='defaultTime' onclick='setDefaultTime()'>Set Default Time</button>
+
 		<br>
 		<div id='buddhaFill'>
 			<img id='buddhaFillImg' src='http://www.vagabondtemple.com/wp-content/uploads/2016/07/mantra-om-1292602.png'>
@@ -38,7 +41,7 @@
 	</div>
 	
 	<div id='meditationJournal' style='display: none;'>
-		<form action='/timer' method='POST' id='meditationEntry' onsubmit='sendMeditateTimeJournal();'>
+		<form action='/timer' method='POST' id='meditationEntry'>
 			<h3>Log your meditation</h3><br>
 			<input type='hidden' id='meditationTime' value='' name='meditationTime'>
 			<textarea id='journalEntry' name='journalEntry'></textarea><br>
@@ -47,6 +50,9 @@
 	</div>
   
 <script src='https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js'></script>
+<script src="/socket.io/socket.io.js"></script>
 <script src='/meditation.js'></script>
+<script>
+</script>
 </body>
 </html>

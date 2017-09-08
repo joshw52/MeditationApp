@@ -17,21 +17,8 @@ function loginMeditation(event) {
 	
 	// check if the server approved of the username/password combo
 	socket.on('loginCheckResponse', function(response) {
-		console.log("Login accepted: " + response.loginAccepted);
-
 		// If the login was accepted, login to the site
-		if (response.loginAccepted === true) {		
-			var loginQuery = {
-				loginUname: document.getElementById('loginUname').value,
-				loginPword: document.getElementById('loginPword').value
-			};
-
-			// Send a POST request to the server
-			var req = new XMLHttpRequest();
-			req.open("POST", '/', true);
-			req.setRequestHeader('Content-Type', 'application/json');
-			req.send(JSON.stringify(loginQuery));
-			
+		if (response.loginAccepted === true) {
 			// Now the form can be submitted
 			document.getElementById('loginForm').submit();
 		}
@@ -45,33 +32,31 @@ function loginMeditation(event) {
 	event.preventDefault();
 }
 
-// Send the meditation time and journal entry to the server
-function sendMeditateTimeJournal() {
-	var insertQuery = {
-		meditationTime: document.getElementById('meditationTime').value,
-		journalEntry: document.getElementById('journalEntry').value
-	};
-				
-	// Send a POST request with the time and journal entry
-	var req = new XMLHttpRequest();
-	req.open("POST", '/timer', true);
-	req.setRequestHeader('Content-Type', 'application/json');
-	req.send(JSON.stringify(insertQuery));
+function setDefaultTime() {
+	// Create a socket
+	var socket = io();
+
+	// Send the username/password to the server
+	socket.emit('setDefaultTime', {
+		defaultHours: document.getElementById('adjustHr').innerHTML,
+		defaultMinutes: document.getElementById('adjustMin').innerHTML,
+		defaultSeconds: document.getElementById('adjustSec').innerHTML		
+	});
 }
 
 // Will send the chosen month/year to the server to retrieve the
 // progress for that time period
 function displayProgress() {
-	var displayQuery = {
+	var socket = io();
+	
+	socket.emit('requestMonthProgress', {
 		progressMonth: document.getElementById('progressMonth').value,
 		progressYear: document.getElementById('progressYear').value
-	};
+	});
 	
-	// POST request for month/year progress
-	var req = new XMLHttpRequest();
-	req.open("POST", '/progress', true);
-	req.setRequestHeader('Content-Type', 'application/json');
-	req.send(JSON.stringify(displayQuery));
+	socket.on('receiveMonthProgress', function(progress) {
+		document.getElementById('progDiv').innerHTML = progress.progDates;
+	});
 }
 
 // Create an account
@@ -153,21 +138,6 @@ function createAccount(event) {
 		socket.on('unameCheckResponse', function(response) {			
 			// If the username has not already been picked
 			if (response.unameFree === true) {
-				var accountQuery = {
-					firstname: document.getElementById('firstname').value,
-					lastname: document.getElementById('lastname').value,
-					username: document.getElementById('username').value,
-					password: document.getElementById('password').value,
-					cpassword: document.getElementById('confirmPass').value,
-					zipcode: document.getElementById('zipcode').value
-				}
-
-				// Ajax/vanilla JS insert request
-				var req = new XMLHttpRequest();
-				req.open("POST", '/account', true);
-				req.setRequestHeader('Content-Type', 'application/json');
-				req.send(JSON.stringify(accountQuery));
-				
 				// Now the account form can be submitted
 				document.getElementById('accountCreation').submit();
 			}

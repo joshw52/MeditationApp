@@ -13,6 +13,7 @@ body {
 	position: fixed;
 	top: 0;
 	width: 100%;
+	z-index: 100;
 }
 
 #menubar ul {
@@ -94,7 +95,7 @@ button {
 	color: #000000;
 	border: 0px;
 	border-radius: 5px;
-	margin: 35px 20px 35px 20px;
+	margin: 35px 20px 15px 20px;
 	padding: 10px 15px 10px 15px;
 	opacity: 0.7;
 }
@@ -104,6 +105,18 @@ button:hover {
 	color: #000000;
 	opacity: 0.8;
 	transition: all .3s ease-in-out;
+}
+
+#defaultTime {
+	background-color: #202020;
+	color: #A8A6A8;
+	margin: 20px 20px 35px 20px;
+}
+
+#defaultTime:hover {
+	background-color: #424042;
+	color: #CAC8CA;
+	margin: 20px 20px 35px 20px;
 }
 
 table {
@@ -252,6 +265,7 @@ table {
 	background-color: rgba(0, 0, 0, 0.3);
 	position: relative;
 	height: 125px;
+	vertical-align: top;
 }
 
 #monthDay {
@@ -264,11 +278,12 @@ table {
 }
 
 #dayRecord {
+	margin-top: 15px;
 	text-align: left;
 }
 
 #logResult {
-	margin: 10px;
+	margin: 10px 10px 10px 10px;
 }
 
 .journalMods {

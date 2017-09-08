@@ -5,6 +5,8 @@ var mongo = require('mongodb').MongoClient;
 var OID = require('mongodb').ObjectID;
 var session = require('client-sessions');
 
+var sessionUser = "";
+
 var app = express();
 /* https://www.npmjs.com/package/socket.io */
 var server = require('http').createServer(app);
@@ -141,17 +143,24 @@ function printCalendar(month, year, dates) {
 // Get the progress page, or redirecting to the login page
 // if a user isn't logged in
 app.get('/progress', function(req, res) {
-	if (req.session.user)
-		res.render('progress', { progCal: "" });
-	else
+	if (req.session.user) {
+		var d = new Date();
+		var month = Number(d.getMonth());
+		var year = Number(d.getFullYear());
+		
+		getDates(req.session.user, month, year, function(dates) {
+			if (dates) res.render('progress', { progCal: dates });
+			else return;
+		});
+	}
+	else {
 		res.render('login', { lerr: false, accountCreated: false });
+	}
 });
 
 // Display the calendar of progress for a month/year
 app.post('/progress', function(req, res) {	
-	getDates(req.session.user, req.body.progressMonth, req.body.progressYear, function(dates) {
-		res.render('progress', { progCal: dates });
-	});	
+	res.render('progress');
 });
 
 // If a journal is to be modified, put in the id and entry
@@ -204,6 +213,7 @@ app.post('/deleteJournalEntry', function(req, res) {
 // Log out of the site
 app.get('/logout', function(req, res) {
 	req.session.reset();
+	sessionUser = "";
 	res.render('login', { lerr: false, accountCreated: false });
 });
 
@@ -211,10 +221,32 @@ app.get('/logout', function(req, res) {
 
 // Get the timer page, redirect to login if no user is logged in
 app.get('/timer', function(req, res) {
-	if (req.session.user)
-		res.render('timer');
-	else
-		res.render('login', { lerr: false, accountCreated: false });
+	if (req.session.user) {
+		mongo.connect(url, function(err, db) {
+			db.collection('users').findOne({
+				username: req.session.user
+			}, function(err, time) {
+				if (time === null) {
+					res.render('timer', {
+						defaultHours: "0",
+						defaultMinutes: "10",
+						defaultSeconds: "00"
+					});
+				}
+				else {
+					res.render('timer', {
+						defaultHours: time.defaultHours,
+						defaultMinutes: time.defaultMinutes,
+						defaultSeconds: time.defaultSeconds
+					});
+				}		
+				db.close();
+			});
+		});
+	}
+	else {
+		res.render('login', { lerr: false, accountCreated: false});
+	}
 });
 
 // Show the meditation timer
@@ -256,6 +288,32 @@ app.post('/timer', function(req, res) {
 // as well as the username/password for the login
 io.on('connection', function(sock) {
 	console.log('Client connected...');
+	
+	sock.on('requestMonthProgress', function(date) {	
+		getDates(sessionUser, Number(date.progressMonth), Number(date.progressYear), function(dates) {
+			sock.emit('receiveMonthProgress', { progDates: dates });
+		});
+	});
+	
+	// Set the default time for a user
+	sock.on('setDefaultTime', function(time) {
+		
+		mongo.connect(url, function(err, db) {
+			db.collection('users').update(
+				{ username: sessionUser },
+				{ $set:
+					{
+						defaultHours: time.defaultHours,
+						defaultMinutes: time.defaultMinutes,
+						defaultSeconds: time.defaultSeconds,
+					}
+				}, function() {
+					console.log("Default time modified...");
+					db.close();
+				}
+			);
+		});
+	});
 	
 	// Check to see if the username is available, sending a
 	// signal back to the client if it is or isn't
@@ -322,7 +380,10 @@ app.post('/account', function(req, res) {
 		lastname: req.body.lastname,
 		username: req.body.username,
 		password: req.body.password,
-		zipcode: req.body.zipcode
+		zipcode: req.body.zipcode,
+		defaultHrs: "0",
+		defaultMinutes: "10",
+		defaultSeconds: "00"
 	}
 
 	// Insert the account
@@ -346,6 +407,7 @@ app.get('/', function(req, res) {
 // The logged in user will move to the home page
 app.post('/home', function(req, res) {
 	req.session.user = req.body.loginUname;
+	sessionUser = req.session.user;
 	res.redirect('/home');
 });
 
