@@ -43,7 +43,7 @@ a {
 }
 
 a:hover {
-	color: #77BEFB;
+	color: #77ADFB;
 	text-decoration: none;
 	transition: all .3s ease-in-out;
 }
@@ -353,4 +353,15 @@ input[type="submit"]:hover, #loginSite:hover, #makeAccount:hover {
 	color: #000000;
 	transition: all .3s ease-in-out;
 	opacity: 0.8;
+}
+
+#errMsg {
+	background-color: rgba(0, 0, 0, 0.7);
+	color: #77ADFB;
+	width: 400px;
+	border-radius: 5px;
+	margin-left: auto;
+	margin-right: auto;
+	padding: 10px;
+	display: none;
 }

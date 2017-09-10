@@ -228,14 +228,14 @@ app.get('/timer', function(req, res) {
 			}, function(err, time) {
 				if (time === null) {
 					res.render('timer', {
-						defaultHours: "0",
+						defaultHrs: "0",
 						defaultMinutes: "10",
 						defaultSeconds: "00"
 					});
 				}
 				else {
 					res.render('timer', {
-						defaultHours: time.defaultHours,
+						defaultHrs: time.defaultHrs,
 						defaultMinutes: time.defaultMinutes,
 						defaultSeconds: time.defaultSeconds
 					});
@@ -303,7 +303,7 @@ io.on('connection', function(sock) {
 				{ username: sessionUser },
 				{ $set:
 					{
-						defaultHours: time.defaultHours,
+						defaultHrs: time.defaultHrs,
 						defaultMinutes: time.defaultMinutes,
 						defaultSeconds: time.defaultSeconds,
 					}
@@ -380,6 +380,7 @@ app.post('/account', function(req, res) {
 		lastname: req.body.lastname,
 		username: req.body.username,
 		password: req.body.password,
+		email: req.body.email,
 		zipcode: req.body.zipcode,
 		defaultHrs: "0",
 		defaultMinutes: "10",

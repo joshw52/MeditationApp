@@ -61,66 +61,46 @@ function displayProgress() {
 
 // Create an account
 function createAccount(event) {	
-	var isErr = false;	// Indicates if there was an error in the form
+	document.getElementById('errMsg').innerHTML = "";
+	document.getElementById('errMsg').style.display = "none";
+	
+	var emptyField = false;
+	var mismatchedPasswords = false;
+	var shortPasswords = false;
+	var zipCodeWrongLength = false;
+	var errMessage = "";
 
 	// Validate first name (can't be empty)
-	if (document.getElementById('firstname').value === "") {
-		document.getElementById('fnameErr').innerHTML = "<span style='color: #FF5555;'>First name is empty!</span>";
-		isErr = true;
-	} else {
-		document.getElementById('fnameErr').innerHTML = "";
-	}
-
-	// Validate last name (can't be empty)	
-	if (document.getElementById('lastname').value === "") {
-		document.getElementById('lnameErr').innerHTML = "<span style='color: #FF5555;'>Last name is empty!</span>";
-		isErr = true;
-	} else {
-		document.getElementById('lnameErr').innerHTML = "";
-	}
-
-	// Validate username (can't be empty)
-	if (document.getElementById('username').value === "") {
-		document.getElementById('unameErr').innerHTML = "<span style='color: #FF5555;'>Username can NOT be empty!</span>";
-		isErr = true;
-	} else {
-		document.getElementById('unameErr').innerHTML = "";
+	if (document.getElementById('firstname').value === "" || document.getElementById('lastname').value === "" || 
+		document.getElementById('username').value === "" || document.getElementById('password').value === "" ||
+		document.getElementById('confirmPass').value === "" || document.getElementById('email').value === "" ||
+		document.getElementById('zipcode').value === "") {
+		emptyField = true;
+		errMessage += "All fields must be filled!<br>";
 	}
 	
 	// Validate the passwords (make sure at least 8 characters)
-	if (String(document.getElementById('password').value).length < 8) {
-		document.getElementById('passErr').innerHTML = "<span style='color: #FF5555;'>Password must be at least 8 characters long!</span>";
-		isErr = true;
-	} else {
-		document.getElementById('passErr').innerHTML = "";
-	}
-	if (String(document.getElementById('confirmPass').value).length < 8) {
-		document.getElementById('cpassErr').innerHTML = "<span style='color: #FF5555;'>Password must be at least 8 characters long!</span>";
-		isErr = true;
-	} else {
-		document.getElementById('cpassErr').innerHTML = "";
+	if (String(document.getElementById('password').value).length < 8 || String(document.getElementById('confirmPass').value).length < 8) {
+		shortPasswords = true;
+		errMessage += "Passwords must be at least 8 characters!<br>";
 	}
 	
 	// Make sure the passwords match
 	if (document.getElementById('password').value !== document.getElementById('confirmPass').value) {
-		document.getElementById('passErr').innerHTML = "<span style='color: #FF5555;'>Passwords must match!</span>";
-		document.getElementById('cpassErr').innerHTML = "<span style='color: #FF5555;'>Passwords must match!</span>";
-		isErr = true;
-	} else if (String(document.getElementById('password').value).length > 7 && String(document.getElementById('confirmPass').value).length > 7) {
-		document.getElementById('passErr').innerHTML = "";
-		document.getElementById('cpassErr').innerHTML = "";
+		mismatchedPasswords = true;
+		errMessage += "Passwords do not match!<br>";
 	}
 	
 	// Make sure zip code is 5 digits
 	if (String(document.getElementById('zipcode').value).length !== 5) {
-		document.getElementById('zipErr').innerHTML = "<span style='color: #FF5555;'>Zip code should be 5 digits!</span>";
-		isErr = true;
-	} else {
-		document.getElementById('zipErr').innerHTML = "";
+		zipCodeWrongLength = true;
+		errMessage += "Zip code must be 5 digits long!<br>";
 	}
-
-	// The form wil not submit if there were errors
-	if (isErr === true) {
+	
+	// The form will not submit if there were errors
+	if (emptyField === true || mismatchedPasswords == true || shortPasswords == true || zipCodeWrongLength == true) {
+		document.getElementById('errMsg').innerHTML = errMessage;
+		document.getElementById('errMsg').style.display = "block";
 		return false;
 	}
 	// Check if the username was chosen already first, and if not,
@@ -143,7 +123,9 @@ function createAccount(event) {
 			}
 			// If the username is being used, display error
 			else {
-				document.getElementById('unameErr').innerHTML = "<span style='color: #FF5555;'>Username is taken!</span>";
+				errMessage += "Username is taken!";	
+				document.getElementById('errMsg').innerHTML = errMessage;
+				document.getElementById('errMsg').style.display = "block";
 			}
 		});
 	};
@@ -339,15 +321,7 @@ function stopTimer() {
 // Reset the timer
 function resetTimer() {
 	stopTimer();
-	timeMeditated = -1;
-	incrementFraction = -1;
-	currentBrightness = 0;
-	document.getElementById("adjustHr").innerHTML = "0";
-	document.getElementById("adjustMin").innerHTML = "10";
-	document.getElementById("adjustSec").innerHTML = "00";
-	document.getElementById('buddhaFillImg').style.filter = "invert(0%)";
-	document.getElementById('buddhaFill').style.opacity = 0.7;
-	document.getElementById('buddhaFillImg').style.display = "none";
+	location.reload();
 }
 
 function replaceHrVal(textId, inputId) {
