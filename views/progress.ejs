@@ -40,6 +40,11 @@
 	<input type='submit' value='Check Progress' id='retrieveProg' onclick='displayProgress();'>
 
 	<br><br>
+	<div id='progMsg'>
+		<% if (progCal) { %>
+			<%- progCal -%><br><br>
+		<% } %>
+	</div>
 	<div id='progDiv'></div>
 
 	<br><br><br>
@@ -51,7 +56,18 @@
 <script>
 	var d = new Date();
 	document.getElementById('progressMonth').value = d.getMonth();
-	document.getElementById('retrieveProg').click();
+	
+	var socket = io();
+	
+	socket.emit('requestMonthProgress', {
+		progressMonth: document.getElementById('progressMonth').value,
+		progressYear: document.getElementById('progressYear').value
+	});
+	
+	socket.on('receiveMonthProgress', function(progress) {
+		document.getElementById('progMsg').style.display = "block";
+		document.getElementById('progDiv').innerHTML = progress.progDates;
+	});
 </script>
 </body>
 </html>

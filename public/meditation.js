@@ -55,6 +55,7 @@ function displayProgress() {
 	});
 	
 	socket.on('receiveMonthProgress', function(progress) {
+		document.getElementById('progMsg').style.display = "none";
 		document.getElementById('progDiv').innerHTML = progress.progDates;
 	});
 }
