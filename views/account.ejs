@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' integrity='sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u' crossorigin='anonymous'>
+<link href='https://fonts.googleapis.com/css?family=Muli' rel='stylesheet'>
+<link rel='stylesheet' href='/meditation.css'>
+</head>
+<body>
+	<br><br>
+	<h1>Create an Account</h1>
+  	<br>
+	<form action='/account' method='POST' id='accountCreation' onsubmit='createAccount(event); return false;'>
+		<table id='accountCreate'>
+				<tr><td><input type='text' name='firstname' id='firstname' placeholder='First Name'></td></tr>
+				<tr><td><input type='text' name='lastname' id='lastname' placeholder='Last Name'></td></tr>
+				<tr><td><input type='text' name='username' id='username' placeholder='Username'></td></tr>
+				<tr><td><input type='password' name='password' id='password' placeholder='Password'></td></tr>
+				<tr><td><input type='password' name='confirmPass' id='confirmPass' placeholder='Confirm Password'></tr>
+				<tr><td><input type='text' name='email' id='email' placeholder='Email'></td></tr>
+				<tr><td><input type='text' name='zipcode' id='zipcode' placeholder='Zip Code'></td></tr>
+				<tr><td style='text-align: center;'><input type='submit' id='makeAccount' value='Submit'></td></tr>
+		</table>
+	</form>
+	<br>
+	<div id='errMsg'></div>
+  
+<script src='https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js'></script>
+<script src="/socket.io/socket.io.js"></script>
+<script src='/meditation.js'></script>
+</body>
+</html>

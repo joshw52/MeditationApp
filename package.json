@@ -1,0 +1,32 @@
+{
+  "name": "meditation_app",
+  "version": "1.0.0",
+  "description": "This README would normally document whatever steps are necessary to get your application up and running.",
+  "main": "meditateServer.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://jw_31_@bitbucket.org/jw_31_/meditation_app.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "homepage": "https://bitbucket.org/jw_31_/meditation_app#readme",
+  "dependencies": {
+    "body-parser": "~1.18.0",
+    "client-sessions": "~0.8.0",
+    "ejs": "~2.5.7",
+    "express": "~4.15.4",
+    "http": "0.0.0",
+    "jade": "^1.11.0",
+    "mongodb": "^2.2.31",
+    "mongoose": "^4.11.8",
+    "mustache": "^2.3.0",
+    "mustache-express": "^1.2.5",
+    "path": "^0.12.7",
+    "pug": "^2.0.0-rc.3",
+    "request": "^2.81.0",
+    "socket.io": "~2.0.3"
+  }
+}

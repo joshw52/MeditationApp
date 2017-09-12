@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' integrity='sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u' crossorigin='anonymous'>
+<link href='https://fonts.googleapis.com/css?family=Muli' rel='stylesheet'>
+<link rel='stylesheet' href='/meditation.css'>
+</head>
+<body>
+	<br><br><br><br>
+	<form action='/home' method='POST' id='loginForm' onsubmit='loginMeditation(event);'>
+		<table id='loginTable'>
+			<tr><td><input type='text' name='loginUname' id='loginUname' placeholder='Username'></td></tr>
+			<tr><td><input type='password' name='loginPword' id='loginPword' placeholder='Password'></td></tr>
+			<tr><td style='text-align: center;'><input type='submit' id='loginSite' value='Login'></td></tr>
+		</table>
+	</form>
+	<div id='loginErr'></div>
+	<% if (accountCreated) { %>
+		<br>Account Successfully created!<br><br>
+	<% } else { %>
+		<br><br>
+	<% } %>
+	<p>No account? <a href='account'>Register</a>.</p>
+  
+<script src='https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js'></script>
+<script src="/socket.io/socket.io.js"></script>
+<script src='/meditation.js'></script>
+</body>
+</html>
