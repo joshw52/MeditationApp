@@ -24,8 +24,11 @@ function loginMeditation(event) {
 		}
 		// If the login was not accepted, display an error
 		else {
-			document.getElementById('loginErr').innerHTML = "<br><span style='color: #FF5555;'>Username/password credentials are incorrect!</span>";
+			document.getElementById('loginErr').innerHTML = "<br><span style='color: #FF5555;'>Username/password credentials are incorrect!</span><br><br>";
+			document.getElementById('accountCreation').style.display = "none";
 		}
+		
+		socket.close();
 	});
 	
 	// The form will not submit unless the login was accepted
@@ -38,7 +41,7 @@ function setDefaultTime() {
 
 	// Send the username/password to the server
 	socket.emit('setDefaultTime', {
-		defaultHours: document.getElementById('adjustHr').innerHTML,
+		defaultHrs: document.getElementById('adjustHr').innerHTML,
 		defaultMinutes: document.getElementById('adjustMin').innerHTML,
 		defaultSeconds: document.getElementById('adjustSec').innerHTML		
 	});
@@ -57,6 +60,7 @@ function displayProgress() {
 	socket.on('receiveMonthProgress', function(progress) {
 		document.getElementById('progMsg').style.display = "none";
 		document.getElementById('progDiv').innerHTML = progress.progDates;
+		socket.close();
 	});
 }
 
@@ -128,6 +132,8 @@ function createAccount(event) {
 				document.getElementById('errMsg').innerHTML = errMessage;
 				document.getElementById('errMsg').style.display = "block";
 			}
+			
+			socket.close();
 		});
 	};
 	

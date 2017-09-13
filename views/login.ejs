@@ -15,11 +15,13 @@
 		</table>
 	</form>
 	<div id='loginErr'></div>
-	<% if (accountCreated) { %>
-		<br>Account Successfully created!<br><br>
-	<% } else { %>
-		<br><br>
-	<% } %>
+	<div id='accountCreation'>
+		<% if (accountCreated) { %>
+			<br>Account Successfully created!<br><br>
+		<% } else { %>
+			<br>
+		<% } %>
+	</div>
 	<p>No account? <a href='account'>Register</a>.</p>
   
 <script src='https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js'></script>

@@ -149,7 +149,7 @@ app.get('/progress', function(req, res) {
 		var year = Number(d.getFullYear());
 		
 		getDates(req.session.user, month, year, function(dates) {
-			if (dates) res.render('progress', { progCal: dates });
+			if (dates) res.render('progress', { progCal: "" });
 			else return;
 		});
 	}
@@ -310,6 +310,7 @@ io.on('connection', function(sock) {
 				}, function() {
 					console.log("Default time modified...");
 					db.close();
+					sock.disconnect();
 				}
 			);
 		});
