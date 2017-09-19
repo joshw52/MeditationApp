@@ -115,9 +115,7 @@ function printCalendar(month, year, dates) {
 			if (Number(loggedDay) === d) {
 				cal += "<div id='logResult'>" + String(dates[logs].time);
 				cal += "&nbsp<form method='POST' action='journal' class='journalMods'>";
-				cal += "<input type='hidden' value='" + dates[logs].date + "' name='jdate'>";
 				cal += "<input type='hidden' value='" + dates[logs]._id + "' name='jid'>";
-				cal += "<input type='hidden' value='" + dates[logs].entry + "' name='jentry'>";
 				cal += "<button type='submit' id='editJournal'><i class='fa fa-book' aria-hidden='true'></i></button></form>";
 				cal += "&nbsp<form method='POST' action='deleteJournalEntry' class='journalMods' onsubmit='return confirm(\"Confirm that you wish to delete this meditation entry\")'>";
 				cal += "<input type='hidden' value='" + dates[logs]._id + "' name='jdid'>";
@@ -165,31 +163,46 @@ app.post('/progress', function(req, res) {
 
 // If a journal is to be modified, put in the id and entry
 app.post('/journal', function(req, res) {
-	res.render('journal', {
-		jid: req.body.jid,
-		jentry: req.body.jentry,
-		jdate: req.body.jdate
+	var jid = new OID(req.body.jid);
+	
+	mongo.connect(url, function(err, db) {
+		db.collection('meditationrecord').findOne({ _id: jid}, function(err, jmentry) {
+			res.render('journal', {
+				jid: req.body.jid,
+				jentry: jmentry.entry,
+				jdate: jmentry.date
+			});	
+			
+			db.close();
+		});
 	});
 });
 
 // Modify the journal entry in the collection, using the id to find it
 app.post('/journalModification', function(req, res) {	
-	var jeid = new OID(req.body.mjid);
+	// If the submit button was clicked, modify the entry
+	if (req.body.modifyEntry === "Submit") {
+		var jeid = new OID(req.body.mjid);
 	
-	// Update the record
-	mongo.connect(url, function(err, db) {
-		db.collection('meditationrecord').update(
-			{ _id: jeid },
-			{ $set:
-				{ entry: req.body.mjentry }
-			},
-			function() {
-				db.close();
-			}
-		);
-	});
+		// Update the record
+		mongo.connect(url, function(err, db) {
+			db.collection('meditationrecord').update(
+				{ _id: jeid },
+				{ $set:
+					{ entry: req.body.mjentry }
+				},
+				function() {
+					db.close();
+				}
+			);
+		});
 	
-	res.render('progress', { progCal: "Meditation Entry Modified!" });
+		res.render('progress', { progCal: "Meditation Entry Modified!" });
+	}
+	// Or else return to the progress page without modifying the entry
+	else {
+		res.render('progress', { progCal: "" });	
+	}
 });
 
 // Delete a journal entry
@@ -274,12 +287,14 @@ app.post('/timer', function(req, res) {
 			if (err) console.log(err);
 			else console.log("Entry made\n");
 			
+			console.log(mlog);
+			
+			// Move to the progress page
+			res.render('progress', { progCal: "Meditation Entry Made!" });
+	
 			db.close();
 		});
 	});
-	
-	// Move to the progress page
-	res.render('progress', { progCal: "Meditation Entry Made!" });
 });
 
 /* Set up the account */
@@ -297,7 +312,6 @@ io.on('connection', function(sock) {
 	
 	// Set the default time for a user
 	sock.on('setDefaultTime', function(time) {
-		
 		mongo.connect(url, function(err, db) {
 			db.collection('users').update(
 				{ username: sessionUser },

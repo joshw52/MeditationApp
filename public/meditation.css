@@ -3,12 +3,12 @@ body {
 	background: url('/images/ocean_at_night.jpg') center center fixed;
 	color: #FFFFFF;
 	text-align: center;
-	font-family: "Muli", Verdana;
+	font-family: "Raleway", Verdana;
 	font-size: 20px;
 }
 
 #menubar {
-	background-color: #000000;
+	background-color: rgba(0, 0, 0, 0.7);
 	padding: 10px;
 	position: fixed;
 	top: 0;
@@ -62,7 +62,7 @@ select:focus {
 /* Home page */
 
 #homePage {
-	background-color: rgba(0, 0, 0, 0.3);
+	background-color: rgba(0, 0, 0, 0.5);
 	border-radius: 5px;
 	margin-top: 120px;
 	margin-left: auto;
@@ -73,7 +73,7 @@ select:focus {
 }
 
 #homeQuote {
-	color: #CAC8CA;
+	color: #FFFFFF;
 }
 
 /* Meditation Page */
@@ -89,13 +89,13 @@ select:focus {
 }
 
 button {
-	font-family: "Muli", Verdana;
-	font-size: 20px;
+	font-family: "Raleway", Verdana;
+	font-size: 18px;
 	background-color: #A8A6A8;
 	color: #000000;
 	border: 0px;
 	border-radius: 5px;
-	margin: 35px 20px 15px 20px;
+	margin: 35px 10px 15px 10px;
 	padding: 10px 15px 10px 15px;
 	opacity: 0.7;
 }
@@ -105,18 +105,6 @@ button:hover {
 	color: #000000;
 	opacity: 0.8;
 	transition: all .3s ease-in-out;
-}
-
-#defaultTime {
-	background-color: #202020;
-	color: #A8A6A8;
-	margin: 20px 20px 35px 20px;
-}
-
-#defaultTime:hover {
-	background-color: #424042;
-	color: #CAC8CA;
-	margin: 20px 20px 35px 20px;
 }
 
 table {
@@ -220,7 +208,7 @@ table {
 }
 
 #logJournal {
-	font-family: "Muli", Verdana;
+	font-family: "Raleway", Verdana;
 	font-size: 26px;
 	background-color: #A8A6A8;
 	color: #000000;
@@ -337,7 +325,7 @@ input {
 }
 
 input[type="submit"], #loginSite, #makeAccount {
-	font-family: "Muli", Verdana;
+	font-family: "Raleway", Verdana;
 	font-size: 20px;
 	background-color: #B9B7B9;
 	color: #000000;
