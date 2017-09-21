@@ -4,6 +4,28 @@ var incrementFraction = -1;	// The fraction that the image will be revealed in p
 var currentBrightness = 0;	// The current brightness of the namaste image
 var gong = new Audio('https://soundbible.com/grab.php?id=1815&type=mp3');	// The gong sound to be played at the beginning and end
 
+// Modify your the account
+function modifyAccount(modify) {
+	var socket = io();
+	
+	socket.emit('accountModification', {
+		username: document.getElementById('username').innerHTML,
+		firstname: document.getElementById('firstname').value,
+		lastname: document.getElementById('lastname').value,
+		email: document.getElementById('email').value,
+		zipcode: document.getElementById('zipcode').value,
+		accountMod: modify
+	});
+	
+	socket.on('accountModified', function(response) {
+		if (response.modified) {
+			document.getElementById('modifiedMsg').innerHTML = "Account Modified!";
+		} else {
+			document.getElementById('modifiedMsg').innerHTML = "";
+		}
+	});
+}
+
 // Log in
 function loginMeditation(event) {
 	// Create a socket

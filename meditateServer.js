@@ -51,12 +51,16 @@ function getDates(user, month, year, callback) {
 
 	// Find the records for that month/year
 	mongo.connect(url, function(err, db) {
+		if (err) throw err;
+		
 		db.collection('meditationrecord').find({
 			username: {
 				$eq: user
 			},
 			date: new RegExp(monthYear)
 		}).toArray(function(err, docs) {
+			if (err) throw err;
+			
 			// Get the calendar
 			var dates = printCalendar(month, year, docs);
 			callback(dates);
@@ -166,7 +170,11 @@ app.post('/journal', function(req, res) {
 	var jid = new OID(req.body.jid);
 	
 	mongo.connect(url, function(err, db) {
+		if (err) throw err;
+		
 		db.collection('meditationrecord').findOne({ _id: jid}, function(err, jmentry) {
+			if (err) throw err;
+			
 			res.render('journal', {
 				jid: req.body.jid,
 				jentry: jmentry.entry,
@@ -186,6 +194,8 @@ app.post('/journalModification', function(req, res) {
 	
 		// Update the record
 		mongo.connect(url, function(err, db) {
+			if (err) throw err;
+			
 			db.collection('meditationrecord').update(
 				{ _id: jeid },
 				{ $set:
@@ -211,6 +221,8 @@ app.post('/deleteJournalEntry', function(req, res) {
 	
 	// Delete the record
 	mongo.connect(url, function(err, db) {
+		if (err) throw err;
+		
 		db.collection('meditationrecord').remove({
 			_id: jdid
 		}, function() {
@@ -236,9 +248,13 @@ app.get('/logout', function(req, res) {
 app.get('/timer', function(req, res) {
 	if (req.session.user) {
 		mongo.connect(url, function(err, db) {
+			if (err) throw err;
+			
 			db.collection('users').findOne({
 				username: req.session.user
 			}, function(err, time) {
+				if (err) throw err;
+				
 				if (time === null) {
 					res.render('timer', {
 						defaultHrs: "0",
@@ -283,8 +299,10 @@ app.post('/timer', function(req, res) {
 	
 	// Insert the meditation log to the database
 	mongo.connect(url, function(err, db) {
+		if (err) throw err;
+		
 		db.collection('meditationrecord').insert(mlog, function(err, docs) {
-			if (err) console.log(err);
+			if (err) throw err;
 			else console.log("Entry made\n");
 			
 			console.log(mlog);
@@ -313,6 +331,8 @@ io.on('connection', function(sock) {
 	// Set the default time for a user
 	sock.on('setDefaultTime', function(time) {
 		mongo.connect(url, function(err, db) {
+			if (err) throw err;
+			
 			db.collection('users').update(
 				{ username: sessionUser },
 				{ $set:
@@ -334,9 +354,13 @@ io.on('connection', function(sock) {
 	// signal back to the client if it is or isn't
 	sock.on('unameCheck', function(uname) {		
 		mongo.connect(url, function(err, db) {
+			if (err) throw err;
+			
 			db.collection('users').findOne({
 				username: uname.username
 			}, function(err, item) {
+				if (err) throw err;
+				
 				if (item === null) {
 					console.log("Username available\n");
 					sock.emit('unameCheckResponse', { unameFree: true });
@@ -353,10 +377,13 @@ io.on('connection', function(sock) {
 	// that the username exists and that the password is correct
 	sock.on('loginCheck', function(login) {
 		mongo.connect(url, function(err, db) {		
+			if (err) throw err;
+			
 			// Look for username
 			db.collection('users').findOne({
 				username: login.loginUname,
 			}, function(err, item) {
+				if (err) throw err;
 				
 				// If the username is not found or the login password doesn't match the user's password
 				if (!item) {
@@ -377,6 +404,31 @@ io.on('connection', function(sock) {
 				db.close();
 			});
 		});
+	});
+	
+	// Modify the account information
+	sock.on('accountModification', function(mod) {		
+		if (mod.username !== "" && mod.accountMod !== "Cancel") {
+			mongo.connect(url, function(err, db) {
+				if (err) throw err;
+			
+				db.collection('users').update(
+					{ username: mod.username },
+					{ $set:
+						{
+							firstname: mod.firstname,
+							lastname: mod.lastname,
+							email: mod.email,
+							zipcode: mod.zipcode
+						}
+					}, function() {
+						console.log("User accound modified...");
+						db.close();
+						//sock.disconnect();
+					}
+				);
+			});
+		}
 	});
 });
 
@@ -404,6 +456,8 @@ app.post('/account', function(req, res) {
 
 	// Insert the account
 	mongo.connect(url, function(err, db) {
+		if (err) throw err;
+		
 		db.collection('users').insert(user, function(err, docs) {
 			db.close();
 		});
@@ -418,6 +472,28 @@ app.post('/account', function(req, res) {
 // Move to the login page
 app.get('/', function(req, res) {
 	res.render('login', { lerr: false, accountCreated: false });
+});
+
+app.get('/accountmod', function(req, res) {
+	mongo.connect(url, function(err, db) {
+		if (err) throw err;
+		
+		db.collection('users').findOne({
+			username: req.session.user
+		}, function(err, user) {
+			if (err) throw err;
+			
+			res.render('accountmod', {
+				username: user.username,
+				firstname: user.firstname,
+				lastname: user.lastname,
+				email: user.email,
+				zipcode: user.zipcode
+			});
+			
+			db.close();
+		});
+	});
 });
 
 // The logged in user will move to the home page
