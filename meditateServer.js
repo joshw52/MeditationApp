@@ -408,6 +408,7 @@ io.on('connection', function(sock) {
 	
 	// Modify the account information
 	sock.on('accountModification', function(mod) {		
+		// Modify the account if the user clicked Modify and not Cancel
 		if (mod.username !== "" && mod.accountMod !== "Cancel") {
 			mongo.connect(url, function(err, db) {
 				if (err) throw err;
@@ -422,11 +423,36 @@ io.on('connection', function(sock) {
 							zipcode: mod.zipcode
 						}
 					}, function() {
-						console.log("User accound modified...");
+						sock.emit('accountModified', {
+							modified: true
+						});
 						db.close();
-						//sock.disconnect();
+						sock.disconnect();
 					}
 				);
+			});
+		}
+		
+		// Otherwise grab the original information and fill the fields back in
+		else if (mod.username !== "" && mod.accountMod === "Cancel") {
+			mongo.connect(url, function(err, db) {
+				if (err) throw err;
+	
+				db.collection('users').findOne({
+					username: mod.username
+				}, function(err, user) {
+					if (err) throw err;
+		
+					sock.emit('accountModified', {
+						username: mod.username,
+						firstname: user.firstname,
+						lastname: user.lastname,
+						email: user.email,
+						zipcode: user.zipcode
+					});
+		
+					db.close();
+				});
 			});
 		}
 	});
@@ -474,6 +500,8 @@ app.get('/', function(req, res) {
 	res.render('login', { lerr: false, accountCreated: false });
 });
 
+// Show the account modification page, grab the current
+// account info for the user
 app.get('/accountmod', function(req, res) {
 	mongo.connect(url, function(err, db) {
 		if (err) throw err;

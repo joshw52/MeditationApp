@@ -8,19 +8,34 @@ var gong = new Audio('https://soundbible.com/grab.php?id=1815&type=mp3');	// The
 function modifyAccount(modify) {
 	var socket = io();
 	
-	socket.emit('accountModification', {
-		username: document.getElementById('username').innerHTML,
-		firstname: document.getElementById('firstname').value,
-		lastname: document.getElementById('lastname').value,
-		email: document.getElementById('email').value,
-		zipcode: document.getElementById('zipcode').value,
-		accountMod: modify
-	});
+	// If any fields are blank or the zip code isn't 5 digits, display an error and don't modify
+	if ((document.getElementById('firstname').value === "" || document.getElementById('lastname').value === "" || 
+		document.getElementById('email').value === "" || String(document.getElementById('zipcode').value).length < 5 || 
+		String(document.getElementById('zipcode').value).length > 5) && modify === "Modify") {
+		document.getElementById('modifiedMsg').innerHTML = "<span style='color: #FF5555;'>Fields cannot be blank, and zip code must be 5 digits</span>";
+	}
+	// Otherwise modify or cancel
+	else {
+		socket.emit('accountModification', {
+			username: document.getElementById('username').innerHTML,
+			firstname: document.getElementById('firstname').value,
+			lastname: document.getElementById('lastname').value,
+			email: document.getElementById('email').value,
+			zipcode: document.getElementById('zipcode').value,
+			accountMod: modify
+		});
+	}
 	
-	socket.on('accountModified', function(response) {
+	// If the account was modified, indicate so, or else grab the unmodified values for the fields
+	socket.on('accountModified', function(response) {		
 		if (response.modified) {
 			document.getElementById('modifiedMsg').innerHTML = "Account Modified!";
 		} else {
+			document.getElementById('username').innerHTML = response.username;
+			document.getElementById('firstname').value = response.firstname;
+			document.getElementById('lastname').value = response.lastname;
+			document.getElementById('email').value = response.email;
+			document.getElementById('zipcode').value = response.zipcode;
 			document.getElementById('modifiedMsg').innerHTML = "";
 		}
 	});
