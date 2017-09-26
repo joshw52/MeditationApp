@@ -304,9 +304,7 @@ app.post('/timer', function(req, res) {
 		db.collection('meditationrecord').insert(mlog, function(err, docs) {
 			if (err) throw err;
 			else console.log("Entry made\n");
-			
-			console.log(mlog);
-			
+						
 			// Move to the progress page
 			res.render('progress', { progCal: "Meditation Entry Made!" });
 	

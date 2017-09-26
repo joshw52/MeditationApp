@@ -6,6 +6,7 @@
   "dependencies": {
     "body-parser": "^1.18.1",
     "client-sessions": "^0.8.0",
+    "crypto": "^1.0.1",
     "ejs": "^2.5.7",
     "express": "^4.15.4",
     "forever": "^0.15.3",

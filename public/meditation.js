@@ -4,6 +4,40 @@ var incrementFraction = -1;	// The fraction that the image will be revealed in p
 var currentBrightness = 0;	// The current brightness of the namaste image
 var gong = new Audio('https://soundbible.com/grab.php?id=1815&type=mp3');	// The gong sound to be played at the beginning and end
 
+function changePassword(change) {
+	var socket = io();
+	
+	// If any fields are blank, display an error
+	if (document.getElementById('oldpword').value === "" || document.getElementById('newpword').value === "" || document.getElementById('cnewpword').value === "") {
+		document.getElementById('changedPword').innerHTML = "<span style='color: #FF5555;'>Fields cannot be blank</span>";
+	}
+	// Make sure the passwords match
+	else if (String(document.getElementById('newpword').value) !== String(document.getElementById('cnewpword').value)) {
+		document.getElementById('changedPword').innerHTML = "<span style='color: #FF5555;'>New password and confirm password must match!</span>";
+	}
+	// Make sure the new password is at least 8 characters
+	else if (String(document.getElementById('newpword').value).length < 8 || String(document.getElementById('cnewpword').value).length < 8) {
+		document.getElementById('changedPword').innerHTML = "<span style='color: #FF5555;'>New password must be at least 8 characters long!</span>";
+	}
+	// Make sure the new password is not the same as the old
+	else if (String(document.getElementById('oldpword').value) === String(document.getElementById('newpword').value)) {
+		document.getElementById('changedPword').innerHTML = "<span style='color: #FF5555;'>New password cannot be the same as the old!</span>";
+	}
+	// Else proceed
+	else {
+		document.getElementById('changedPword').innerHTML = "";
+		
+		socket.emit('pwordChange', {
+			oldpword: document.getElementById('oldpword').value,
+			newpword: document.getElementById('newpword').value
+		});
+	}
+
+	socket.on('newpwordAccepted', function(response) {
+		
+	});	
+}
+
 // Modify your the account
 function modifyAccount(modify) {
 	var socket = io();
