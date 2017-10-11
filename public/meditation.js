@@ -6,36 +6,44 @@ var gong = new Audio('https://soundbible.com/grab.php?id=1815&type=mp3');	// The
 
 function changePassword(change) {
 	var socket = io();
-	
-	// If any fields are blank, display an error
-	if (document.getElementById('oldpword').value === "" || document.getElementById('newpword').value === "" || document.getElementById('cnewpword').value === "") {
-		document.getElementById('changedPword').innerHTML = "<span style='color: #FF5555;'>Fields cannot be blank</span>";
-	}
-	// Make sure the passwords match
-	else if (String(document.getElementById('newpword').value) !== String(document.getElementById('cnewpword').value)) {
-		document.getElementById('changedPword').innerHTML = "<span style='color: #FF5555;'>New password and confirm password must match!</span>";
-	}
-	// Make sure the new password is at least 8 characters
-	else if (String(document.getElementById('newpword').value).length < 8 || String(document.getElementById('cnewpword').value).length < 8) {
-		document.getElementById('changedPword').innerHTML = "<span style='color: #FF5555;'>New password must be at least 8 characters long!</span>";
-	}
-	// Make sure the new password is not the same as the old
-	else if (String(document.getElementById('oldpword').value) === String(document.getElementById('newpword').value)) {
-		document.getElementById('changedPword').innerHTML = "<span style='color: #FF5555;'>New password cannot be the same as the old!</span>";
-	}
-	// Else proceed
-	else {
-		document.getElementById('changedPword').innerHTML = "";
-		
-		socket.emit('pwordChange', {
-			oldpword: document.getElementById('oldpword').value,
-			newpword: document.getElementById('newpword').value
-		});
-	}
 
-	socket.on('newpwordAccepted', function(response) {
+	if (change === "Change") {	
+		// If any fields are blank, display an error
+		if (document.getElementById('oldpword').value === "" || document.getElementById('newpword').value === "" || document.getElementById('cnewpword').value === "") {
+			document.getElementById('changedPword').innerHTML = "<span style='color: #FF5555;'>Fields cannot be blank</span>";
+		}
+		// Make sure the passwords match
+		else if (String(document.getElementById('newpword').value) !== String(document.getElementById('cnewpword').value)) {
+			document.getElementById('changedPword').innerHTML = "<span style='color: #FF5555;'>New password and confirm password must match!</span>";
+		}
+		// Make sure the new password is at least 8 characters
+		else if (String(document.getElementById('newpword').value).length < 8 || String(document.getElementById('cnewpword').value).length < 8) {
+			document.getElementById('changedPword').innerHTML = "<span style='color: #FF5555;'>New password must be at least 8 characters long!</span>";
+		}
+		// Make sure the new password is not the same as the old
+		else if (String(document.getElementById('oldpword').value) === String(document.getElementById('newpword').value)) {
+			document.getElementById('changedPword').innerHTML = "<span style='color: #FF5555;'>New password cannot be the same as the old!</span>";
+		}
+		// Else proceed
+		else {
+			document.getElementById('changedPword').innerHTML = "";
 		
-	});	
+			socket.emit('pwordChange', {
+				username: document.getElementById('username').innerHTML,
+				oldpword: document.getElementById('oldpword').value,
+				newpword: document.getElementById('newpword').value
+			});
+
+			socket.on('newpwordAccepted', function(response) {
+				if (response.pwordAccept) document.getElementById('changedPword').innerHTML = "Password changed!";
+				else document.getElementById('changedPword').innerHTML = "<span style='color: #FF5555;'>Password could not be changed!</span>";
+			});	
+		}
+	} else {
+		document.getElementById('oldpword').value = "";
+		document.getElementById('newpword').value = "";
+		document.getElementById('cnewpword').value = "";
+	}
 }
 
 // Modify your the account
@@ -299,6 +307,26 @@ function modifySecond(sign) {
 	}
 }
 
+function getDateTime() {
+	// Put the date in the proper format
+    var d = new Date();
+    // Offset for the user's timezone
+    var dt = d.getTime() - d.getTimezoneOffset() / 60;
+    dt = new Date(dt);
+    // Get the month
+    var m = dt.getMonth() + 1;
+    if (m < 10) m = "0" + String(m);
+    // Get the day
+    var d = dt.getDate();
+    if (d < 10) d = "0" + String(d);
+    
+    // Concatenate the year, month, day, hours, and minutes
+    var entryDate = dt.getFullYear() + "-" + m + "-" + d + " ";
+   	entryDate += dt.getHours() + ":" + dt.getMinutes();
+
+	return entryDate;
+}
+
 // This will end the session and prompt for a journal entry
 function endTimer() {
 	// Play the gong to indicate the meditation period is over
@@ -316,6 +344,12 @@ function endTimer() {
 	gong.onended = function() {				
 		// Prompt the user to move to the journal entry or skip and submit
 		var journalEntry = confirm("Click OK to make a journal entry");
+		
+		// Get the time and put the date and hours/minutes into the form
+		var time = getDateTime();
+		time = time.split(" ");
+		document.getElementById('meditationDate').value = time[0];
+		document.getElementById('meditationHrMin').value = time[1];
 	
 		if (journalEntry) {
 			// Hide the timer and display the journal entry

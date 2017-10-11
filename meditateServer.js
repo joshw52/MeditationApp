@@ -46,7 +46,7 @@ app.get('/home', function(req, res) {
 function getDates(user, month, year, callback) {
 	// Put the month and year in the proper format
 	var monthYear = String(year) + "-";
-	if (month < 10) monthYear += "0";
+	if (Number(month) < 9) monthYear += "0";
 	monthYear += String(Number(month)+1);
 
 	// Find the records for that month/year
@@ -117,13 +117,19 @@ function printCalendar(month, year, dates) {
 		for (logs in dates) {
 			var loggedDay = String(dates[logs].date).split("-")[2];
 			if (Number(loggedDay) === d) {
-				cal += "<div id='logResult'>" + String(dates[logs].time);
+				// Modify the time from military time
+				var hrmin = String(dates[logs].datetime).split(":");
+				if (Number(hrmin[0]) > 12) hrmin = String(Number(hrmin[0]) - 12) + ":" + String(hrmin[1]) + " PM";
+				else hrmin = String(dates[logs].datetime) + " AM";
+				
+				cal += "<div id='logResult'>" + String(dates[logs].medtime);
 				cal += "&nbsp<form method='POST' action='journal' class='journalMods'>";
 				cal += "<input type='hidden' value='" + dates[logs]._id + "' name='jid'>";
 				cal += "<button type='submit' id='editJournal'><i class='fa fa-book' aria-hidden='true'></i></button></form>";
 				cal += "&nbsp<form method='POST' action='deleteJournalEntry' class='journalMods' onsubmit='return confirm(\"Confirm that you wish to delete this meditation entry\")'>";
 				cal += "<input type='hidden' value='" + dates[logs]._id + "' name='jdid'>";
-				cal += "<button type='submit' id='deleteJournal'><i class='fa fa-times-circle' aria-hidden='true'></i></button></form></div>";
+				cal += "<button type='submit' id='deleteJournal'><i class='fa fa-times-circle' aria-hidden='true'></i></button>";
+				cal += hrmin + "</form></div>";
 			}
 		}
 
@@ -280,23 +286,15 @@ app.get('/timer', function(req, res) {
 
 // Show the meditation timer
 app.post('/timer', function(req, res) {
-	// Put the date in the proper format
-	var dt = new Date();
-	var m = dt.getMonth() + 1;
-	if (m < 10) m = "0" + String(m);
-	var d = dt.getDate();
-	if (d < 10) d = "0" + String(d);
-	
-	var entryDate = dt.getFullYear() + "-" + m + "-" + d;
-	
 	// The meditation log for a user
 	var mlog = {
 		username: req.session.user,
-		date: entryDate,
-		time: req.body.meditationTime,
+		date: req.body.meditationDate,
+		medtime: req.body.meditationTime,
+		datetime: req.body.meditationHrMin,
 		entry: req.body.journalEntry
 	}
-	
+		
 	// Insert the meditation log to the database
 	mongo.connect(url, function(err, db) {
 		if (err) throw err;
@@ -453,6 +451,38 @@ io.on('connection', function(sock) {
 				});
 			});
 		}
+	});
+	
+	// Modify the password
+	sock.on('pwordChange', function(cpword) {
+		mongo.connect(url, function(err, db) {
+			if (err) throw err;
+			
+			db.collection('users').findOne({
+				username: cpword.username
+			}, function(err, item) {
+				if (err) throw err;
+				
+				if (item.password !== cpword.oldpword) {
+					sock.emit('newpwordAccepted', { pwordAccept: false });
+					db.close();
+				}
+				else {
+					db.collection('users').update(
+						{ username: cpword.username },
+						{ $set:
+							{
+								password: cpword.newpword
+							}
+						}, function() {
+							console.log("User password changed!");
+							sock.emit('newpwordAccepted', { pwordAccept: true });
+							db.close();
+						}
+					);
+				}
+			});
+		});
 	});
 });
 
