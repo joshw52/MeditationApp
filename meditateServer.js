@@ -12,6 +12,16 @@ var app = express();
 var server = require('http').createServer(app);
 var io = require('socket.io')(server);
 
+var crypto = require('crypto');
+
+// Encrypt a string
+function encrypt(str) {
+  var cipher = crypto.createCipher('aes-256-ctr', 'N58Q2ae9');
+  var encrypedStr = cipher.update(str, 'utf8', 'hex');
+  encrypedStr += cipher.final('hex');
+  return encrypedStr;
+}
+
 var port = 8080;
 var db = 'meditation';
 var url = 'mongodb://localhost:27017/' + db;
@@ -387,7 +397,7 @@ io.on('connection', function(sock) {
 					sock.emit('loginCheckResponse', { loginAccepted: false });
 				} 
 				else {
-					if (login.loginPword !== item.password) {
+					if (encrypt(login.loginPword) !== item.password) {
 						console.log("The password is not correct\n");
 						sock.emit('loginCheckResponse', { loginAccepted: false });
 					} 
@@ -463,7 +473,7 @@ io.on('connection', function(sock) {
 			}, function(err, item) {
 				if (err) throw err;
 				
-				if (item.password !== cpword.oldpword) {
+				if (item.password !== encrypt(cpword.oldpword)) {
 					sock.emit('newpwordAccepted', { pwordAccept: false });
 					db.close();
 				}
@@ -472,7 +482,7 @@ io.on('connection', function(sock) {
 						{ username: cpword.username },
 						{ $set:
 							{
-								password: cpword.newpword
+								password: encrypt(cpword.newpword)
 							}
 						}, function() {
 							console.log("User password changed!");
@@ -500,7 +510,7 @@ app.post('/account', function(req, res) {
 		firstname: req.body.firstname,
 		lastname: req.body.lastname,
 		username: req.body.username,
-		password: req.body.password,
+		password: encrypt(req.body.password),
 		email: req.body.email,
 		zipcode: req.body.zipcode,
 		defaultHrs: "0",
