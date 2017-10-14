@@ -20,10 +20,10 @@
 	<h2>Modify Your Account (<span id='username'><%- username %></span>)</h2>
   	<br>
 	<table id='accountModification'>
-			<tr><td class='modid'>First Name</td><td><input type='text' name='firstname' id='firstname' value='<%- firstname %>'></td></tr>
-			<tr><td class='modid'>Last Name</td><td><input type='text' name='lastname' id='lastname' value='<%- lastname %>'></td></tr>
-			<tr><td class='modid'>Email</td><td><input type='text' name='email' id='email' value='<%- email %>'></td></tr>
-			<tr><td class='modid'>Zip Code</td><td><input type='text' name='zipcode' id='zipcode' value='<%- zipcode %>'></td></tr>
+			<tr><td><input type='text' name='firstname' id='firstname' value='<%- firstname %>' placeholder='First Name'></td></tr>
+			<tr><td><input type='text' name='lastname' id='lastname' value='<%- lastname %>' placeholder='Last Name'></td></tr>
+			<tr><td><input type='text' name='email' id='email' value='<%- email %>' placeholder='Email'></td></tr>
+			<tr><td><input type='text' name='zipcode' id='zipcode' value='<%- zipcode %>' placeholder='Zip Code'></td></tr>
 			<tr><td id='modButtons' colspan=2><input type='submit' onclick='modifyAccount("Cancel")' value='Cancel'><input type='submit' onclick='modifyAccount("Modify")' value='Modify'></td></tr>
 	</table>
 	<br>
@@ -32,10 +32,10 @@
 	<h2>Change Your Password</h2>
   	<br>
 	<table id='passwordChange'>
-			<tr><td class='modid'>Old Password</td><td><input type='password' name='oldpword' id='oldpword'></td></tr>
-			<tr><td class='modid'>New Password</td><td><input type='password' name='newpword' id='newpword'></td></tr>
-			<tr><td class='modid'>Confirm Password</td><td><input type='password' name='cnewpword' id='cnewpword'></td></tr>
-			<tr><td id='modButtons' colspan=2><input type='submit' onclick='changePassword("Cancel")' value='Cancel'><input type='submit' onclick='changePassword("Change")' value='Change Password'></td></tr>
+			<tr><td><input type='password' name='oldpword' id='oldpword' placeholder='Old Password'></td></tr>
+			<tr><td><input type='password' name='newpword' id='newpword' placeholder='New Password'></td></tr>
+			<tr><td><input type='password' name='cnewpword' id='cnewpword' placeholder='Confirm Password'></td></tr>
+			<tr><td id='modButtons'><input type='submit' onclick='changePassword("Cancel")' value='Cancel'><input type='submit' onclick='changePassword("Change")' value='Change Password'></td></tr>
 	</table>
 	<br>
 	<div id='changedPword'></div>
