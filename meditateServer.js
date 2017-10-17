@@ -350,7 +350,7 @@ io.on('connection', function(sock) {
 				}, function() {
 					console.log("Default time modified...");
 					db.close();
-					sock.disconnect();
+					sock.emit('defaultTimeSet', {});
 				}
 			);
 		});

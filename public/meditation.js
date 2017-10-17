@@ -133,6 +133,7 @@ function loginMeditation(event) {
 	event.preventDefault();
 }
 
+// Set the default meditation time to something else
 function setDefaultTime() {
 	// Create a socket
 	var socket = io();
@@ -142,6 +143,10 @@ function setDefaultTime() {
 		defaultHrs: document.getElementById('adjustHr').innerHTML,
 		defaultMinutes: document.getElementById('adjustMin').innerHTML,
 		defaultSeconds: document.getElementById('adjustSec').innerHTML		
+	});
+	
+	socket.on('defaultTimeSet', function() {
+		document.getElementById('defaultTimeMsg').innerHTML = "Default Time Reset!";
 	});
 }
 
