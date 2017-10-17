@@ -4,6 +4,25 @@ var incrementFraction = -1;	// The fraction that the image will be revealed in p
 var currentBrightness = 0;	// The current brightness of the namaste image
 var gong = new Audio('https://soundbible.com/grab.php?id=1815&type=mp3');	// The gong sound to be played at the beginning and end
 
+// Toggle on and off the meditation timer info
+function displayTimerInfo() {
+	if (document.getElementById('timerInfo').style.display === 'none') {
+		document.getElementById('timerInfo').style.display = 'block';
+	} else {
+		document.getElementById('timerInfo').style.display = 'none';
+	}
+}
+
+// Toggle on and off the meditation progress info
+function displayProgressInfo() {
+	if (document.getElementById('progressInfo').style.display === 'none') {
+		document.getElementById('progressInfo').style.display = 'block';
+	} else {
+		document.getElementById('progressInfo').style.display = 'none';
+	}
+}
+
+// Change the user's password
 function changePassword(change) {
 	var socket = io();
 
@@ -322,7 +341,10 @@ function getDateTime() {
     
     // Concatenate the year, month, day, hours, and minutes
     var entryDate = dt.getFullYear() + "-" + m + "-" + d + " ";
-   	entryDate += dt.getHours() + ":" + dt.getMinutes();
+   	entryDate += dt.getHours() + ":";
+   	var min = dt.getMinutes();
+   	if (Number(min) < 10) min = "0" + String(min);
+   	entryDate += min;
 
 	return entryDate;
 }

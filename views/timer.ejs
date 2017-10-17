@@ -33,6 +33,19 @@
 			<button id='stop' onclick='stopTimer()'>Stop</button>
 			<button id='reset' onclick='resetTimer()'>Reset</button>
 			<button id='defaultTime' onclick='setDefaultTime()'>Set Default Time</button>
+			<button id='info' onclick='displayTimerInfo()'><i class="fa fa-info-circle" aria-hidden="true"></i></button>
+		</div>
+
+		<div id='timerInfo' style='display: none;'>
+			<p>Here you can record a meditation session.  A gong will sound both when the
+			session starts and when it ends.  Press <span style='color: #77BEFB'>Start</span>
+			to start the timer, <span style='color: #77BEFB'>Stop</span> to stop it,
+			<span style='color: #77BEFB'>Reset</span> to go back to the beginning, or 
+			<span style='color: #77BEFB'>Set Default Time</span> to personalize your default
+			meditation time.  You can adjust the time with either the up and down arrows, 
+			or you can click on the numbers and enter in the appropriate time.  You will be 
+			prompted to make a journal entry after the meditation session ends, where you 
+			can log your thoughts, or you can cancel to not record a journal entry.</p>
 		</div>
 
 		<br>
@@ -54,6 +67,7 @@
   
 <script src='https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js'></script>
 <script src="/socket.io/socket.io.js"></script>
+<script src='https://use.fontawesome.com/c25bf22fda.js'></script>
 <script src='/meditation.js'></script>
 <script>
 </script>

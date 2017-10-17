@@ -36,10 +36,20 @@
 
 	<select name='progressYear' id='progressYear'>
 		<option value='2017'>2017&nbsp&nbsp&nbsp</option>
+		<option value='2018'>2018&nbsp&nbsp&nbsp</option>
 	</select>
 	<br><br>
 	<input type='submit' value='Check Progress' id='retrieveProg' onclick='displayProgress();'>
+	<button id='info' onclick='displayProgressInfo()'><i class="fa fa-info-circle" aria-hidden="true"></i></button>
 
+	<div id='progressInfo' style='display: none;'>
+		<p>Here you can see the progress you've made in meditating.  If you've recorded a 
+		meditation session, you can see the time you meditated, display and modify the journal
+		entry you made <i class='fa fa-book' aria-hidden='true'></i>, delete a journal entry
+		<i class='fa fa-times-circle' aria-hidden='true'></i>, and see what time of the day
+		you meditated.</p>
+	</div>
+		
 	<br><br>
 	<div id='progMsg'>
 		<% if (progCal) { %>

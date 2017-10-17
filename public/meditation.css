@@ -111,6 +111,32 @@ button:hover {
 	transition: all .3s ease-in-out;
 }
 
+#info {
+	background: none;
+	padding: 0px;
+	font-size: 25px;
+	color: #FFFFFF;
+}
+
+#info:hover {
+	color: #77BEFB;
+	transition: all .3s ease-in-out;
+}
+
+#timerInfo, #progressInfo {
+	background-color: rgba(0, 0, 0, 0.5);
+	margin: 20px;
+	margin-left: auto;
+	margin-right: auto;
+	padding: 20px;
+	width: 60%;
+	border-radius: 5px;
+}
+
+#progressInfo {
+	margin-bottom: 0px;
+}
+
 table {
 	font-size: 36px;
 	color: #FFFFFF;
