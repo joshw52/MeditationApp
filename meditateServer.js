@@ -130,7 +130,9 @@ function printCalendar(month, year, dates) {
 				// Modify the time from military time
 				var hrmin = String(dates[logs].datetime).split(":");
 				if (Number(hrmin[0]) > 12) hrmin = String(Number(hrmin[0]) - 12) + ":" + String(hrmin[1]) + " PM";
+				else if (Number(hrmin[0]) === 0) hrmin = "12" + ":" + String(hrmin[1]) + " AM";
 				else hrmin = String(dates[logs].datetime) + " AM";
+					
 				
 				cal += "<div id='logResult'>" + String(dates[logs].medtime);
 				cal += "&nbsp<form method='POST' action='journal' class='journalMods'>";
