@@ -41,8 +41,52 @@ app.use(session({
 	activeDuration: (1000 * 60 * 30)
 }));
 
+app.use(function(req, res, next) {
+	res.header("Access-Control-Allow-Origin", "*");
+	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+	next();
+});
+
 // EJS is the view engine
 app.set('view engine', 'ejs');
+
+// Check that the login credentials are correct, 
+// that the username exists and that the password is correct
+app.post('/login', function(req, res) {
+	mongo.connect(url, function(err, db) {		
+		if (err) throw err;
+		
+		// Look for username
+		db.collection('users').findOne({
+			username: req.body.loginUsername,
+		}, function(err, item) {
+			if (err) throw err;
+			var loginAccepted = false;
+			var loginMsg = "";
+			
+			// If the username is not found or the login password doesn't match the user's password
+			if (!item) {
+				loginMsg = "The username is not valid";
+			} else if (encrypt(req.body.loginPassword) !== item.password) {
+				loginMsg = "The password is not correct";
+			} else {
+				// Indicate if the credentials are correct
+				loginAccepted = true;
+				loginMsg = "The entry is correct!";
+			}
+
+			res.setHeader('Content-Type', 'application/json');
+			res.end(
+				JSON.stringify({
+					loginAccepted: loginAccepted,
+					loginMsg: loginMsg,
+				})
+			);
+			
+			db.close();
+		});
+	});
+});
 
 // Go to the home page, or redirect to the login if a user isn't logged in
 app.get('/home', function(req, res) {
