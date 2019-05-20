@@ -5,7 +5,7 @@ const CleanWebpackPlugin = require('clean-webpack-plugin');
 module.exports = {
     devServer: {
         compress: true,
-        contentBase: path.join(__dirname, 'dist'),
+        contentBase: path.join(__dirname, '/dist'),
         historyApiFallback: true,
         hot: true,
         port: 9000,
@@ -19,21 +19,29 @@ module.exports = {
     module: {
         rules: [
             {
-                test: /\.(js|jsx)$/,
                 exclude: /node_modules/,
+                test: /\.(js|jsx)$/,
                 use: ['babel-loader']
+            },
+            {
+                test: /\.css$/,
+                use: ['style-loader', 'css-loader']
+            },
+            {
+                test: /\.(gif|png|jpe?g|svg)$/i,
+                use: ['file-loader']
             }
         ]
     },
     output: {
         filename: 'bundle.js',
-        path: path.join(__dirname, 'dist'),
+        path: path.join(__dirname, '/dist'),
         publicPath: '/'
     },
     plugins: [
         new CleanWebpackPlugin(),
         new HtmlWebpackPlugin({
-            template: path.join(__dirname, 'index.html'),
+            template: path.join(__dirname, '/index.html'),
         }),
-    ],
+    ]
 };

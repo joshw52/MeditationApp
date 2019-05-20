@@ -1,5 +1,6 @@
 import React from 'react';
 import axios from 'axios';
+import { Link } from "react-router-dom";
 
 class Login extends React.Component {
     constructor(props) {
@@ -22,27 +23,18 @@ class Login extends React.Component {
             loginPassword,
             loginUsername,
         }).then(res => {
-            console.log(res);
+            const { loginAccepted, loginMsg } = res.data;
+            let msg = '';
+            if (!loginAccepted) {
+                msg = loginMsg;
+            }
+            this.setState({ loginError: msg });
         });
-        // userLogin(loginPassword, loginUsername);
-        // check if the server approved of the username/password combo
-        // socket.on('loginCheckResponse', function(response) {
-        //     // If the login was accepted, login to the site
-        //     if (response.loginAccepted === true) {
-        //         // Now the form can be submitted
-        //         document.getElementById('loginForm').submit();
-        //     }
-        //     // If the login was not accepted, display an error
-        //     else {
-        //         document.getElementById('loginErr').innerHTML = "<br><span style='color: #FF5555;'>Username/password credentials are incorrect!</span><br><br>";
-        //         document.getElementById('accountCreation').style.display = "none";
-        //     }
-        //     socket.close();
-        // });
     }
 
-    onChange = (updatedInput, field) => {
-        this.setState({ [field]: updatedInput });
+    onChange = event => {
+        const { name, value } = event.target;
+        this.setState({ [name]: value });
     }
 
     render () {
@@ -55,25 +47,34 @@ class Login extends React.Component {
         return (
             <div>
                 <h1>Meditation Tracker</h1>
-                <input
-                    onChange={e => this.onChange(e.target.value, 'loginUsername')}
-                    placeholder="Username"
-                    type='text'
-                    value={loginUsername}
-                />
-                <input
-                    onChange={e => this.onChange(e.target.value, 'loginPassword')}
-                    placeholder='Password'
-                    type='password'
-                    value={loginPassword}
-                />
-                <input
-                    type='submit'
-                    onClick={this.loginMeditation}
-                    value='Login'
-                />
-                <div id='loginErr'>{loginError}</div>
-                <p>No account? <a href='account'>Register</a>.</p>
+                <div className="meditationForm">
+                    <input
+                        onChange={this.onChange}
+                        name="loginUsername"
+                        placeholder="Username"
+                        type='text'
+                        value={loginUsername}
+                    />
+                    <input
+                        name="loginPassword"
+                        onChange={this.onChange}
+                        placeholder='Password'
+                        type='password'
+                        value={loginPassword}
+                    />
+                    <input
+                        className="formButtom"
+                        name="loginSubmit"
+                        onClick={this.loginMeditation}
+                        type='submit'
+                        value='Login'
+                    />
+                    {loginError.length ? <div className="errMsg">{loginError}</div> : null}
+                    <div>
+                        No account?
+                        <Link to='createaccount'>Create an Account</Link>
+                    </div>
+                </div>
             </div>
         );
     }
