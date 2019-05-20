@@ -154,8 +154,7 @@ class CreateAccount extends React.Component {
                 </div>
                 {accountError.length ? <div className="errMsg">{accountError}</div> : null}
                 <div>
-                    Already a member? 
-                    <Link to='/'>Login</Link>
+                    Already a member? <Link to='/'>Login</Link>
                 </div>
             </div>
         );

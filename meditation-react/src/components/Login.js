@@ -71,8 +71,7 @@ class Login extends React.Component {
                     />
                     {loginError.length ? <div className="errMsg">{loginError}</div> : null}
                     <div>
-                        No account?
-                        <Link to='createaccount'>Create an Account</Link>
+                        No account? <Link to='createaccount'>Create One</Link>
                     </div>
                 </div>
             </div>
