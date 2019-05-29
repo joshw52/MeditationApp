@@ -14,7 +14,7 @@ body {
 	font-size: 20px;
 }
 
-#menubar {
+.menubar {
 	background-color: rgba(0, 0, 0, 0.7);
 	padding: 10px;
 	position: fixed;
@@ -23,14 +23,14 @@ body {
 	z-index: 100;
 }
 
-#menubar ul {
+.menubar ul {
 	list-style-type: none;
 	margin: 0;
 	padding: 0;
 	overflow: hidden;
 }
 
-#menubar li {
+.menubar li {
 	color: #A8A6A8;
 	padding: 10px;
 	padding-left: 20px;
@@ -41,16 +41,16 @@ body {
 	transition: all .3s ease-in-out;
 }
 
-#menubar li:hover {
+.menubar li:hover {
 	color: #FFFFFF;
 }
 
-a {
+a, .homePage span {
 	color: #FFFFFF;
 	text-decoration: none;
 }
 
-a:hover {
+a:hover, .homePage span:hover {
 	color: #77ADFB;
 	text-decoration: none;
 	transition: all .3s ease-in-out;
@@ -84,7 +84,7 @@ select:focus {
 
 /* Home page */
 
-#homePage {
+.homePage {
 	background-color: rgba(0, 0, 0, 0.5);
 	border-radius: 5px;
 	margin-top: 120px;
@@ -95,17 +95,17 @@ select:focus {
 	font-size: 20px;
 }
 
-#homeQuote {
+.homeQuote {
 	color: #FFFFFF;
 }
 
 /* Meditation Page */
 
-#meditationTimer {
+.meditationTimer {
 	margin-top: 120px;
 }
 
-#timerAdjust {
+.timerAdjust {
 	margin-left: auto;
 	margin-right: auto;
 	font-family: "Muli", Verdana;
@@ -130,26 +130,26 @@ button:hover {
 	transition: all .3s ease-in-out;
 }
 
-#defaultTimeMsg {
+.defaultTimeMsg {
 	margin-top: 20px;
 	margin-bottom: 10px;
 	margin-left: 0;
 	margin-right: 0;
 }
 
-#info {
+.info {
 	background: none;
 	padding: 0px;
 	font-size: 25px;
 	color: #FFFFFF;
 }
 
-#info:hover {
+.info:hover {
 	color: #77BEFB;
 	transition: all .3s ease-in-out;
 }
 
-#timerInfo, #progressInfo {
+.timerInfo, .progressInfo {
 	background-color: rgba(0, 0, 0, 0.5);
 	margin: 20px;
 	margin-left: auto;
@@ -159,7 +159,7 @@ button:hover {
 	border-radius: 5px;
 }
 
-#progressInfo {
+.progressInfo {
 	margin-bottom: 0px;
 }
 
@@ -168,7 +168,7 @@ table {
 	color: #FFFFFF;
 }
 
-#hrup, #minup, #secup {
+.hrup, .minup, .secup {
 	width: 0px;
 	height: 0px;
 	border-left: 50px solid transparent;
@@ -177,7 +177,7 @@ table {
 	opacity: 0.7;
 }
 
-#hrdown, #mindown, #secdown {
+.hrdown, .mindown, .secdown {
 	width: 0px;
 	height: 0px;
 	border-left: 50px solid transparent;
@@ -186,7 +186,7 @@ table {
 	opacity: 0.7;
 }
 
-#hrup:hover, #secup:hover, #minup:hover {
+.hrup:hover, .secup:hover, .minup:hover {
 	color: #CAC8CA;
 	width: 0px;
 	height: 0px;
@@ -197,7 +197,7 @@ table {
 	transition: all .3s ease-in-out;
 }
 
-#hrdown:hover, #mindown:hover, #secdown:hover {
+.hrdown:hover, .mindown:hover, .secdown:hover {
 	width: 0px;
 	height: 0px;
 	border-left: 50px solid transparent;
@@ -207,7 +207,7 @@ table {
 	transition: all .3s ease-in-out;
 }
 
-#hrInput, #minInput, #secInput {
+.hrInput, .minInput, .secInput {
 	background-color: #000000;
 	color: #CAC8CA;
 	width: 100px;
@@ -215,19 +215,19 @@ table {
 	text-align: center;
 }
 
-#adjustHr, #adjustMin, #adjustSec {
+.adjustHr, .adjustMin, .adjustSec {
 	opacity: 0.7;
 }
 
-#hrInput, #minInput, #secInput {
+.hrInput, .minInput, .secInput {
 	border-radius: 5px;
 }
 
-#colonspacer {
+.colonspacer {
 	width: 30px;
 }
 
-#buddhaFill {
+.buddhaFill {
     background-color: #000000;
 	color: #FFFFFF;
 	box-shadow: 0px 0px 2px 2px #000000;
@@ -241,7 +241,7 @@ table {
 	transition: all .3s ease-in-out;
 }
 
-#buddhaFillImg {
+.buddhaFillImg {
 	height: 280px;
 	margin: 50px;
 	filter: invert(0%);	
@@ -249,11 +249,11 @@ table {
 	display: none;
 }
 
-#meditationJournal {
+.meditationJournal {
 	margin-top: 120px;
 }
 
-#journalEntry, #jentryMod {
+.journalEntry, .jentryMod {
 	height: 500px;
 	width: 500px;
 	background-color: #000000;
@@ -263,7 +263,7 @@ table {
 	padding: 15px;
 }
 
-#logJournal {
+.logJournal {
 	font-family: "Raleway", Verdana;
 	font-size: 26px;
 	background-color: #A8A6A8;
@@ -275,7 +275,7 @@ table {
 	opacity: 0.7;
 }
 
-#logJournal:hover {
+.logJournal:hover {
 	background-color: #CAC8CA;
 	color: #000000;
 	transition: all .3s ease-in-out;
@@ -283,7 +283,7 @@ table {
 }
 
 /* Progress */
-#progressCalendar {
+.progressCalendar {
 	border: 2px solid #CCCCCC;
 	border-collapse: separate;
 	border-spacing: 0px;
@@ -292,27 +292,27 @@ table {
 	margin-right: auto;
 }
 
-#progressCalendar th, #progressCalendar td {
+.progressCalendar th, .progressCalendar td {
 	border: 2px solid #CCCCCC;
 	text-align: center;
 	width: 125px;
 }
 
-#progressCalendar th {
+.progressCalendar th {
 	background-color: rgba(0, 0, 0, 0.6);
 	color: #FFFFFF;
 	height: 50px;
 	font-size: 20px;
 }
 
-#progressCalendar td {
+.progressCalendar td {
 	background-color: rgba(0, 0, 0, 0.3);
 	position: relative;
 	height: 125px;
 	vertical-align: top;
 }
 
-#monthDay {
+.monthDay {
 	background-color: rgba(0, 0, 0, 0.4);
 	width: 100%;
 	padding: 5px;
@@ -321,12 +321,12 @@ table {
 	top: 0;
 }
 
-#dayRecord {
+.dayRecord {
 	margin-top: 15px;
 	text-align: left;
 }
 
-#logResult {
+.logResult {
 	margin: 10px 10px 10px 10px;
 }
 
@@ -334,7 +334,7 @@ table {
 	display: inline;
 }
 
-#editJournal, #deleteJournal {
+.editJournal, .deleteJournal {
 	background: none;
 	border: 0;
 	color: #FFFFFF;
@@ -342,25 +342,25 @@ table {
 	padding: 0px;
 }
 
-#editJournal:hover {
+.editJournal:hover {
 	color: #77BEFB;
 	opacity: 0.85;
 }
 
-#deleteJournal:hover {
+.deleteJournal:hover {
 	color: #FF7777;
 	opacity: 0.85;
 }
 
 /* Account Creation Page */
-#accountCreate {
+.accountCreate {
 	margin-left: auto;
 	margin-right: auto;
 	font-size: 24px;
 	text-align: left;
 }
 
-#accountCreate td {
+.accountCreate td {
 	padding: 5px;
 }
 
@@ -408,12 +408,12 @@ input[type="submit"]:hover, .formButtom:hover {
 
 /* Account modification */
 
-#accountModification, #passwordChange {
+.accountModification, .passwordChange {
 	margin-left: auto;
 	margin-right: auto;
 }
 
-#accountModification input[type="text"], #passwordChange input[type="password"] {
+.accountModification input[type="text"], .passwordChange input[type="password"] {
 	width: 400px;
 	font-size: 24px;
 }
@@ -425,6 +425,6 @@ input[type="submit"]:hover, .formButtom:hover {
 	text-align: center;
 }
 
-#modbuttons {
+.modbuttons {
 	text-align: center;
 }

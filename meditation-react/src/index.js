@@ -4,9 +4,7 @@ import { BrowserRouter as Router, Route } from "react-router-dom";
 
 import CreateAccount from './components/CreateAccount';
 import Login from './components/Login';
-// // import Home from './components/Home';
-// // import Meditate from './components/Meditate';
-// // import Calendar from './components/Calendar';
+import Home from './components/Home';
 
 import './styles/meditation.css';
 
@@ -15,10 +13,8 @@ class App extends React.Component {
         return (
             <Router>
                 <Route exact path="/" component={Login} />
-                {/* <Route path="/calendar" component={Calendar} /> */}
                 <Route path="/createaccount" component={CreateAccount} />
-                {/* <Route path="/home" component={Home} />
-                <Route path="/meditate" component={Meditate} /> */}
+                <Route path="/home" component={Home} />
             </Router>
         );
     }
