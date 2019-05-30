@@ -6,10 +6,10 @@ class Meditate extends React.Component {
         super(props);
 
         this.state = {
-            meditateTimer: 36000,
-            hourEditing: false,
-            minuteEditing: false,
-            secondEditing: false,
+            meditateHours: '0',
+            meditateMinutes: '10',
+            meditateSeconds: '0',
+            timerEditing: false,
         };
     };
 
@@ -23,53 +23,53 @@ class Meditate extends React.Component {
         }));
     }
 
-    modifyTime = timeAmt => {
-        this.setState(state => {
-            if (state.meditateTimer + timeAmt >= 0) {
-                return {
-                    meditateTimer: state.meditateTimer + timeAmt,
-                };
-            }
-        });
+    modifyTime = event => {
+        const { name, value } = event.target;
+
+        if (
+            Number(value) &&
+            Number(value) >= 0 &&
+            ((name === 'meditateMinutes' || name === 'meditateSeconds') && Number(value) < 60)
+        ) {
+            this.setState({ [name]: value });
+        }
     }
 
     render () {
         const {
-            meditateTimer,
-            hourEditing,
-            minuteEditing,
-            secondEditing,
+            meditateHours,
+            meditateMinutes,
+            meditateSeconds,
+            timerEditing
         } = this.state;
-
-        const meditateHours = Math.floor(meditateTimer / 3600);
-        const meditateMinutes = Math.floor(meditateTimer % 3600 / 60);
-        const meditateSeconds = Math.floor(meditateTimer % 3600 % 60);
 
         return (
             <div>
                 <div className='meditationTimer'>
                     <div className='timerAdjust'>
-                        <div className='hrup' onClick={() => this.modifyTime(3600)} />
-                        <div className='minup' onClick={() => this.modifyTime(60)} />
-                        <div className='secup' onClick={() => this.modifyTime(1)} />
-                        <div className='adjustHr' onClick={() => toggleEditing('hourEditing')}>
-                            {meditateHours}
+                        <div className='timerRow'>
+                            {/* {hourEditing && <input className='hrInput' value={meditateHours} />} */}
+                            <input
+                                className='timerInput'
+                                name='meditateHours'
+                                onChange={this.modifyTime}
+                                value={meditateHours}
+                            />
+                            {/* {minuteEditing && <input className='minInput' value={meditateMinutes} />} */}
+                            <input
+                                className='timerInput'
+                                name='meditateMinutes'
+                                onChange={this.modifyTime}
+                                value={meditateMinutes}
+                            />
+                            {/* {secondEditing && <input className='secInput' value={meditateSeconds} />} */}
+                            <input
+                                className='timerInput'
+                                name='meditateSeconds'
+                                onChange={this.modifyTime}
+                                value={meditateSeconds}
+                            />
                         </div>
-                        {hourEditing && <input className='hrInput' value={meditateHours} />}
-                        <div className='colonspacer'>:</div>
-                        <div className='adjustMin' onClick={() => toggleEditing('minuteEditing')}>
-                            {meditateMinutes}
-                        </div>
-                        {minuteEditing && <input className='minInput' value={meditateMinutes} />}
-                        <div className='colonspacer'>:</div>
-                        <div className='adjustSec' onClick={() => toggleEditing('secondEditing')}>
-                            {meditateSeconds}
-                        </div>
-                        {secondEditing && <input className='secInput' value={meditateSeconds} />}
-                        
-                        <div className='hrdown' onClick={() => this.modifyTime(-3600)} />
-                        <div className='mindown' onClick={() => this.modifyTime(-60)} />
-                        <div className='secdown' onClick={() => this.modifyTime(-1)} />
                     </div>
 
                     {/* <div className='timerButtons'>
