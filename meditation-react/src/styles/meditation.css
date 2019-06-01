@@ -68,6 +68,10 @@ select:focus {
 	opacity: 0.85;
 }
 
+.textSpan {
+	color: #77BEFB;
+}
+
 /* Login Page */
 .meditationForm {
 	display: flex;
@@ -118,6 +122,7 @@ button {
 	font-size: 18px;
 	background-color: #A8A6A8;
 	color: #000000;
+	cursor: pointer;
 	border: 0px;
 	border-radius: 5px;
 	margin: 35px 10px 15px 10px;
@@ -141,12 +146,14 @@ button:hover {
 
 .info {
 	background: none;
+	cursor: pointer;
 	padding: 0px;
 	font-size: 25px;
 	color: #FFFFFF;
 }
 
 .info:hover {
+	background: none;
 	color: #77BEFB;
 	transition: all .3s ease-in-out;
 }
@@ -178,7 +185,7 @@ button:hover {
 	border-radius: 5px;
 	color: #CAC8CA;
 	font-size: 1.0em;
-	width: 100px;
+	width: 75px;
 	height: 40px;
 	margin: 5px;
 	text-align: center;

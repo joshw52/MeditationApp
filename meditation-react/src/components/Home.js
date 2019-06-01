@@ -33,7 +33,6 @@ class Home extends React.Component {
     }
 
     render () {
-        console.log(this.renderMeditationPage());
         return (
             <div>
                 <div className="menubar">
