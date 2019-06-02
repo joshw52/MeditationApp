@@ -103,7 +103,7 @@ class Meditate extends React.Component {
         const { journalEntry } = this.state;
         axios.post("http://127.0.0.1:8080/meditationEntry", {
             username: "test",
-	        meditateDateTime: moment().format(),
+	        meditateDateTime: moment().unix(),
 	        meditateDuration: 1000,
 	        journalEntry
         }).then(res => {

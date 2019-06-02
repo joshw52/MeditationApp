@@ -1,5 +1,6 @@
 import React from 'react';
 
+import Calendar from './Calendar.js';
 import Meditate from './Meditate.js';
 import Welcome from './Welcome.js';
 
@@ -19,6 +20,10 @@ class Home extends React.Component {
     renderMeditationPage = () => {
         const { meditateTab } = this.state;
         switch (meditateTab) {
+            case 'progress':
+                return (
+                    <Calendar />
+                );
             case 'meditate':
                 return (
                     <Meditate />

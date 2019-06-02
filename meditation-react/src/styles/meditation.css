@@ -252,8 +252,15 @@ button:hover {
 }
 
 /* Progress */
+.progressCalendarContainer {
+	margin-top: 80px;
+	margin-left: auto;
+	margin-right: auto;
+	width: 80%;
+}
+
 .progressCalendar {
-	border: 2px solid #CCCCCC;
+	border: 1px solid #CCCCCC;
 	border-collapse: separate;
 	border-spacing: 0px;
 	font-size: 16px;
@@ -262,7 +269,7 @@ button:hover {
 }
 
 .progressCalendar th, .progressCalendar td {
-	border: 2px solid #CCCCCC;
+	border: 1px solid #CCCCCC;
 	text-align: center;
 	width: 125px;
 }
@@ -270,7 +277,7 @@ button:hover {
 .progressCalendar th {
 	background-color: rgba(0, 0, 0, 0.6);
 	color: #FFFFFF;
-	height: 50px;
+	height: 40px;
 	font-size: 20px;
 }
 
@@ -281,10 +288,15 @@ button:hover {
 	vertical-align: top;
 }
 
+.progressSelect {
+	background-color: rgba(0, 0, 0, 0.7);
+	border-radius: 5px;
+	color: #ffffff;
+	margin: 10px;
+}
+
 .monthDay {
-	background-color: rgba(0, 0, 0, 0.4);
-	width: 100%;
-	padding: 5px;
+	width: 95%;
 	text-align: right;
 	position: absolute;
 	top: 0;
