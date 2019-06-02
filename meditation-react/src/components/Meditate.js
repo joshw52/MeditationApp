@@ -1,4 +1,7 @@
 import React from 'react';
+import axios from 'axios';
+import moment from 'moment-timezone';
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons'
 
@@ -7,10 +10,12 @@ class Meditate extends React.Component {
         super(props);
 
         this.state = {
+            gong: new Audio('https://soundbible.com/grab.php?id=1815&type=mp3'),
+            journalEntry: '',
             journalView: false,
             meditateHours: '0',
-            meditateMinutes: '10',
-            meditateSeconds: '0',
+            meditateMinutes: '0',
+            meditateSeconds: '02',
             timerInfoShow: false,
             timerRunning: false,
         };
@@ -22,10 +27,11 @@ class Meditate extends React.Component {
         }));
     }
 
-    modifyTime = event => {
+    modifyEntry = event => {
         const { name, value } = event.target;
 
         if (
+            name === 'journalEntry' ||
             Number(value) &&
             Number(value) >= 0 &&
             ((name === 'meditateMinutes' || name === 'meditateSeconds') && Number(value) < 60)
@@ -38,13 +44,15 @@ class Meditate extends React.Component {
         clearInterval(this.meditationTimer);
         this.setState({
             meditateHours: '0',
-            meditateMinutes: '10',
-            meditateSeconds: '0',
+            meditateMinutes: '0',
+            meditateSeconds: '02',
             timerRunning: false,
         });
     }
 
     startTimer = () => {
+        const { gong } = this.state;
+        gong.play();
         this.setState({
             timerRunning: true,
         });
@@ -61,12 +69,13 @@ class Meditate extends React.Component {
                     (Number(meditateMinutes) * 60) +
                     Number(meditateSeconds) - 1;
 
-                if (totalTime <= 0) {
+                if (totalTime < 0) {
                     clearInterval(this.meditationTimer);
-                    this.setState({
+                    gong.play();
+                    return {
                         journalView: true,
                         timerRunning: false,
-                    });
+                    };
                 } else {
                     const hours = Math.floor(totalTime / 3600);
                     let minutes = Math.floor((totalTime - (hours * 3600)) / 60);
@@ -90,8 +99,26 @@ class Meditate extends React.Component {
         });
     }
 
+    submitMeditationEntry = () => {
+        const { journalEntry } = this.state;
+        axios.post("http://127.0.0.1:8080/meditationEntry", {
+            username: "test",
+	        meditateDateTime: moment().format(),
+	        meditateDuration: 1000,
+	        journalEntry
+        }).then(res => {
+            // const { loginAccepted, loginMsg } = res.data;
+            // let msg = '';
+            // if (!loginAccepted) {
+            //     msg = loginMsg;
+            // }
+            // this.setState({ loginError: msg });
+        });
+    }
+
     render () {
         const {
+            journalEntry,
             journalView,
             meditateHours,
             meditateMinutes,
@@ -103,11 +130,20 @@ class Meditate extends React.Component {
         return (
             <div>
                 {journalView ?
-                    <div className='meditationJournal' style='display: none;'>
-                        {/* {/* <form action='/timer' method='POST' className='meditationEntry'> */}
+                    <div className='meditationJournal'>
                         <h3>Log your meditation</h3>
-                        <textarea className='journalEntry' name='journalEntry' />
-                        <input type='submit' className='logJournal' value='Log Journal' />
+                        <textarea
+                            className='journalEntry'
+                            name='journalEntry'
+                            onChange={this.modifyEntry}
+                            value={journalEntry}
+                        />
+                        <input
+                            className='logJournal'
+                            onClick={this.submitMeditationEntry}
+                            type='submit'
+                            value='Log Journal'
+                        />
                     </div> :
                     <div className='meditationTimer'>
                         <div className='timerAdjust'>
@@ -116,28 +152,28 @@ class Meditate extends React.Component {
                                     className='timerInput'
                                     disabled={timerRunning}
                                     name='meditateHours'
-                                    onChange={this.modifyTime}
+                                    onChange={this.modifyEntry}
                                     value={meditateHours}
                                 />
                                 <input
                                     className='timerInput'
                                     disabled={timerRunning}
                                     name='meditateMinutes'
-                                    onChange={this.modifyTime}
+                                    onChange={this.modifyEntry}
                                     value={meditateMinutes}
                                 />
                                 <input
                                     className='timerInput'
                                     disabled={timerRunning}
                                     name='meditateSeconds'
-                                    onChange={this.modifyTime}
+                                    onChange={this.modifyEntry}
                                     value={meditateSeconds}
                                 />
                             </div>
                         </div>
 
                         <div className='timerRow'>
-                            <button onClick={this.startTimer}>Start</button>
+                            <button disabled={timerRunning} onClick={this.startTimer}>Start</button>
                             <button onClick={this.stopTimer}>Stop</button>
                             <button onClick={this.setDefaultTime}>Reset</button>
                             <button className='info' onClick={this.displayTimerInfo}>

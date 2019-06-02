@@ -133,6 +133,34 @@ app.post('/login', function(req, res) {
 	});
 });
 
+app.post('/meditationEntry', function(req, res) {
+	var meditationEntry = {
+		// username: req.session.user,
+		username: req.body.username,
+		meditateDateTime: req.body.meditateDateTime,
+		meditateDuration: req.body.meditateDuration,
+		journalEntry: req.body.journalEntry
+	}
+
+	// Insert the meditation entry to the database
+	mongo.connect(url, function(err, db) {
+		if (err) throw err;
+		
+		db.collection('meditationrecord').insert(meditationEntry, function(err, docs) {
+			if (err) throw err;
+						
+			res.setHeader('Content-Type', 'application/json');
+			res.end(
+				JSON.stringify({
+					meditationEntryMsg: 'Meditation Entry Made!',
+				})
+			);
+	
+			db.close();
+		});
+	});
+});
+
 // Go to the home page, or redirect to the login if a user isn't logged in
 // app.get('/home', function(req, res) {
 // 	if (req.session.user)

@@ -214,10 +214,15 @@ button:hover {
 }
 
 .meditationJournal {
-	margin-top: 120px;
+	margin-top: 80px;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
 }
 
 .journalEntry, .jentryMod {
+	font-family: "Raleway", Verdana;
 	height: 500px;
 	width: 500px;
 	background-color: #000000;
