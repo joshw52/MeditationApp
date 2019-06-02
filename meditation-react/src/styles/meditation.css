@@ -19,6 +19,7 @@ body {
 	padding: 10px;
 	position: fixed;
 	top: 0;
+	left: 0;
 	width: 100%;
 	z-index: 100;
 }
@@ -58,10 +59,15 @@ a:hover, .homePage span:hover {
 }
 
 select {
+	border: 1.5px solid #ffffff;
 	color: #000000;
+	cursor: pointer;
 	padding: 5px;
 	font-size: 20px;
 	opacity: 0.7;
+	-webkit-box-shadow: none;
+	-moz-box-shadow: none;
+	box-shadow: none;
 }
 
 select:focus {
@@ -106,8 +112,12 @@ select:focus {
 
 /* Meditation Page */
 
+.textLink {
+	cursor: pointer;
+}
+
 .meditationTimer {
-	margin-top: 120px;
+	margin-top: 90px;
 }
 
 .timerAdjust {
@@ -146,10 +156,11 @@ button:hover {
 
 .info {
 	background: none;
-	cursor: pointer;
-	padding: 0px;
-	font-size: 25px;
 	color: #FFFFFF;
+	cursor: pointer;
+	font-size: 25px;
+	padding: 0px;
+	transition: all .3s ease-in-out;
 }
 
 .info:hover {
@@ -158,18 +169,15 @@ button:hover {
 	transition: all .3s ease-in-out;
 }
 
-.timerInfo, .progressInfo {
+.infoText {
 	background-color: rgba(0, 0, 0, 0.5);
+	border-radius: 5px;
+	font-size: 0.9em;
 	margin: 20px;
 	margin-left: auto;
 	margin-right: auto;
-	padding: 20px;
+	padding: 5px 15px 5px 15px;
 	width: 60%;
-	border-radius: 5px;
-}
-
-.progressInfo {
-	margin-bottom: 0px;
 }
 
 .timerRow {
@@ -253,7 +261,7 @@ button:hover {
 
 /* Progress */
 .progressCalendarContainer {
-	margin-top: 80px;
+	margin-top: 70px;
 	margin-left: auto;
 	margin-right: auto;
 	width: 80%;
@@ -277,8 +285,8 @@ button:hover {
 .progressCalendar th {
 	background-color: rgba(0, 0, 0, 0.6);
 	color: #FFFFFF;
-	height: 40px;
-	font-size: 20px;
+	height: 30px;
+	font-size: 1em;
 }
 
 .progressCalendar td {

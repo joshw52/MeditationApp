@@ -3,13 +3,14 @@ import axios from 'axios';
 import moment from 'moment-timezone';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faInfoCircle } from '@fortawesome/free-solid-svg-icons'
+import { faBook, faInfoCircle, faTimesCircle } from '@fortawesome/free-solid-svg-icons'
 
 class Calendar extends React.Component {
     constructor(props) {
         super(props);
 
         this.state = {
+            displayProgressInfo: false,
             progressMonth: moment().format('MMMM'),
             progressYear: moment().format('YYYY'),
         };
@@ -69,7 +70,15 @@ class Calendar extends React.Component {
         return years;
     }
 
+    toggleProgressInfo = () => {
+        this.setState(state => ({
+            displayProgressInfo: !state.displayProgressInfo,
+        }));
+    }
+
     render () {
+        const { displayProgressInfo } = this.state;
+
         return (
             <div className='progressCalendarContainer'>
                 <select
@@ -92,16 +101,23 @@ class Calendar extends React.Component {
                     {this.renderYearSelection()}
                 </select>
 
-                {/* <input type='submit' value='Check Progress' className='retrieveProg' onclick='displayProgress();'>
-                <button className='info' onclick='displayProgressInfo()'><i class="fa fa-info-circle" aria-hidden="true"></i></button>
+                
+                <button className='info' onClick={this.toggleProgressInfo}>
+                    <FontAwesomeIcon icon={faInfoCircle} />
+                </button>
 
-                <div className='progressInfo' style='display: none;'>
-                    <p>Here you can see the progress you've made in meditating.  If you've recorded a 
-                    meditation session, you can see the time you meditated, display and modify the journal
-                    entry you made <i class='fa fa-book' aria-hidden='true'></i>, delete a meditation entry
-                    <i class='fa fa-times-circle' aria-hidden='true'></i>, and see what time of the day
-                    you meditated.</p>
-                </div> */}
+                {displayProgressInfo && (
+                    <div className='infoText'>
+                        <p>
+                            Here you can see the progress you've made in meditating. 
+                            If you've recorded a meditation session, you can see the
+                            time you meditated, display and modify the journal entry you 
+                            made <FontAwesomeIcon icon={faBook} />, delete a meditation
+                            entry <FontAwesomeIcon icon={faTimesCircle} />, and see what
+                            time of the day you meditated.
+                        </p>
+                    </div>
+                )}
 
                 <table className='progressCalendar'>
                     <thead>

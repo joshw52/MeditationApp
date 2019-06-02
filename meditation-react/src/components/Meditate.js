@@ -184,7 +184,7 @@ class Meditate extends React.Component {
                         <div className='defaultTimeMsg'></div>
 
                         {timerInfoShow &&
-                            <div className='timerInfo'>
+                            <div className='infoText'>
                                 <p>Here you can record a meditation session.  A gong will sound both when the
                                 session starts and when it ends.  Press <span className='textSpan'>Start</span> to
                                 start the timer, <span className='textSpan'>Stop</span> to stop it, <span className='textSpan'>Reset</span> to
