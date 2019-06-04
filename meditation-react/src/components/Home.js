@@ -1,4 +1,5 @@
 import React from 'react';
+import axios from 'axios';
 
 import Calendar from './Calendar.js';
 import Meditate from './Meditate.js';

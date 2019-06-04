@@ -118,6 +118,7 @@ app.post('/login', function(req, res) {
 				// Indicate if the credentials are correct
 				loginAccepted = true;
 				loginMsg = "The entry is correct!";
+				sessionUser = req.body.loginUsername;
 			}
 
 			res.setHeader('Content-Type', 'application/json');
@@ -131,6 +132,27 @@ app.post('/login', function(req, res) {
 			db.close();
 		});
 	});
+});
+
+// Go to the home page, or redirect to the login if a user isn't logged in
+app.post('/checkUserSession', function(req, res) {
+	let canMeditate = false;
+	if (sessionUser && req.body.sessionUser === sessionUser)
+		canMeditate = true;
+	console.log(session);
+	
+	res.setHeader('Content-Type', 'application/json');
+	res.end(JSON.stringify({ canMeditate, sessionUser: sessionUser }));
+});
+
+// Log out of the site
+app.post('/killUserSession', function(req, res) {
+	req.session.reset();
+	res.setHeader('Content-Type', 'application/json');
+	res.end(JSON.stringify({
+		canMeditate: false,
+		sessionUser: sessionUser,
+	}));
 });
 
 app.post('/meditationEntry', function(req, res) {
@@ -160,14 +182,6 @@ app.post('/meditationEntry', function(req, res) {
 		});
 	});
 });
-
-// Go to the home page, or redirect to the login if a user isn't logged in
-// app.get('/home', function(req, res) {
-// 	if (req.session.user)
-// 		res.render('index');
-// 	else
-// 		res.render('login', { lerr: false, accountCreated: false });
-// });
 
 // Get the records for a user for a month/year
 function getDates(user, month, year, callback) {
@@ -366,15 +380,6 @@ function printCalendar(month, year, dates) {
 // 	});
 	
 // 	res.render('progress', { progCal: "Meditation Entry Deleted!" });
-// });
-
-/* Logout */
-
-// Log out of the site
-// app.get('/logout', function(req, res) {
-// 	req.session.reset();
-// 	sessionUser = "";
-// 	res.render('login', { lerr: false, accountCreated: false });
 // });
 
 /* Timer code */

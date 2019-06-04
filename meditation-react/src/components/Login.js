@@ -14,6 +14,7 @@ class Login extends React.Component {
     };
 
     loginMeditation = () => {
+        const { updateSession } = this.props;
         const {
             loginPassword,
             loginUsername,
@@ -25,9 +26,9 @@ class Login extends React.Component {
         }).then(res => {
             const { loginAccepted, loginMsg } = res.data;
             let msg = '';
-            if (!loginAccepted) {
-                msg = loginMsg;
-            }
+            if (!loginAccepted) msg = loginMsg;
+            else updateSession(loginUsername);
+
             this.setState({ loginError: msg });
         });
     }
