@@ -100,12 +100,11 @@ class Meditate extends React.Component {
     }
 
     submitMeditationEntry = () => {
-        const { journalEntry } = this.state;
         axios.post("http://127.0.0.1:8080/meditationEntry", {
             username: "test",
 	        meditateDateTime: moment().unix(),
 	        meditateDuration: 1000,
-	        journalEntry
+	        journalEntry: this.state.journalEntry
         }).then(res => {
             // const { loginAccepted, loginMsg } = res.data;
             // let msg = '';
@@ -113,6 +112,7 @@ class Meditate extends React.Component {
             //     msg = loginMsg;
             // }
             // this.setState({ loginError: msg });
+            this.props.changeMeditationTab('progress');
         });
     }
 

@@ -28,7 +28,9 @@ class Home extends React.Component {
                 );
             case 'meditate':
                 return (
-                    <Meditate />
+                    <Meditate
+                        changeMeditationTab={this.changeMeditationTab}
+                    />
                 );
             default:
                 return (
