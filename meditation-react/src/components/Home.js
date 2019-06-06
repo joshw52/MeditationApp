@@ -1,9 +1,10 @@
 import React from 'react';
-import axios from 'axios';
 
 import Calendar from './Calendar.js';
 import Meditate from './Meditate.js';
 import Welcome from './Welcome.js';
+
+import history from '../history';
 
 class Home extends React.Component {
     constructor(props) {
@@ -38,6 +39,11 @@ class Home extends React.Component {
         }
     }
 
+    logout = () => {
+        this.props.killSession();
+        history.push('/');
+    }
+
     render () {
         return (
             <div>
@@ -47,7 +53,7 @@ class Home extends React.Component {
                         <li onClick={() => this.changeMeditationTab('meditate')}>Meditation</li>
                         <li onClick={() => this.changeMeditationTab('progress')}>Progress</li>
                         <li onClick={() => this.changeMeditationTab('accountMod')}>Account</li>
-                        <li onClick={() => this.changeMeditationTab('logout')}>Logout</li>
+                        <li onClick={this.logout}>Logout</li>
                     </ul>
                 </div>
                 {this.renderMeditationPage()}

@@ -2,6 +2,8 @@ import React from 'react';
 import axios from 'axios';
 import { Link } from "react-router-dom";
 
+import history from '../history';
+
 class Login extends React.Component {
     constructor(props) {
         super(props);
@@ -14,7 +16,7 @@ class Login extends React.Component {
     };
 
     loginMeditation = () => {
-        const { updateSession } = this.props;
+        const { checkUserSession } = this.props;
         const {
             loginPassword,
             loginUsername,
@@ -24,12 +26,13 @@ class Login extends React.Component {
             loginPassword,
             loginUsername,
         }).then(res => {
-            const { loginAccepted, loginMsg } = res.data;
-            let msg = '';
-            if (!loginAccepted) msg = loginMsg;
-            else updateSession(loginUsername);
-
-            this.setState({ loginError: msg });
+            const { loginAccepted, loginMsg, loginSession } = res.data;
+            let loginError = '';
+            if (!loginAccepted) this.setState({ loginError: loginMsg });
+            else {
+                checkUserSession(loginSession);
+                history.push('/home');
+            }
         });
     }
 

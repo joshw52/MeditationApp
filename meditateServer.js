@@ -1,11 +1,8 @@
 var express = require('express');
-var path = require('path');
+// var path = require('path');
 var parser = require('body-parser');
 var mongo = require('mongodb').MongoClient;
 var OID = require('mongodb').ObjectID;
-var session = require('client-sessions');
-
-var sessionUser = "";
 
 var app = express();
 var server = require('http').createServer(app);
@@ -24,18 +21,12 @@ var port = 8080;
 var db = 'meditation';
 var url = 'mongodb://localhost:27017/' + db;
 
+var userLogin = '';
+
 app.set('port', port);
 
 app.use(parser.json());
 app.use(parser.urlencoded({ extended: true }));
-
-// https://stormpath.com/blog/everything-you-ever-wanted-to-know-about-node-dot-js-sessions
-app.use(session({
-	cookieName: 'session',
-	secret: 'thisisthesecretkey',
-	duration: (1000 * 60 * 60),
-	activeDuration: (1000 * 60 * 30)
-}));
 
 app.use(function(req, res, next) {
 	res.header("Access-Control-Allow-Origin", "*");
@@ -110,15 +101,15 @@ app.post('/login', function(req, res) {
 			var loginMsg = "";
 			
 			// If the username is not found or the login password doesn't match the user's password
-			if (!item) {
-				loginMsg = "The username is not valid";
-			} else if (encrypt(req.body.loginPassword) !== item.password) {
-				loginMsg = "The password is not correct";
+			if (!item || encrypt(req.body.loginPassword) !== item.password) {
+				loginMsg = "Invalid Credentials";
 			} else {
 				// Indicate if the credentials are correct
+
 				loginAccepted = true;
 				loginMsg = "The entry is correct!";
-				sessionUser = req.body.loginUsername;
+				
+				userLogin = req.body.loginUsername;
 			}
 
 			res.setHeader('Content-Type', 'application/json');
@@ -126,6 +117,7 @@ app.post('/login', function(req, res) {
 				JSON.stringify({
 					loginAccepted: loginAccepted,
 					loginMsg: loginMsg,
+					loginSession: userLogin,
 				})
 			);
 			
@@ -137,28 +129,25 @@ app.post('/login', function(req, res) {
 // Go to the home page, or redirect to the login if a user isn't logged in
 app.post('/checkUserSession', function(req, res) {
 	let canMeditate = false;
-	if (sessionUser && req.body.sessionUser === sessionUser)
+	if (userLogin && req.body.userSession === userLogin)
 		canMeditate = true;
-	console.log(session);
-	
 	res.setHeader('Content-Type', 'application/json');
-	res.end(JSON.stringify({ canMeditate, sessionUser: sessionUser }));
+	res.end(JSON.stringify({ canMeditate, userSession: userLogin }));
 });
 
 // Log out of the site
 app.post('/killUserSession', function(req, res) {
-	req.session.reset();
+	userLogin = '';
+
 	res.setHeader('Content-Type', 'application/json');
 	res.end(JSON.stringify({
 		canMeditate: false,
-		sessionUser: sessionUser,
 	}));
 });
 
 app.post('/meditationEntry', function(req, res) {
 	var meditationEntry = {
-		// username: req.session.user,
-		username: req.body.username,
+		username: req.session.user,
 		meditateDateTime: req.body.meditateDateTime,
 		meditateDuration: req.body.meditateDuration,
 		journalEntry: req.body.journalEntry
