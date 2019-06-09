@@ -2,6 +2,7 @@ import React from 'react';
 
 import Calendar from './Calendar.js';
 import Meditate from './Meditate.js';
+import ModifyAccount from './ModifyAccount.js';
 import Welcome from './Welcome.js';
 
 import history from '../history';
@@ -20,17 +21,32 @@ class Home extends React.Component {
     }
 
     renderMeditationPage = () => {
+        const {
+            changeDefaultMeditationTime,
+            userMeditationTime,
+            userSession
+        } = this.props;
         const { meditateTab } = this.state;
+
         switch (meditateTab) {
-            case 'progress':
+            case 'accountMod':
                 return (
-                    <Calendar />
+                    <ModifyAccount
+                        username={userSession}
+                    />
                 );
             case 'meditate':
                 return (
                     <Meditate
+                        changeDefaultMeditationTime={changeDefaultMeditationTime}
                         changeMeditationTab={this.changeMeditationTab}
+                        userMeditationTime={userMeditationTime}
+                        username={userSession}
                     />
+                );
+            case 'progress':
+                return (
+                    <Calendar />
                 );
             default:
                 return (

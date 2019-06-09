@@ -185,7 +185,7 @@ button:hover {
 	display: flex;
 	flex-direction: row;
 	justify-content: center;
-	width: 40%;
+	width: 50%;
 }
 
 .timerInput {
@@ -209,6 +209,7 @@ button:hover {
 	margin: auto;
 	margin-left: auto;
 	margin-right: auto;
+	margin-top: 20px;
 	opacity: 0.7;
 	transition: all .3s ease-in-out;
 }
@@ -395,25 +396,13 @@ input[type="submit"]:hover, .formButtom:hover {
 	padding: 10px;
 }
 
-/* Account modification */
-
-.accountModification, .passwordChange {
-	margin-left: auto;
-	margin-right: auto;
+.accountModification {
+	margin-top: 90px;
 }
 
-.accountModification input[type="text"], .passwordChange input[type="password"] {
-	width: 400px;
-	font-size: 24px;
-}
-
-.modid {
-	font-size: 24px;
-	padding-top: 10px;
-	padding-right: 10px;
-	text-align: center;
-}
-
-.modbuttons {
-	text-align: center;
+.accountModButtons {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
 }

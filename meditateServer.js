@@ -43,9 +43,7 @@ app.post('/account', function(req, res) {
 		password: encrypt(req.body.accountPassword),
 		email: req.body.accountEmail,
 		zipcode: req.body.accountZip,
-		defaultHrs: "0",
-		defaultMinutes: "10",
-		defaultSeconds: "00"
+		defaultMeditationTime: 600,
 	}
 
 	// Insert the account
@@ -104,8 +102,6 @@ app.post('/login', function(req, res) {
 			if (!item || encrypt(req.body.loginPassword) !== item.password) {
 				loginMsg = "Invalid Credentials";
 			} else {
-				// Indicate if the credentials are correct
-
 				loginAccepted = true;
 				loginMsg = "The entry is correct!";
 				
@@ -118,6 +114,7 @@ app.post('/login', function(req, res) {
 					loginAccepted: loginAccepted,
 					loginMsg: loginMsg,
 					loginSession: userLogin,
+					userMeditationTime: item.defaultMeditationTime,
 				})
 			);
 			
@@ -145,9 +142,38 @@ app.post('/killUserSession', function(req, res) {
 	}));
 });
 
+app.post('/setMeditationTime', function(req, res) {
+	mongo.connect(url, function(err, db) {
+		db.collection('users').findOne({
+			username: req.body.username,
+		}, function(err, item) {
+			if (err) throw err;
+
+			if (item) {
+				db.collection('users').update(
+					{ username: req.body.username },
+					{ $set: {
+						defaultMeditationTime: req.body.userMeditationTime,
+					}},
+					function(err) {
+						if (err) throw err;
+
+						res.setHeader('Content-Type', 'application/json');
+						res.end(JSON.stringify({
+							defaultMeditationTime: req.body.userMeditationTime,
+						}));
+
+						db.close();
+					}
+				);
+			}
+		});
+	});
+});
+
 app.post('/meditationEntry', function(req, res) {
 	var meditationEntry = {
-		username: req.session.user,
+		username: req.body.user,
 		meditateDateTime: req.body.meditateDateTime,
 		meditateDuration: req.body.meditateDuration,
 		journalEntry: req.body.journalEntry
@@ -171,6 +197,83 @@ app.post('/meditationEntry', function(req, res) {
 		});
 	});
 });
+
+app.get('/accountInfoLoad', function(req, res) {
+	mongo.connect(url, function(err, db) {
+		if (err) throw err;
+		db.collection('users').findOne({
+			username: req.query.username
+		}, function(err, user) {
+			if (err) throw err;
+			
+			res.setHeader('Content-Type', 'application/json');
+			res.end(
+				JSON.stringify({
+					firstname: user.firstname,
+					lastname: user.lastname,
+					email: user.email,
+					zipcode: user.zipcode
+				})
+			);
+			
+			db.close();
+		});
+	});
+});
+
+app.post('accountMod', function(req, res) {
+	// Modify the account if the user clicked Modify and not Cancel
+	mongo.connect(url, function(err, db) {
+		if (err) throw err;
+	
+		db.collection('users').update(
+			{ username: req.body.username },
+			{ $set:
+				{
+					firstname: req.body.firstname,
+					lastname: req.body.lastname,
+					email: req.body.email,
+					zipcode: req.body.zipcode
+				}
+			}, function() {
+				db.close();
+			}
+		);
+	});
+});
+
+// 	// Modify the password
+// 	sock.on('pwordChange', function(cpword) {
+// 		mongo.connect(url, function(err, db) {
+// 			if (err) throw err;
+			
+// 			db.collection('users').findOne({
+// 				username: cpword.username
+// 			}, function(err, item) {
+// 				if (err) throw err;
+				
+// 				if (item.password !== encrypt(cpword.oldpword)) {
+// 					sock.emit('newpwordAccepted', { pwordAccept: false });
+// 					db.close();
+// 				}
+// 				else {
+// 					db.collection('users').update(
+// 						{ username: cpword.username },
+// 						{ $set:
+// 							{
+// 								password: encrypt(cpword.newpword)
+// 							}
+// 						}, function() {
+// 							console.log("User password changed!");
+// 							sock.emit('newpwordAccepted', { pwordAccept: true });
+// 							db.close();
+// 						}
+// 					);
+// 				}
+// 			});
+// 		});
+// 	});
+// });
 
 // Get the records for a user for a month/year
 function getDates(user, month, year, callback) {
@@ -298,10 +401,6 @@ function printCalendar(month, year, dates) {
 // 	}
 // });
 
-// Display the calendar of progress for a month/year
-// app.post('/progress', function(req, res) {	
-// 	res.render('progress');
-// });
 
 // If a journal is to be modified, put in the id and entry
 // app.post('/journal', function(req, res) {
@@ -373,66 +472,6 @@ function printCalendar(month, year, dates) {
 
 /* Timer code */
 
-// Get the timer page, redirect to login if no user is logged in
-// app.get('/timer', function(req, res) {
-// 	if (req.session.user) {
-// 		mongo.connect(url, function(err, db) {
-// 			if (err) throw err;
-			
-// 			db.collection('users').findOne({
-// 				username: req.session.user
-// 			}, function(err, time) {
-// 				if (err) throw err;
-				
-// 				if (time === null) {
-// 					res.render('timer', {
-// 						defaultHrs: "0",
-// 						defaultMinutes: "10",
-// 						defaultSeconds: "00"
-// 					});
-// 				}
-// 				else {
-// 					res.render('timer', {
-// 						defaultHrs: time.defaultHrs,
-// 						defaultMinutes: time.defaultMinutes,
-// 						defaultSeconds: time.defaultSeconds
-// 					});
-// 				}		
-// 				db.close();
-// 			});
-// 		});
-// 	}
-// 	else {
-// 		res.render('login', { lerr: false, accountCreated: false});
-// 	}
-// });
-
-// Show the meditation timer
-// app.post('/timer', function(req, res) {
-// 	// The meditation log for a user
-// 	var mlog = {
-// 		username: req.session.user,
-// 		date: req.body.meditationDate,
-// 		medtime: req.body.meditationTime,
-// 		datetime: req.body.meditationHrMin,
-// 		entry: req.body.journalEntry
-// 	}
-		
-// 	// Insert the meditation log to the database
-// 	mongo.connect(url, function(err, db) {
-// 		if (err) throw err;
-		
-// 		db.collection('meditationrecord').insert(mlog, function(err, docs) {
-// 			if (err) throw err;
-// 			else console.log("Entry made\n");
-						
-// 			// Move to the progress page
-// 			res.render('progress', { progCal: "Meditation Entry Made!" });
-	
-// 			db.close();
-// 		});
-// 	});
-// });
 
 /* Set up the account */
 
@@ -444,84 +483,6 @@ function printCalendar(month, year, dates) {
 // 	sock.on('requestMonthProgress', function(date) {	
 // 		getDates(sessionUser, Number(date.progressMonth), Number(date.progressYear), function(dates) {
 // 			sock.emit('receiveMonthProgress', { progDates: dates });
-// 		});
-// 	});
-	
-// 	// Set the default time for a user
-// 	sock.on('setDefaultTime', function(time) {
-// 		mongo.connect(url, function(err, db) {
-// 			if (err) throw err;
-			
-// 			db.collection('users').update(
-// 				{ username: sessionUser },
-// 				{ $set:
-// 					{
-// 						defaultHrs: time.defaultHrs,
-// 						defaultMinutes: time.defaultMinutes,
-// 						defaultSeconds: time.defaultSeconds,
-// 					}
-// 				}, function() {
-// 					console.log("Default time modified...");
-// 					db.close();
-// 					sock.emit('defaultTimeSet', {});
-// 				}
-// 			);
-// 		});
-// 	});
-	
-// 	// Check to see if the username is available, sending a
-// 	// signal back to the client if it is or isn't
-// 	sock.on('unameCheck', function(uname) {		
-// 		mongo.connect(url, function(err, db) {
-// 			if (err) throw err;
-			
-// 			db.collection('users').findOne({
-// 				username: uname.username
-// 			}, function(err, item) {
-// 				if (err) throw err;
-				
-// 				if (item === null) {
-// 					console.log("Username available\n");
-// 					sock.emit('unameCheckResponse', { unameFree: true });
-// 				} else {
-// 					console.log("Username not available\n");
-// 					sock.emit('unameCheckResponse', { unameFree: false });
-// 				}		
-// 				db.close();
-// 			});
-// 		});
-// 	});
-	
-// 	// Check that the login credentials are correct, 
-// 	// that the username exists and that the password is correct
-// 	sock.on('loginCheck', function(login) {
-// 		mongo.connect(url, function(err, db) {		
-// 			if (err) throw err;
-			
-// 			// Look for username
-// 			db.collection('users').findOne({
-// 				username: login.loginUname,
-// 			}, function(err, item) {
-// 				if (err) throw err;
-				
-// 				// If the username is not found or the login password doesn't match the user's password
-// 				if (!item) {
-// 					console.log("The username is not valid\n");
-// 					sock.emit('loginCheckResponse', { loginAccepted: false });
-// 				} 
-// 				else {
-// 					if (encrypt(login.loginPword) !== item.password) {
-// 						console.log("The password is not correct\n");
-// 						sock.emit('loginCheckResponse', { loginAccepted: false });
-// 					} 
-// 					// Indicate if the credentials are correct
-// 					else {
-// 						console.log("The entry is correct!\n");
-// 						sock.emit('loginCheckResponse', { loginAccepted: true });
-// 					}
-// 				}
-// 				db.close();
-// 			});
 // 		});
 // 	});
 	
@@ -607,79 +568,6 @@ function printCalendar(month, year, dates) {
 // 			});
 // 		});
 // 	});
-// });
-
-// // Render the account creation page
-// app.get('/account', function(req, res) {
-// 	res.render('account');
-// });
-
-// // Add an account to the users collection
-// app.post('/account', function(req, res) {
-// 	console.log("User added\n");
-
-// 	// The user entry to be made
-// 	var user = {
-// 		firstname: req.body.firstname,
-// 		lastname: req.body.lastname,
-// 		username: req.body.username,
-// 		password: encrypt(req.body.password),
-// 		email: req.body.email,
-// 		zipcode: req.body.zipcode,
-// 		defaultHrs: "0",
-// 		defaultMinutes: "10",
-// 		defaultSeconds: "00"
-// 	}
-
-// 	// Insert the account
-// 	mongo.connect(url, function(err, db) {
-// 		if (err) throw err;
-		
-// 		db.collection('users').insert(user, function(err, docs) {
-// 			db.close();
-// 		});
-// 	});
-	
-// 	// Move to the login page
-// 	res.render('login', { lerr: false, accountCreated: true });
-// })
-
-// /* Log in */
-
-// // Move to the login page
-// app.get('/', function(req, res) {
-// 	res.render('login', { lerr: false, accountCreated: false });
-// });
-
-// // Show the account modification page, grab the current
-// // account info for the user
-// app.get('/accountmod', function(req, res) {
-// 	mongo.connect(url, function(err, db) {
-// 		if (err) throw err;
-		
-// 		db.collection('users').findOne({
-// 			username: req.session.user
-// 		}, function(err, user) {
-// 			if (err) throw err;
-			
-// 			res.render('accountmod', {
-// 				username: user.username,
-// 				firstname: user.firstname,
-// 				lastname: user.lastname,
-// 				email: user.email,
-// 				zipcode: user.zipcode
-// 			});
-			
-// 			db.close();
-// 		});
-// 	});
-// });
-
-// // The logged in user will move to the home page
-// app.post('/home', function(req, res) {
-// 	req.session.user = req.body.loginUname;
-// 	sessionUser = req.session.user;
-// 	res.redirect('/home');
 // });
 
 // // Listen for an incoming connection

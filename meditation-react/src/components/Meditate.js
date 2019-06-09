@@ -5,21 +5,70 @@ import moment from 'moment-timezone';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons'
 
+const gong = new Audio('https://soundbible.com/grab.php?id=1815&type=mp3');
+
+const getHoursMinutesSeconds = userTime => {
+    const hours = Math.floor(userTime / 3600);
+    const minutes = Math.floor((userTime - (hours * 3600)) / 60);
+    let seconds = userTime - (hours * 3600) - (minutes * 60);
+    if (seconds < 10) seconds = "0" + String(seconds);
+
+    return {
+        hours: String(hours),
+        minutes: String(minutes),
+        seconds: String(seconds),
+    };
+}
+
+const getTotalSeconds = (hours, minutes, seconds) =>
+    (Number(hours) * 3600) + (Number(minutes) * 60) + Number(seconds);
+
+const formatTime = (hours, minutes, seconds) => {
+    let updatedHrs = hours;
+    let updatedMin = minutes;
+    let updatedSec = seconds;
+    if (!Number(updatedHrs) || Number(updatedHrs) < 0) updatedHrs = "0";
+    if (!Number(updatedMin) || Number(updatedMin) < 0) updatedMin = "0";
+    if (!Number(updatedSec) || Number(updatedSec) < 0) updatedSec = "00";
+    else if (Number(updatedSec) > 59) updatedSec = "59";
+
+    return {
+        updatedHrs,
+        updatedMin,
+        updatedSec,
+    };
+}
+
 class Meditate extends React.Component {
     constructor(props) {
         super(props);
 
+        const {
+            hours,
+            minutes,
+            seconds,
+        } = getHoursMinutesSeconds(props.userMeditationTime);
+
         this.state = {
-            gong: new Audio('https://soundbible.com/grab.php?id=1815&type=mp3'),
+            buddhaTimerStyle: {},
+            currentBrightness: 0,
+            defaultTimeChanged: false,
+            incrementFraction: -1,
             journalEntry: '',
             journalView: false,
-            meditateHours: '0',
-            meditateMinutes: '0',
-            meditateSeconds: '02',
+            meditateHours: hours,
+            meditateMinutes: minutes,
+            meditateSeconds: seconds,
             timerInfoShow: false,
             timerRunning: false,
         };
     };
+
+    componentDidUpdate(prevProps) {
+        if (prevProps.userMeditationTime !== this.props.userMeditationTime) {
+            this.resetTimer();
+        }
+    }
 
     displayTimerInfo = () => {
         this.setState(state => ({
@@ -29,63 +78,94 @@ class Meditate extends React.Component {
 
     modifyEntry = event => {
         const { name, value } = event.target;
-
-        if (
-            name === 'journalEntry' ||
-            Number(value) &&
-            Number(value) >= 0 &&
-            ((name === 'meditateMinutes' || name === 'meditateSeconds') && Number(value) < 60)
-        ) {
-            this.setState({ [name]: value });
-        }
+        this.setState({ [name]: value });
     }
 
-    setDefaultTime = () => {
+    resetTimer = () => {
+        const {
+            hours,
+            minutes,
+            seconds,
+        } = getHoursMinutesSeconds(this.props.userMeditationTime);
         clearInterval(this.meditationTimer);
         this.setState({
-            meditateHours: '0',
-            meditateMinutes: '0',
-            meditateSeconds: '02',
+            meditateHours: hours,
+            meditateMinutes: minutes,
+            meditateSeconds: seconds,
             timerRunning: false,
         });
     }
 
     startTimer = () => {
-        const { gong } = this.state;
-        gong.play();
+        const {
+            updatedHrs,
+            updatedMin,
+            updatedSec,
+        } = formatTime(
+            this.state.meditateHours,
+            this.state.meditateMinutes,
+            this.state.meditateSeconds,
+        );
+
+        let incrementFraction = 100 / getTotalSeconds(updatedHrs, updatedMin, updatedSec);
+        const buddhaTimerStyle = {
+            display: 'initial',
+            filter: `invert(${this.state.currentBrightness}%)`,
+            opacity: '0.85',
+        };
+
         this.setState({
+            buddhaTimerStyle,
+            defaultTimeChanged: false,
+            incrementFraction,
+            meditateHours: updatedHrs,
+            meditateMinutes: updatedMin,
+            meditateSeconds: updatedSec,
             timerRunning: true,
         });
+
+        gong.play();
+
         this.meditationTimer = setInterval(() => {
             this.setState(state => {
                 const {
+                    currentBrightness,
                     meditateHours,
                     meditateMinutes,
                     meditateSeconds,
                 } = state;
 
-                let totalTime =
-                    (Number(meditateHours) * 3600) +
-                    (Number(meditateMinutes) * 60) +
-                    Number(meditateSeconds) - 1;
+                let totalTime = getTotalSeconds(
+                    meditateHours,
+                    meditateMinutes,
+                    meditateSeconds
+                ) - 1;
 
                 if (totalTime < 0) {
                     clearInterval(this.meditationTimer);
                     gong.play();
                     return {
+                        buddhaTimerStyle: {},
+                        incrementFraction: -1,
                         journalView: true,
                         timerRunning: false,
                     };
                 } else {
-                    const hours = Math.floor(totalTime / 3600);
-                    let minutes = Math.floor((totalTime - (hours * 3600)) / 60);
-                    let seconds = totalTime - (hours * 3600) - (minutes * 60);
-                    if (seconds < 10) seconds = "0" + String(seconds);
+                    const {
+                        hours,
+                        minutes,
+                        seconds,
+                    } = getHoursMinutesSeconds(totalTime);
 
                     return {
-                        meditateHours: String(hours),
-                        meditateMinutes: String(minutes),
-                        meditateSeconds: String(seconds),
+                        buddhaTimerStyle: {
+                            ...state.buddhaTimerStyle,
+                            filter: `invert(${this.state.currentBrightness}%)`,
+                        },
+                        currentBrightness: currentBrightness + incrementFraction,
+                        meditateHours: hours,
+                        meditateMinutes: minutes,
+                        meditateSeconds: seconds,
                     }
                 }
             });
@@ -95,6 +175,8 @@ class Meditate extends React.Component {
     stopTimer = () => {
         clearInterval(this.meditationTimer);
         this.setState({
+            currentBrightness: 0,
+            incrementFraction: -1,
             timerRunning: false,
         });
     }
@@ -105,19 +187,37 @@ class Meditate extends React.Component {
 	        meditateDateTime: moment().unix(),
 	        meditateDuration: 1000,
 	        journalEntry: this.state.journalEntry
-        }).then(res => {
-            // const { loginAccepted, loginMsg } = res.data;
-            // let msg = '';
-            // if (!loginAccepted) {
-            //     msg = loginMsg;
-            // }
-            // this.setState({ loginError: msg });
-            this.props.changeMeditationTab('progress');
+        }).then(res => this.props.changeMeditationTab('progress'));
+    }
+
+    setDefaultTime = () => {
+        const {
+            changeDefaultMeditationTime,
+            username,
+        } = this.props;
+        const {
+            updatedHrs,
+            updatedMin,
+            updatedSec,
+        } = formatTime(
+            this.state.meditateHours,
+            this.state.meditateMinutes,
+            this.state.meditateSeconds,
+        );
+
+        changeDefaultMeditationTime(
+            username,
+            getTotalSeconds(updatedHrs, updatedMin, updatedSec)
+        );
+        this.setState({
+            defaultTimeChanged: true,
         });
     }
 
     render () {
         const {
+            buddhaTimerStyle,
+            defaultTimeChanged,
             journalEntry,
             journalView,
             meditateHours,
@@ -175,13 +275,17 @@ class Meditate extends React.Component {
                         <div className='timerRow'>
                             <button disabled={timerRunning} onClick={this.startTimer}>Start</button>
                             <button onClick={this.stopTimer}>Stop</button>
-                            <button onClick={this.setDefaultTime}>Reset</button>
-                            <button className='info' onClick={this.displayTimerInfo}>
+                            <button onClick={this.resetTimer}>Reset</button>
+                            <button disabled={timerRunning} onClick={this.setDefaultTime}>Set Default Time</button>
+                            <button
+                                className='info'
+                                onClick={this.displayTimerInfo}
+                            >
                                 <FontAwesomeIcon icon={faInfoCircle} />
                             </button>
                         </div>
 
-                        <div className='defaultTimeMsg'></div>
+                        {defaultTimeChanged && <div id='defaultTimeMsg'>Default time changed!</div>}
 
                         {timerInfoShow &&
                             <div className='infoText'>
@@ -196,8 +300,18 @@ class Meditate extends React.Component {
                             </div>
                         }
 
-                        <div className='buddhaFill'>
-                            <img className='buddhaFillImg' src='http://www.vagabondtemple.com/wp-content/uploads/2016/07/mantra-om-1292602.png' />
+                        <div
+                            className='buddhaFill'
+                            style={{ opacity: timerRunning && buddhaTimerStyle.opacity }}
+                        >
+                            <img
+                                className='buddhaFillImg'
+                                src='http://www.vagabondtemple.com/wp-content/uploads/2016/07/mantra-om-1292602.png'
+                                style={{
+                                    display: timerRunning && buddhaTimerStyle.display,
+                                    filter: timerRunning && buddhaTimerStyle.filter,
+                                }}
+                            />
                         </div>
                     </div>
                 }

@@ -26,11 +26,15 @@ class Login extends React.Component {
             loginPassword,
             loginUsername,
         }).then(res => {
-            const { loginAccepted, loginMsg, loginSession } = res.data;
-            let loginError = '';
+            const {
+                loginAccepted,
+                loginMsg,
+                loginSession,
+                userMeditationTime
+            } = res.data;
             if (!loginAccepted) this.setState({ loginError: loginMsg });
             else {
-                checkUserSession(loginSession);
+                checkUserSession(loginSession, userMeditationTime);
                 history.push('/home');
             }
         });

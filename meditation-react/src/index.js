@@ -13,32 +13,51 @@ import './styles/meditation.css';
 
 class App extends React.Component {
     state = {
+        userMeditationTime: 600,
         userSession: null,
     };
 
-    killSession = () => axios
-        .post('http://127.0.0.1:8080/killUserSession', {
-            userSession: this.state.userSession,
-        })
-        .then(() => this.updateSession(null));
-
-    checkUserSession = userSession => axios
+    checkUserSession = (userSession, userMeditationTime) => axios
         .post('http://127.0.0.1:8080/checkUserSession', {
             userSession,
         })
         .then(res => {
             const { canMeditate, userSession } = res.data;
 
-            if (canMeditate) this.setState({ userSession });
-            else this.setState({ userSession: null });
+            if (canMeditate)
+                this.setState({
+                    userMeditationTime: Number(userMeditationTime),
+                    userSession,
+                });
+            else
+                this.setState({
+                    userMeditationTime: 600,
+                    userSession: null,
+                });
         });
+
+    killSession = () => axios
+        .post('http://127.0.0.1:8080/killUserSession', {
+            userSession: this.state.userSession,
+        })
+        .then(() => this.updateSession(null));
+    
+    changeDefaultMeditationTime = (username, newTime) => axios
+        .post('http://127.0.0.1:8080/setMeditationTime', {
+            userMeditationTime: newTime,
+            username,
+        })
+        .then(res => this.setState({
+            userMeditationTime: Number(res.data.defaultMeditationTime),
+        }));
 
     render () {
         const appPropsAndState = {
             ...this.props,
             ...this.state,
-            killSession: this.killSession,
+            changeDefaultMeditationTime: this.changeDefaultMeditationTime,
             checkUserSession: this.checkUserSession,
+            killSession: this.killSession,
         }
 
         return (
