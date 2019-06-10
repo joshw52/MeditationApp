@@ -9,14 +9,14 @@ class ModifyAccount extends React.Component {
                 
         this.state = {
             accountEmail: '',
-            accountError: '',
+            accountMsg: '',
             accountFirstName: '',
             accountLastName: '',
             accountOldPassword: '',
             accountPassword: '',
             accountPasswordConfirm: '',
             accountZip: '',
-            passwordError: '',
+            pwordChangeMsg: '',
         };
     };
 
@@ -39,6 +39,7 @@ class ModifyAccount extends React.Component {
     }
 
     modifyAccount = () => {
+        const { username } = this.props;
         const {
             accountEmail,
             accountFirstName,
@@ -53,25 +54,58 @@ class ModifyAccount extends React.Component {
             accountZip === ''
         ) {
             this.setState({
-                accountError: "All fields must be filled out!",
+                accountMsg: "All fields must be filled out!",
             });
         } else {
             axios.post("http://127.0.0.1:8080/accountModify", {
                 accountEmail,
                 accountFirstName,
                 accountLastName,
-                accountPassword,
                 accountZip,
+                username,
             }).then(res => {
-                const { accountCreated, accountMsg } = res.data;
+                const { accountModified, accountMsg } = res.data;
 
                 this.setState({
-                    accountError: !accountCreated ? accountMsg : '',
+                    accountMsg: accountModified ? accountMsg : 'Account Modification Error',
                 });
+            });
+        }
+    }
 
-                if (accountCreated) {
-                    history.push('/');
-                }
+    changePassword = () => {
+        const { username } = this.props;
+        const {
+            accountOldPassword,
+            accountPassword,
+            accountPasswordConfirm,
+        } = this.state;
+
+        if (
+            accountOldPassword === '' ||
+            accountPassword === '' ||
+            accountPasswordConfirm === ''
+        ) {
+            this.setState({
+                pwordChangeMsg: "All fields must be filled out!",
+            });
+        } else if (accountPassword !== accountPasswordConfirm) {
+            this.setState({
+                pwordChangeMsg: "New Password and Confirmation don't match!",
+            });
+        } else if (accountPassword.length < 8 || accountPasswordConfirm.length < 8) {
+            this.setState({
+                pwordChangeMsg: "New Password must be at least 8 characters",
+            });
+        } else{
+            axios.post("http://127.0.0.1:8080/accountLoginModify", {
+                accountOldPassword,
+                accountPassword,
+                username,
+            }).then(res => {
+                const { pwordChangeMsg } = res.data;
+
+                this.setState({ pwordChangeMsg });
             });
         }
     }
@@ -84,14 +118,14 @@ class ModifyAccount extends React.Component {
     render () {
         const {
             accountEmail,
-            accountError,
+            accountMsg,
             accountFirstName,
             accountLastName,
             accountOldPassword,
             accountPassword,
             accountPasswordConfirm,
             accountZip,
-            passwordError,
+            pwordChangeMsg,
         } = this.state;
 
         return (
@@ -143,7 +177,7 @@ class ModifyAccount extends React.Component {
                         />
                     </div>
                 </div>
-                {accountError.length ? <div className="errMsg">{accountError}</div> : null}
+                {accountMsg.length > 0 && <div className="accountMsg">{accountMsg}</div>}
 
                 <h2>Change your Password</h2>
                 <div className="meditationForm">
@@ -176,7 +210,7 @@ class ModifyAccount extends React.Component {
                         value='Change Password'
                     />
                 </div>
-                {passwordError.length ? <div className="errMsg">{passwordError}</div> : null}
+                {pwordChangeMsg.length > 0 && <div className="accountMsg">{pwordChangeMsg}</div>}
             </div>
         );
     }

@@ -221,7 +221,7 @@ app.get('/accountInfoLoad', function(req, res) {
 	});
 });
 
-app.post('accountMod', function(req, res) {
+app.post('/accountModify', function(req, res) {
 	// Modify the account if the user clicked Modify and not Cancel
 	mongo.connect(url, function(err, db) {
 		if (err) throw err;
@@ -230,15 +230,69 @@ app.post('accountMod', function(req, res) {
 			{ username: req.body.username },
 			{ $set:
 				{
-					firstname: req.body.firstname,
-					lastname: req.body.lastname,
-					email: req.body.email,
-					zipcode: req.body.zipcode
+					email: req.body.accountEmail,
+					firstname: req.body.accountFirstName,
+					lastname: req.body.accountLastName,
+					zipcode: req.body.accountZip
 				}
-			}, function() {
+			}, function(err) {
+				if (err) throw err;
+
+				res.setHeader('Content-Type', 'application/json');
+				res.end(
+					JSON.stringify({
+						accountModified: true,
+						accountMsg: 'Account Modified!',
+					})
+				);
+
 				db.close();
 			}
 		);
+	});
+});
+
+app.post('/accountLoginModify', function(req, res) {
+	mongo.connect(url, function(err, db) {
+		if (err) throw err;
+		
+		db.collection('users').findOne({
+			username: req.body.username
+		}, function(err, item) {
+			if (err) throw err;
+			
+			if (item.password !== encrypt(req.body.accountOldPassword)) {
+				res.setHeader('Content-Type', 'application/json');
+				res.end(
+					JSON.stringify({
+						pwordChangeMsg: 'Old Password Incorrect!',
+					})
+				);
+
+				db.close();
+			}
+			else {
+				db.collection('users').update(
+					{ username: req.body.username },
+					{ $set:
+						{
+							password: encrypt(req.body.accountPassword)
+						}
+					}, function(err) {
+						if (err) throw err;
+
+						res.setHeader('Content-Type', 'application/json');
+						res.end(
+							JSON.stringify({
+								pwordChangeMsg: 'Password Changed!',
+							})
+						);
+
+						db.close();
+					}
+				);
+			}
+		});
 	});
 });
 
@@ -486,88 +540,6 @@ function printCalendar(month, year, dates) {
 // 		});
 // 	});
 	
-// 	// Modify the account information
-// 	sock.on('accountModification', function(mod) {		
-// 		// Modify the account if the user clicked Modify and not Cancel
-// 		if (mod.username !== "" && mod.accountMod !== "Cancel") {
-// 			mongo.connect(url, function(err, db) {
-// 				if (err) throw err;
-			
-// 				db.collection('users').update(
-// 					{ username: mod.username },
-// 					{ $set:
-// 						{
-// 							firstname: mod.firstname,
-// 							lastname: mod.lastname,
-// 							email: mod.email,
-// 							zipcode: mod.zipcode
-// 						}
-// 					}, function() {
-// 						sock.emit('accountModified', {
-// 							modified: true
-// 						});
-// 						db.close();
-// 						sock.disconnect();
-// 					}
-// 				);
-// 			});
-// 		}
-		
-// 		// Otherwise grab the original information and fill the fields back in
-// 		else if (mod.username !== "" && mod.accountMod === "Cancel") {
-// 			mongo.connect(url, function(err, db) {
-// 				if (err) throw err;
-	
-// 				db.collection('users').findOne({
-// 					username: mod.username
-// 				}, function(err, user) {
-// 					if (err) throw err;
-		
-// 					sock.emit('accountModified', {
-// 						username: mod.username,
-// 						firstname: user.firstname,
-// 						lastname: user.lastname,
-// 						email: user.email,
-// 						zipcode: user.zipcode
-// 					});
-		
-// 					db.close();
-// 				});
-// 			});
-// 		}
-// 	});
-	
-// 	// Modify the password
-// 	sock.on('pwordChange', function(cpword) {
-// 		mongo.connect(url, function(err, db) {
-// 			if (err) throw err;
-			
-// 			db.collection('users').findOne({
-// 				username: cpword.username
-// 			}, function(err, item) {
-// 				if (err) throw err;
-				
-// 				if (item.password !== encrypt(cpword.oldpword)) {
-// 					sock.emit('newpwordAccepted', { pwordAccept: false });
-// 					db.close();
-// 				}
-// 				else {
-// 					db.collection('users').update(
-// 						{ username: cpword.username },
-// 						{ $set:
-// 							{
-// 								password: encrypt(cpword.newpword)
-// 							}
-// 						}, function() {
-// 							console.log("User password changed!");
-// 							sock.emit('newpwordAccepted', { pwordAccept: true });
-// 							db.close();
-// 						}
-// 					);
-// 				}
-// 			});
-// 		});
-// 	});
 // });
 
 // // Listen for an incoming connection
