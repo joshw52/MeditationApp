@@ -2,12 +2,12 @@ import React from 'react';
 import axios from 'axios';
 import moment from 'moment-timezone';
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faInfoCircle } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 
 const gong = new Audio('https://soundbible.com/grab.php?id=1815&type=mp3');
 
-const getHoursMinutesSeconds = userTime => {
+export const getHoursMinutesSeconds = userTime => {
     const hours = Math.floor(userTime / 3600);
     const minutes = Math.floor((userTime - (hours * 3600)) / 60);
     let seconds = userTime - (hours * 3600) - (minutes * 60);
@@ -59,6 +59,7 @@ class Meditate extends React.Component {
             meditateHours: hours,
             meditateMinutes: minutes,
             meditateSeconds: seconds,
+            timeMeditated: props.userMeditationTime,
             timerInfoShow: false,
             timerRunning: false,
         };
@@ -92,6 +93,7 @@ class Meditate extends React.Component {
             meditateHours: hours,
             meditateMinutes: minutes,
             meditateSeconds: seconds,
+            timeMeditated: this.props.userMeditationTime,
             timerRunning: false,
         });
     }
@@ -121,6 +123,7 @@ class Meditate extends React.Component {
             meditateHours: updatedHrs,
             meditateMinutes: updatedMin,
             meditateSeconds: updatedSec,
+            timeMeditated: getTotalSeconds(updatedHrs, updatedMin, updatedSec),
             timerRunning: true,
         });
 
@@ -183,11 +186,11 @@ class Meditate extends React.Component {
 
     submitMeditationEntry = () => {
         axios.post("http://127.0.0.1:8080/meditationEntry", {
-            username: "test",
+            username: this.props.username,
 	        meditateDateTime: moment().unix(),
-	        meditateDuration: 1000,
+	        meditateDuration: this.state.timeMeditated,
 	        journalEntry: this.state.journalEntry
-        }).then(res => this.props.changeMeditationTab('progress'));
+        }).then(() => this.props.changeMeditationTab('progress'));
     }
 
     setDefaultTime = () => {

@@ -5,26 +5,68 @@ import moment from 'moment-timezone';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBook, faInfoCircle, faTimesCircle } from '@fortawesome/free-solid-svg-icons'
 
+import { getHoursMinutesSeconds } from './Meditate';
+
 class Calendar extends React.Component {
     constructor(props) {
         super(props);
 
         this.state = {
             displayProgressInfo: false,
+            meditationRecords: [],
             progressMonth: moment().format('MMMM'),
             progressYear: moment().format('YYYY'),
         };
     };
+
+    componentDidMount() {
+        this.getJournalEntries();
+    }
+
+    getJournalEntries = () => {
+        const {
+            progressMonth,
+            progressYear,
+        } = this.state;
+        const startTimestamp = moment(`${progressYear}-${progressMonth}`, 'YYYY-MMMM')
+            .startOf('month').startOf('day').unix();
+        const endTimestamp = moment(`${progressYear}-${progressMonth}`, 'YYYY-MMMM')
+            .endOf('month').endOf('day').unix();
+        axios.get('http://127.0.0.1:8080/progress', {
+            params: {
+                endTimestamp,
+                startTimestamp,
+                username: this.props.username
+            }
+        }).then(res => {
+            this.setState({
+                meditationRecords: res.data.meditationRecords,
+            });
+        });
+    }
 
     onChange = event => {
         const { name, value } = event.target;
         this.setState({
             [name]: value,
         });
+
+        this.getJournalEntries();
+    }
+
+    modifyJournalEntry = record => {
+
+    }
+    
+    deleteJournalEntry = record => {
+        axios.post("http://127.0.0.1:8080/deleteJournalEntry", {
+            journalID: record._id
+        }).then(() => this.getJournalEntries());
     }
 
     renderCalendarDays = () => {
         const {
+            meditationRecords,
             progressMonth,
             progressYear,
         } = this.state;
@@ -35,17 +77,53 @@ class Calendar extends React.Component {
         const progressCalendarWeeks = [];
         const progressDay = moment(firstDay);
 
+        const displayRecord = record => {
+            const {
+                hours,
+                minutes,
+                seconds
+            } = getHoursMinutesSeconds(Number(record.meditateDuration));
+        
+            return (
+                <div className='dayRecord' key={`${record._id}`}>
+                    {`${hours}:${minutes}:${seconds}`}
+                    <button
+                        className='editJournal'
+                        onClick={() => this.modifyJournalEntry(record)}
+                        type='submit'
+                    >
+                        <FontAwesomeIcon icon={faBook} />
+                    </button>
+                    <button
+                        className='deleteJournal'
+                        onClick={() => this.deleteJournalEntry(record)}
+                        type='submit'
+                    >
+                        <FontAwesomeIcon icon={faTimesCircle} />
+                    </button>
+                </div>
+            )
+        };
+
         for (let week = 0; week <= progressNumDays / 7; week++) {
             const weekDays = [];
             for (let day = 0; day < 7; day++) {
                 weekDays.push(
                     <td key={progressDay.format()}>
-                        <div className='monthDay'>
-                            {progressDay.isSame(
-                                moment(progressCalendarMonth, 'YYYY-MMMM'),
-                                'month'
-                            ) && progressDay.format('D')}
-                            {' '}
+                        <div className='dayContainer'>
+                            <div className='monthDay'>
+                                {progressDay.isSame(
+                                    moment(progressCalendarMonth, 'YYYY-MMMM'),
+                                    'month'
+                                ) && progressDay.format('D')}
+                                {' '}
+                                {meditationRecords
+                                    .filter(record =>
+                                        moment(Number(record.meditateDateTime) * 1000)
+                                            .isSame(progressDay, 'day')
+                                    ).map(record => displayRecord(record))
+                                }
+                            </div>
                         </div>
                     </td>
                 );
@@ -78,6 +156,7 @@ class Calendar extends React.Component {
 
     render () {
         const { displayProgressInfo } = this.state;
+        console.log(this.state);
 
         return (
             <div className='progressCalendarContainer'>

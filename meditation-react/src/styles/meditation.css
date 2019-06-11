@@ -304,6 +304,13 @@ button:hover {
 	margin: 10px;
 }
 
+.dayContainer {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
 .monthDay {
 	width: 95%;
 	text-align: right;
@@ -312,12 +319,8 @@ button:hover {
 }
 
 .dayRecord {
-	margin-top: 15px;
 	text-align: left;
-}
-
-.logResult {
-	margin: 10px 10px 10px 10px;
+	margin: 2px 2px 2px 5px;
 }
 
 .journalMods {
@@ -333,11 +336,13 @@ button:hover {
 }
 
 .editJournal:hover {
+	background: none;
 	color: #77BEFB;
 	opacity: 0.85;
 }
 
 .deleteJournal:hover {
+	background: none;
 	color: #FF7777;
 	opacity: 0.85;
 }

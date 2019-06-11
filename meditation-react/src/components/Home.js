@@ -46,7 +46,9 @@ class Home extends React.Component {
                 );
             case 'progress':
                 return (
-                    <Calendar />
+                    <Calendar
+                        username={userSession}
+                    />
                 );
             default:
                 return (

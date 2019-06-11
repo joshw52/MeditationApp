@@ -28,7 +28,6 @@ class ModifyAccount extends React.Component {
         axios.get('http://127.0.0.1:8080/accountInfoLoad', {
             params: { username: this.props.username }
         }).then(res => {
-            console.log(res);
             this.setState({
                 accountEmail: res.data.email,
                 accountFirstName: res.data.firstname,
