@@ -156,7 +156,6 @@ class Calendar extends React.Component {
 
     render () {
         const { displayProgressInfo } = this.state;
-        console.log(this.state);
 
         return (
             <div className='progressCalendarContainer'>

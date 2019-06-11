@@ -357,7 +357,7 @@ app.post('/modifyJournalEntry', function(req, res) {
 			},
 			function(err, docs) {
 				if (err) throw err;
-				console.log(docs);
+
 				res.setHeader('Content-Type', 'application/json');
 				res.end(
 					JSON.stringify({
