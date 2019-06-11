@@ -1,5 +1,4 @@
 var express = require('express');
-// var path = require('path');
 var parser = require('body-parser');
 var mongo = require('mongodb').MongoClient;
 var OID = require('mongodb').ObjectID;
@@ -296,251 +295,106 @@ app.post('/accountLoginModify', function(req, res) {
 	});
 });
 
-// 	// Modify the password
-// 	sock.on('pwordChange', function(cpword) {
-// 		mongo.connect(url, function(err, db) {
-// 			if (err) throw err;
+app.get('/progress', function(req, res) {
+	if (userLogin) {
+		mongo.connect(url, function(err, db) {
+			if (err) throw err;
 			
-// 			db.collection('users').findOne({
-// 				username: cpword.username
-// 			}, function(err, item) {
-// 				if (err) throw err;
+			db.collection('meditationrecord').find({
+				$and: [
+					{
+						username: {
+							$eq: req.query.user
+						}
+					},
+					{
+						meditateDateTime: {
+							$lte: Number(req.query.endTimestamp),
+						}
+					},
+					{
+						meditateDateTime: {
+							$gte: Number(req.query.startTimestamp),
+						}
+					}
+				]
+			}).toArray(function(err, meditationRecords) {
+				if (err) throw err;
 				
-// 				if (item.password !== encrypt(cpword.oldpword)) {
-// 					sock.emit('newpwordAccepted', { pwordAccept: false });
-// 					db.close();
-// 				}
-// 				else {
-// 					db.collection('users').update(
-// 						{ username: cpword.username },
-// 						{ $set:
-// 							{
-// 								password: encrypt(cpword.newpword)
-// 							}
-// 						}, function() {
-// 							console.log("User password changed!");
-// 							sock.emit('newpwordAccepted', { pwordAccept: true });
-// 							db.close();
-// 						}
-// 					);
-// 				}
-// 			});
-// 		});
-// 	});
-// });
+				res.setHeader('Content-Type', 'application/json');
+				res.end(
+					JSON.stringify({
+						meditationRecords,
+						recordsFound: true,
+					})
+				);
 
-// Get the records for a user for a month/year
-function getDates(user, month, year, callback) {
-	// Put the month and year in the proper format
-	var monthYear = String(year) + "-";
-	if (Number(month) < 9) monthYear += "0";
-	monthYear += String(Number(month)+1);
+				db.close();
+			});
+		});
+	} else {
+		res.setHeader('Content-Type', 'application/json');
+		res.end(
+			JSON.stringify({
+				recordsFound: false,
+			})
+		);
+	}
+});
 
-	// Find the records for that month/year
+// Modify the journal entry in the collection, using the id to find it
+app.post('/modifyJournalEntry', function(req, res) {	
+	var jeid = new OID(req.body.journalID);
+
+	// Update the record
 	mongo.connect(url, function(err, db) {
 		if (err) throw err;
 		
-		db.collection('meditationrecord').find({
-			username: {
-				$eq: user
+		db.collection('meditationrecord').update(
+			{ _id: jeid },
+			{ $set:
+				{ journalEntry: req.body.journalEntry }
 			},
-			date: new RegExp(monthYear)
-		}).toArray(function(err, docs) {
+			function(err, docs) {
+				if (err) throw err;
+				console.log(docs);
+				res.setHeader('Content-Type', 'application/json');
+				res.end(
+					JSON.stringify({
+						journalModified: true,
+					})
+				);
+
+				db.close();
+			}
+		);
+	});
+});
+
+// Delete a journal entry
+app.post('/deleteJournalEntry', function(req, res) {
+	var jdid = new OID(req.body.journalID);
+	
+	// Delete the record
+	mongo.connect(url, function(err, db) {
+		if (err) throw err;
+		
+		db.collection('meditationrecord').remove({
+			_id: jdid
+		}, function(err) {
 			if (err) throw err;
+
+			res.setHeader('Content-Type', 'application/json');
+			res.end(
+				JSON.stringify({
+					journalDeleted: true,
+				})
+			);
 			
-			// Get the calendar
-			var dates = printCalendar(month, year, docs);
-			callback(dates);
 			db.close();
 		});
 	});
-}
-
-// Construct the calendar to be displayed for a particular month/year,
-// showing the meditation time, a link to modify the journal entry,
-// and a button to delete the entry
-function printCalendar(month, year, dates) {
-	var cal = "<table id='progressCalendar'><thead><tr><th>Sun</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th></tr><tbody>";
-
-	// Get the number of days in the month
-	var numDays = 0;
-	switch (Number(month)) {
-		case 0:
-		case 2:
-		case 4:
-		case 6:
-		case 7:
-		case 9:
-		case 11:
-			numDays = 31;
-			break;
-		case 3:
-		case 5:
-		case 8:
-		case 10:
-			numDays = 30;
-			break;
-		case 1:
-			numDays = 28;
-			if (((Number(year) % 4 === 0) && (Number(year) % 100 !== 0)) || (Number(year) % 400 === 0)) numDays++;
-	}
-	
-	var firstDay = new Date(year, month);
-	var start = 0 - firstDay.getDay();
-	var end = numDays;// + (7 - Math.abs(start));
-	while ((end + Math.abs(start)) % 7 !== 0) end++;
-	
-	// For each day of the month, if there's an entry, put it in
-	var count = 0;
-	for (var d = start+1; d <= end; d++) {
-		if (count === 0) cal += "<tr>";
-		cal += "<td>";
-
-		// Put the day of the month in 
-		if (d > 0 && d <= numDays)
-			cal += "<div id='monthDay'>" + String(d) + "</div><br><div id='dayRecord'>";
-
-		// Put the meditation entries in
-		for (logs in dates) {
-			var loggedDay = String(dates[logs].date).split("-")[2];
-			if (Number(loggedDay) === d) {
-				// Modify the time from military time
-				var hrmin = String(dates[logs].datetime).split(":");
-				if (Number(hrmin[0]) > 12) hrmin = String(Number(hrmin[0]) - 12) + ":" + String(hrmin[1]) + " PM";
-				else if (Number(hrmin[0]) === 0) hrmin = "12" + ":" + String(hrmin[1]) + " AM";
-				else hrmin = String(dates[logs].datetime) + " AM";
-					
-				
-				cal += "<div id='logResult'>" + String(dates[logs].medtime);
-				cal += "&nbsp<form method='POST' action='journal' class='journalMods'>";
-				cal += "<input type='hidden' value='" + dates[logs]._id + "' name='jid'>";
-				cal += "<button type='submit' id='editJournal'><i class='fa fa-book' aria-hidden='true'></i></button></form>";
-				cal += "&nbsp<form method='POST' action='deleteJournalEntry' class='journalMods' onsubmit='return confirm(\"Confirm that you wish to delete this meditation entry\")'>";
-				cal += "<input type='hidden' value='" + dates[logs]._id + "' name='jdid'>";
-				cal += "<button type='submit' id='deleteJournal'><i class='fa fa-times-circle' aria-hidden='true'></i></button>";
-				cal += hrmin + "</form></div>";
-			}
-		}
-
-		cal += "</div></td>";
-
-		count++;
-		if (count > 6) {
-			count = 0;
-			cal += "</tr>";
-		}
-	}
-	
-	cal += "</tbody></table>";
-
-	// Return the constructed calendar
-	return cal;
-}
-
-// Get the progress page, or redirecting to the login page
-// if a user isn't logged in
-// app.get('/progress', function(req, res) {
-// 	if (req.session.user) {
-// 		var d = new Date();
-// 		var month = Number(d.getMonth());
-// 		var year = Number(d.getFullYear());
-		
-// 		getDates(req.session.user, month, year, function(dates) {
-// 			if (dates) res.render('progress', { progCal: "" });
-// 			else return;
-// 		});
-// 	}
-// 	else {
-// 		res.render('login', { lerr: false, accountCreated: false });
-// 	}
-// });
-
-
-// If a journal is to be modified, put in the id and entry
-// app.post('/journal', function(req, res) {
-// 	var jid = new OID(req.body.jid);
-	
-// 	mongo.connect(url, function(err, db) {
-// 		if (err) throw err;
-		
-// 		db.collection('meditationrecord').findOne({ _id: jid}, function(err, jmentry) {
-// 			if (err) throw err;
-			
-// 			res.render('journal', {
-// 				jid: req.body.jid,
-// 				jentry: jmentry.entry,
-// 				jdate: jmentry.date
-// 			});	
-			
-// 			db.close();
-// 		});
-// 	});
-// });
-
-// Modify the journal entry in the collection, using the id to find it
-// app.post('/journalModification', function(req, res) {	
-// 	// If the submit button was clicked, modify the entry
-// 	if (req.body.modifyEntry === "Submit") {
-// 		var jeid = new OID(req.body.mjid);
-	
-// 		// Update the record
-// 		mongo.connect(url, function(err, db) {
-// 			if (err) throw err;
-			
-// 			db.collection('meditationrecord').update(
-// 				{ _id: jeid },
-// 				{ $set:
-// 					{ entry: req.body.mjentry }
-// 				},
-// 				function() {
-// 					db.close();
-// 				}
-// 			);
-// 		});
-	
-// 		res.render('progress', { progCal: "Meditation Entry Modified!" });
-// 	}
-// 	// Or else return to the progress page without modifying the entry
-// 	else {
-// 		res.render('progress', { progCal: "" });	
-// 	}
-// });
-
-// Delete a journal entry
-// app.post('/deleteJournalEntry', function(req, res) {
-// 	var jdid = new OID(req.body.jdid);
-	
-// 	// Delete the record
-// 	mongo.connect(url, function(err, db) {
-// 		if (err) throw err;
-		
-// 		db.collection('meditationrecord').remove({
-// 			_id: jdid
-// 		}, function() {
-// 			db.close();
-// 		});
-// 	});
-	
-// 	res.render('progress', { progCal: "Meditation Entry Deleted!" });
-// });
-
-/* Timer code */
-
-
-/* Set up the account */
-
-// Sockets for checking the username for the account creation
-// as well as the username/password for the login
-// io.on('connection', function(sock) {
-// 	console.log('Client connected...');
-	
-// 	sock.on('requestMonthProgress', function(date) {	
-// 		getDates(sessionUser, Number(date.progressMonth), Number(date.progressYear), function(dates) {
-// 			sock.emit('receiveMonthProgress', { progDates: dates });
-// 		});
-// 	});
-	
-// });
+});
 
 // // Listen for an incoming connection
 server.listen(8080, function() {
