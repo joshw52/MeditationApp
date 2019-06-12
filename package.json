@@ -5,19 +5,24 @@
   "main": "meditateServer.js",
   "dependencies": {
     "body-parser": "^1.18.1",
-    "client-sessions": "^0.8.0",
+    "braces": "^3.0.2",
     "crypto": "^1.0.1",
-    "ejs": "^2.5.7",
-    "express": "^4.15.4",
-    "forever": "^0.15.3",
+    "dotenv": "^8.0.0",
+    "express": "^4.17.0",
+    "forever": "^1.0.0",
     "http": "^0.0.0",
     "mongo": "^0.1.0",
     "mongodb": "^2.2.31",
     "path": "^0.12.7",
-    "socket.io": "^2.0.3"
+    "uuid": "^3.3.2"
   },
   "devDependencies": {},
+  "engines": {
+    "node": "10.15.3"
+  },
   "scripts": {
+    "heroku-postbuild": "cd client && npm install --only=dev && npm install && npm run build",
+    "start": "node meditateServer.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
