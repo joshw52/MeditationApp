@@ -1,3 +1,3 @@
 # MeditationApp
 
-Site hosted at: http://goo.gl/UvkK6a
+Site hosted at: http://imeditate.herokuapp.com

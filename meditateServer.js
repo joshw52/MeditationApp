@@ -1,5 +1,6 @@
 var express = require('express');
 var parser = require('body-parser');
+var path = require("path");
 var mongo = require('mongodb').MongoClient;
 var OID = require('mongodb').ObjectID;
 
@@ -7,6 +8,8 @@ var app = express();
 var server = require('http').createServer(app);
 
 var crypto = require('crypto');
+
+require('dotenv').config();
 
 // Encrypt a string
 function encrypt(str) {
@@ -16,9 +19,9 @@ function encrypt(str) {
   return encrypedStr;
 }
 
-var port = 8080;
+var port = process.env.PORT || 8080;
 var db = 'meditation';
-var url = 'mongodb://localhost:27017/' + db;
+var url = (process.env.MONGODB_URI || 'mongodb://localhost:27017/') + db;
 
 var userLogin = '';
 
@@ -32,6 +35,8 @@ app.use(function(req, res, next) {
 	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 	next();
 });
+
+app.use(express.static(path.join(__dirname, "client", "dist")));
 
 app.post('/account', function(req, res) {
 	// The user entry to be made
@@ -396,7 +401,11 @@ app.post('/deleteJournalEntry', function(req, res) {
 	});
 });
 
-// // Listen for an incoming connection
-server.listen(8080, function() {
+app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "client", "index.html"));
+});
+
+// Listen for an incoming connection
+server.listen(port, function() {
 	console.log("Server is listening...\n");
 });
