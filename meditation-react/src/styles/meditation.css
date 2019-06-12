@@ -185,7 +185,7 @@ button:hover {
 	display: flex;
 	flex-direction: row;
 	justify-content: center;
-	width: 50%;
+	width: 70%;
 }
 
 .timerInput {
@@ -405,7 +405,7 @@ input[type="submit"]:hover, .formButtom:hover {
 	margin-top: 90px;
 }
 
-.accountModButtons {
+.accountModButtons, .journalModButtons {
 	display: flex;
 	flex-direction: row;
 	justify-content: center;
