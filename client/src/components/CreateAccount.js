@@ -55,7 +55,7 @@ class CreateAccount extends React.Component {
                 accountError: "Password must be at least 8 characters",
             });
         } else {
-            axios.post("http://127.0.0.1:8080/account", {
+            axios.post("/account", {
                 accountEmail,
                 accountFirstName,
                 accountLastName,
