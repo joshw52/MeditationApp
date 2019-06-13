@@ -22,7 +22,7 @@ class Login extends React.Component {
             loginUsername,
         } = this.state;
 
-        axios.post('/login', {
+        axios.post('localhost:8080/login', {
             loginPassword,
             loginUsername,
         }).then(res => {
