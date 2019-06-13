@@ -21,7 +21,7 @@ function encrypt(str) {
 
 var port = process.env.PORT || 8080;
 var db = 'meditation';
-var url = (process.env.MONGODB_URI || 'mongodb://localhost:27017') + "/" + db;
+var url = process.env.MONGODB_URI || ('mongodb://localhost:27017' + "/" + db);
 
 var userLogin = '';
 
