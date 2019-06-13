@@ -88,9 +88,11 @@ app.post('/account', function(req, res) {
 	});
 })
 
+console.log(process.env);
 // Check that the login credentials are correct, 
 // that the username exists and that the password is correct
 app.post('/login', function(req, res) {
+	console.log(req);
 	mongo.connect(url, function(err, db) {		
 		if (err) throw err;
 		
