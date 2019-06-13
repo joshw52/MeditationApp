@@ -21,8 +21,7 @@ function encrypt(str) {
 
 var port = process.env.PORT || 8080;
 
-var mongoURL = process.env.MONGODB_URI.split("/");
-var db = process.env.MONGODB_URI ? mongoURL[mongoURL - 1] : 'meditation';
+var db = process.env.DBNAME || 'meditation';
 var url = process.env.MONGODB_URI || ('mongodb://localhost:27017' + "/" + db);
 console.log("\n\n", db, url, "\n\n");
 
@@ -107,23 +106,28 @@ app.post('/api/login', function(req, res) {
 			
 			// If the username is not found or the login password doesn't match the user's password
 			if (!item || encrypt(req.body.loginPassword) !== item.password) {
-				loginMsg = "Invalid Credentials";
+				res.setHeader('Content-Type', 'application/json');
+				res.end(
+					JSON.stringify({
+						loginAccepted: true,
+						loginMsg: "Invalid Credentials",
+						loginSession: null,
+						userMeditationTime: null,
+					})
+				);
 			} else {
-				loginAccepted = true;
-				loginMsg = "The entry is correct!";
-				
 				userLogin = req.body.loginUsername;
+				
+				res.setHeader('Content-Type', 'application/json');
+				res.end(
+					JSON.stringify({
+						loginAccepted: true,
+						loginMsg: "The entry is correct!",
+						loginSession: userLogin,
+						userMeditationTime: item.defaultMeditationTime,
+					})
+				);
 			}
-
-			res.setHeader('Content-Type', 'application/json');
-			res.end(
-				JSON.stringify({
-					loginAccepted: loginAccepted,
-					loginMsg: loginMsg,
-					loginSession: userLogin,
-					userMeditationTime: item.defaultMeditationTime,
-				})
-			);
 			
 			db.close();
 		});
