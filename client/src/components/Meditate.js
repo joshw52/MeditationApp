@@ -185,7 +185,7 @@ class Meditate extends React.Component {
     }
 
     submitMeditationEntry = () => {
-        axios.post("http://127.0.0.1:8080/meditationEntry", {
+        axios.post("/api/meditationEntry", {
             username: this.props.username,
 	        meditateDateTime: moment().unix(),
 	        meditateDuration: this.state.timeMeditated,

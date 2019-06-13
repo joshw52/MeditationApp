@@ -38,7 +38,7 @@ app.use(function(req, res, next) {
 
 app.use(express.static(path.join(__dirname, "client", "dist")));
 
-app.post('/account', function(req, res) {
+app.post('/api/account', function(req, res) {
 	// The user entry to be made
 	var newUser = {
 		firstname: req.body.accountFirstName,
@@ -91,7 +91,7 @@ app.post('/account', function(req, res) {
 console.log(process.env);
 // Check that the login credentials are correct, 
 // that the username exists and that the password is correct
-app.post('/login', function(req, res) {
+app.post('/api/login', function(req, res) {
 	console.log(req);
 	mongo.connect(url, function(err, db) {		
 		if (err) throw err;
@@ -130,7 +130,7 @@ app.post('/login', function(req, res) {
 });
 
 // Go to the home page, or redirect to the login if a user isn't logged in
-app.post('/checkUserSession', function(req, res) {
+app.post('/api/checkUserSession', function(req, res) {
 	let canMeditate = false;
 	if (userLogin && req.body.userSession === userLogin)
 		canMeditate = true;
@@ -139,7 +139,7 @@ app.post('/checkUserSession', function(req, res) {
 });
 
 // Log out of the site
-app.post('/killUserSession', function(req, res) {
+app.post('/api/killUserSession', function(req, res) {
 	userLogin = '';
 
 	res.setHeader('Content-Type', 'application/json');
@@ -148,7 +148,7 @@ app.post('/killUserSession', function(req, res) {
 	}));
 });
 
-app.post('/setMeditationTime', function(req, res) {
+app.post('/api/setMeditationTime', function(req, res) {
 	mongo.connect(url, function(err, db) {
 		db.collection('users').findOne({
 			username: req.body.username,
@@ -177,7 +177,7 @@ app.post('/setMeditationTime', function(req, res) {
 	});
 });
 
-app.post('/meditationEntry', function(req, res) {
+app.post('/api/meditationEntry', function(req, res) {
 	var meditationEntry = {
 		username: req.body.user,
 		meditateDateTime: req.body.meditateDateTime,
@@ -204,7 +204,7 @@ app.post('/meditationEntry', function(req, res) {
 	});
 });
 
-app.get('/accountInfoLoad', function(req, res) {
+app.get('/api/accountInfoLoad', function(req, res) {
 	mongo.connect(url, function(err, db) {
 		if (err) throw err;
 		db.collection('users').findOne({
@@ -227,7 +227,7 @@ app.get('/accountInfoLoad', function(req, res) {
 	});
 });
 
-app.post('/accountModify', function(req, res) {
+app.post('/api/accountModify', function(req, res) {
 	// Modify the account if the user clicked Modify and not Cancel
 	mongo.connect(url, function(err, db) {
 		if (err) throw err;
@@ -258,7 +258,7 @@ app.post('/accountModify', function(req, res) {
 	});
 });
 
-app.post('/accountLoginModify', function(req, res) {
+app.post('/api/accountLoginModify', function(req, res) {
 	mongo.connect(url, function(err, db) {
 		if (err) throw err;
 		
@@ -302,7 +302,7 @@ app.post('/accountLoginModify', function(req, res) {
 	});
 });
 
-app.get('/progress', function(req, res) {
+app.get('/api/progress', function(req, res) {
 	if (userLogin) {
 		mongo.connect(url, function(err, db) {
 			if (err) throw err;
@@ -350,7 +350,7 @@ app.get('/progress', function(req, res) {
 });
 
 // Modify the journal entry in the collection, using the id to find it
-app.post('/modifyJournalEntry', function(req, res) {	
+app.post('/api/modifyJournalEntry', function(req, res) {	
 	var jeid = new OID(req.body.journalID);
 
 	// Update the record
@@ -379,7 +379,7 @@ app.post('/modifyJournalEntry', function(req, res) {
 });
 
 // Delete a journal entry
-app.post('/deleteJournalEntry', function(req, res) {
+app.post('/api/deleteJournalEntry', function(req, res) {
 	var jdid = new OID(req.body.journalID);
 	
 	// Delete the record

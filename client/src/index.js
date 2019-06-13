@@ -18,7 +18,7 @@ class App extends React.Component {
     };
 
     checkUserSession = (userSession, userMeditationTime) => axios
-        .post('http://127.0.0.1:8080/checkUserSession', {
+        .post('/api/checkUserSession', {
             userSession,
         })
         .then(res => {
@@ -37,13 +37,13 @@ class App extends React.Component {
         });
 
     killSession = () => axios
-        .post('http://127.0.0.1:8080/killUserSession', {
+        .post('/api/killUserSession', {
             userSession: this.state.userSession,
         })
         .then(() => this.updateSession(null));
     
     changeDefaultMeditationTime = (username, newTime) => axios
-        .post('http://127.0.0.1:8080/setMeditationTime', {
+        .post('/api/setMeditationTime', {
             userMeditationTime: newTime,
             username,
         })

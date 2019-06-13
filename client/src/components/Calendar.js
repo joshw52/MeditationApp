@@ -35,7 +35,7 @@ class Calendar extends React.Component {
             .startOf('month').startOf('day').unix();
         const endTimestamp = moment(`${progressYear}-${progressMonth}`, 'YYYY-MMMM')
             .endOf('month').endOf('day').unix();
-        axios.get('http://127.0.0.1:8080/progress', {
+        axios.get('/api/progress', {
             params: {
                 endTimestamp,
                 startTimestamp,
@@ -80,7 +80,7 @@ class Calendar extends React.Component {
             journalID,
         } = this.state;
 
-        axios.post("http://127.0.0.1:8080/modifyJournalEntry", {
+        axios.post("/api/modifyJournalEntry", {
             journalEntry,
             journalID,
         }).then(() => this.getJournalEntries());
@@ -89,7 +89,7 @@ class Calendar extends React.Component {
     }
     
     deleteJournalEntry = record => {
-        axios.post("http://127.0.0.1:8080/deleteJournalEntry", {
+        axios.post("/api/deleteJournalEntry", {
             journalID: record._id
         }).then(() => this.getJournalEntries());
     }

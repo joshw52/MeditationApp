@@ -25,7 +25,7 @@ class ModifyAccount extends React.Component {
     }
     
     loadAccountInformation = () => {
-        axios.get('http://127.0.0.1:8080/accountInfoLoad', {
+        axios.get('/api/accountInfoLoad', {
             params: { username: this.props.username }
         }).then(res => {
             this.setState({
@@ -56,7 +56,7 @@ class ModifyAccount extends React.Component {
                 accountMsg: "All fields must be filled out!",
             });
         } else {
-            axios.post("http://127.0.0.1:8080/accountModify", {
+            axios.post("/api/accountModify", {
                 accountEmail,
                 accountFirstName,
                 accountLastName,
@@ -97,7 +97,7 @@ class ModifyAccount extends React.Component {
                 pwordChangeMsg: "New Password must be at least 8 characters",
             });
         } else{
-            axios.post("http://127.0.0.1:8080/accountLoginModify", {
+            axios.post("/api/accountLoginModify", {
                 accountOldPassword,
                 accountPassword,
                 username,
