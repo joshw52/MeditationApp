@@ -22,7 +22,7 @@ class Login extends React.Component {
             loginUsername,
         } = this.state;
 
-        axios.post('localhost:8080/login', {
+        axios.post('https://imeditate.herokuapp.com/login', {
             loginPassword,
             loginUsername,
         }).then(res => {
