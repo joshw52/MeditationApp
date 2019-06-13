@@ -23,7 +23,6 @@ var port = process.env.PORT || 8080;
 
 var db = process.env.DBNAME || 'meditation';
 var url = process.env.MONGODB_URI || ('mongodb://localhost:27017' + "/" + db);
-console.log("\n\n", db, url, "\n\n");
 
 var userLogin = '';
 
@@ -101,15 +100,13 @@ app.post('/api/login', function(req, res) {
 			username: req.body.loginUsername,
 		}, function(err, item) {
 			if (err) throw err;
-			var loginAccepted = false;
-			var loginMsg = "";
 			
 			// If the username is not found or the login password doesn't match the user's password
 			if (!item || encrypt(req.body.loginPassword) !== item.password) {
 				res.setHeader('Content-Type', 'application/json');
 				res.end(
 					JSON.stringify({
-						loginAccepted: true,
+						loginAccepted: false,
 						loginMsg: "Invalid Credentials",
 						loginSession: null,
 						userMeditationTime: null,
