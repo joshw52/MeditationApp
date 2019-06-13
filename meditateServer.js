@@ -89,7 +89,6 @@ app.post('/api/account', function(req, res) {
 	});
 })
 
-console.log(process.env);
 // Check that the login credentials are correct, 
 // that the username exists and that the password is correct
 app.post('/api/login', function(req, res) {
