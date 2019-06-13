@@ -22,7 +22,7 @@ class Login extends React.Component {
             loginUsername,
         } = this.state;
 
-        axios.post("http://127.0.0.1:8080/login", {
+        axios.post('/login', {
             loginPassword,
             loginUsername,
         }).then(res => {
