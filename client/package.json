@@ -17,6 +17,7 @@
     "react-router-dom": "^5.0.0",
     "react-scripts": "3.0.1"
   },
+  "proxy": "http://localhost:8080",
   "scripts": {
     "build": "webpack --mode production",
     "eslint-fix": "eslint --fix \"src/**/*.js\"",
