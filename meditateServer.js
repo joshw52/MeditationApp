@@ -20,8 +20,11 @@ function encrypt(str) {
 }
 
 var port = process.env.PORT || 8080;
-var db = 'meditation';
+
+var mongoURL = process.env.MONGODB_URI.split("/");
+var db = process.env.MONGODB_URI ? mongoURL[mongoURL - 1] : 'meditation';
 var url = process.env.MONGODB_URI || ('mongodb://localhost:27017' + "/" + db);
+console.log("\n\n", db, url, "\n\n");
 
 var userLogin = '';
 
