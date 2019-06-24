@@ -8,7 +8,7 @@ module.exports = {
         contentBase: path.join(__dirname, '/dist'),
         historyApiFallback: true,
         hot: true,
-        port: 8000,
+        port: 8080,
         publicPath: "/",
     },
     devtool: 'inline-source-map',
