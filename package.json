@@ -9,16 +9,15 @@
     "crypto": "^1.0.1",
     "dotenv": "^8.0.0",
     "express": "^4.17.0",
-    "forever": "^1.0.0",
+    "forever": "^0.10.10",
     "http": "^0.0.0",
     "mongo": "^0.1.0",
-    "mongodb": "^2.2.31",
+    "mongodb": "^3.6.6",
     "path": "^0.12.7",
     "uuid": "^3.3.2"
   },
-  "devDependencies": {},
   "engines": {
-    "node": "10.15.3"
+    "node": "14.16.0"
   },
   "scripts": {
     "heroku-prebuild": "cd client && npm install --dev",
