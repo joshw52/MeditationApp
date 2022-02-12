@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Router, Route } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import axios from 'axios';
 
 import CreateAccount from './components/CreateAccount';
@@ -62,22 +62,24 @@ class App extends React.Component {
 
         return (
             <Router history={history}>
-                <Route
-                    exact
-                    path="/"
-                    render={() => <Login {...appPropsAndState} />}
-                />
-                <Route
-                    path="/createaccount"
-                    render={() => <CreateAccount {...appPropsAndState} />}
-                />
-                <Route
-                    path="/home"
-                    render={() => this.state.userSession
-                        ? <Home {...appPropsAndState} />
-                        : <Login {...appPropsAndState} />
-                    }
-                />
+                <Routes>
+                    <Route
+                        exact
+                        path="/"
+                        element={<Login {...appPropsAndState} />}
+                    />
+                    <Route
+                        path="/createaccount"
+                        element={<CreateAccount {...appPropsAndState} />}
+                    />
+                    <Route
+                        path="/home"
+                        element={this.state.userSession
+                            ? <Home {...appPropsAndState} />
+                            : <Login {...appPropsAndState} />
+                        }
+                    />
+                </Routes>
             </Router>
         );
     }
