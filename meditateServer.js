@@ -1,28 +1,33 @@
-var express = require('express');
-var parser = require('body-parser');
-var path = require("path");
-var mongo = require('mongodb').MongoClient;
-var OID = require('mongodb').ObjectID;
+const express = require('express');
+const parser = require('body-parser');
+const cors = require('cors');
+const path = require('path');
 
-var app = express();
-var server = require('http').createServer(app);
+const mongo = require('mongodb').MongoClient;
+const OID = require('mongodb').ObjectID;
 
-var crypto = require('crypto');
+const app = express();
+const server = require('http').createServer(app);
+
+const crypto = require('crypto');
 
 require('dotenv').config();
 
 // Encrypt a string
 function encrypt(str) {
-  var cipher = crypto.createCipher('aes-256-ctr', 'N58Q2ae9');
-  var encrypedStr = cipher.update(str, 'utf8', 'hex');
-  encrypedStr += cipher.final('hex');
-  return encrypedStr;
+  const cipher = crypto.createCipher('aes-256-ctr', 'N58Q2ae9');
+  return cipher.update(str, 'utf8', 'hex') + cipher.final('hex');
 }
 
-var port = process.env.PORT || 8080;
+const port = process.env.PORT || 8080;
 
-var db = process.env.DBNAME || 'meditation';
-var url = process.env.MONGODB_URI || ('mongodb://localhost:27017' + "/" + db);
+const username = process.env.DB_USER || '';
+const password = process.env.DB_PASS || '';
+const cluster = process.env.DB_CLUSTER || '';
+const database = process.env.DB_NAME || 'meditation';
+
+// const url = `mongodb://:@${cluster}/?retryWrites=true&w=majority`;
+const url = `mongodb+srv://${username}:${password}@${cluster}.mongodb.net/test?retryWrites=true&w=majority&useNewUrlParser=true&useUnifiedTopology=true`;
 
 var userLogin = '';
 
@@ -31,17 +36,19 @@ app.set('port', port);
 app.use(parser.json());
 app.use(parser.urlencoded({ extended: true }));
 
-app.use(function(req, res, next) {
-	res.header("Access-Control-Allow-Origin", "*");
-	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-	next();
-});
+app.use(cors());
+
+// app.use(function(req, res, next) {
+// 	res.header("Access-Control-Allow-Origin", "*");
+// 	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+// 	next();
+// });
 
 app.use(express.static(path.join(__dirname, "client", "dist")));
 
 app.post('/api/account', function(req, res) {
 	// The user entry to be made
-	var newUser = {
+	const newUser = {
 		firstname: req.body.accountFirstName,
 		lastname: req.body.accountLastName,
 		username: req.body.accountUsername,
@@ -52,13 +59,14 @@ app.post('/api/account', function(req, res) {
 	}
 
 	// Insert the account
-	mongo.connect(url, function(err, db) {
-		if (err) throw err;
+	mongo.connect(url, function(err, client) {
+		const db = client.db('meditation');	
+		if (err) console.log('[Account Connect Error]', err);
 
 		db.collection('users').findOne({
 			username: req.body.accountUsername,
 		}, function(err, item) {
-			if (err) throw err;
+			if (err) console.log('[User FindOne Error]', err);
 
 			if (item !== null) {
 				res.setHeader('Content-Type', 'application/json');
@@ -69,9 +77,9 @@ app.post('/api/account', function(req, res) {
 					})
 				);
 
-				db.close();
+				client.close();
 			} else {
-				db.collection('users').insert(newUser, function(err, docs) {
+				db.collection('users').insertOne(newUser, function(err, docs) {
 					if (err) throw err;
 
 					res.setHeader('Content-Type', 'application/json');
@@ -82,7 +90,7 @@ app.post('/api/account', function(req, res) {
 						})
 					);
 
-					db.close();
+					client.close();
 				});
 			}
 		});
@@ -92,7 +100,8 @@ app.post('/api/account', function(req, res) {
 // Check that the login credentials are correct, 
 // that the username exists and that the password is correct
 app.post('/api/login', function(req, res) {
-	mongo.connect(url, function(err, db) {		
+	mongo.connect(url, function(err, client) {
+		const db = client.db('meditation');		
 		if (err) throw err;
 		
 		// Look for username
@@ -126,7 +135,7 @@ app.post('/api/login', function(req, res) {
 				);
 			}
 			
-			db.close();
+			client.close();
 		});
 	});
 });
@@ -151,7 +160,8 @@ app.post('/api/killUserSession', function(req, res) {
 });
 
 app.post('/api/setMeditationTime', function(req, res) {
-	mongo.connect(url, function(err, db) {
+	mongo.connect(url, function(err, client) {
+		const db = client.db('meditation');	
 		db.collection('users').findOne({
 			username: req.body.username,
 		}, function(err, item) {
@@ -171,7 +181,7 @@ app.post('/api/setMeditationTime', function(req, res) {
 							defaultMeditationTime: req.body.userMeditationTime,
 						}));
 
-						db.close();
+						client.close();
 					}
 				);
 			}
@@ -180,7 +190,7 @@ app.post('/api/setMeditationTime', function(req, res) {
 });
 
 app.post('/api/meditationEntry', function(req, res) {
-	var meditationEntry = {
+	const meditationEntry = {
 		username: req.body.user,
 		meditateDateTime: req.body.meditateDateTime,
 		meditateDuration: req.body.meditateDuration,
@@ -188,10 +198,11 @@ app.post('/api/meditationEntry', function(req, res) {
 	}
 
 	// Insert the meditation entry to the database
-	mongo.connect(url, function(err, db) {
+	mongo.connect(url, function(err, client) {
+		const db = client.db('meditation');	
 		if (err) throw err;
 		
-		db.collection('meditationrecord').insert(meditationEntry, function(err, docs) {
+		db.collection('meditationrecord').insertOne(meditationEntry, function(err, docs) {
 			if (err) throw err;
 						
 			res.setHeader('Content-Type', 'application/json');
@@ -201,13 +212,14 @@ app.post('/api/meditationEntry', function(req, res) {
 				})
 			);
 	
-			db.close();
+			client.close();
 		});
 	});
 });
 
 app.get('/api/accountInfoLoad', function(req, res) {
-	mongo.connect(url, function(err, db) {
+	mongo.connect(url, function(err, client) {
+		const db = client.db('meditation');	
 		if (err) throw err;
 		db.collection('users').findOne({
 			username: req.query.username
@@ -224,14 +236,15 @@ app.get('/api/accountInfoLoad', function(req, res) {
 				})
 			);
 			
-			db.close();
+			client.close();
 		});
 	});
 });
 
 app.post('/api/accountModify', function(req, res) {
 	// Modify the account if the user clicked Modify and not Cancel
-	mongo.connect(url, function(err, db) {
+	mongo.connect(url, function(err, client) {
+		const db = client.db('meditation');	
 		if (err) throw err;
 	
 		db.collection('users').update(
@@ -254,14 +267,15 @@ app.post('/api/accountModify', function(req, res) {
 					})
 				);
 
-				db.close();
+				client.close();
 			}
 		);
 	});
 });
 
 app.post('/api/accountLoginModify', function(req, res) {
-	mongo.connect(url, function(err, db) {
+	mongo.connect(url, function(err, client) {
+		const db = client.db('meditation');	
 		if (err) throw err;
 		
 		db.collection('users').findOne({
@@ -277,7 +291,7 @@ app.post('/api/accountLoginModify', function(req, res) {
 					})
 				);
 
-				db.close();
+				client.close();
 			}
 			else {
 				db.collection('users').update(
@@ -296,7 +310,7 @@ app.post('/api/accountLoginModify', function(req, res) {
 							})
 						);
 
-						db.close();
+						client.close();
 					}
 				);
 			}
@@ -306,7 +320,8 @@ app.post('/api/accountLoginModify', function(req, res) {
 
 app.get('/api/progress', function(req, res) {
 	if (userLogin) {
-		mongo.connect(url, function(err, db) {
+		mongo.connect(url, function(err, client) {
+			const db = client.db('meditation');	
 			if (err) throw err;
 			
 			db.collection('meditationrecord').find({
@@ -338,7 +353,7 @@ app.get('/api/progress', function(req, res) {
 					})
 				);
 
-				db.close();
+				client.close();
 			});
 		});
 	} else {
@@ -353,10 +368,11 @@ app.get('/api/progress', function(req, res) {
 
 // Modify the journal entry in the collection, using the id to find it
 app.post('/api/modifyJournalEntry', function(req, res) {	
-	var jeid = new OID(req.body.journalID);
+	const jeid = new OID(req.body.journalID);
 
 	// Update the record
-	mongo.connect(url, function(err, db) {
+	mongo.connect(url, function(err, client) {
+		const db = client.db('meditation');	
 		if (err) throw err;
 		
 		db.collection('meditationrecord').update(
@@ -374,7 +390,7 @@ app.post('/api/modifyJournalEntry', function(req, res) {
 					})
 				);
 
-				db.close();
+				client.close();
 			}
 		);
 	});
@@ -382,10 +398,11 @@ app.post('/api/modifyJournalEntry', function(req, res) {
 
 // Delete a journal entry
 app.post('/api/deleteJournalEntry', function(req, res) {
-	var jdid = new OID(req.body.journalID);
+	const jdid = new OID(req.body.journalID);
 	
 	// Delete the record
-	mongo.connect(url, function(err, db) {
+	mongo.connect(url, function(err, client) {
+		const db = client.db('meditation');	
 		if (err) throw err;
 		
 		db.collection('meditationrecord').remove({
@@ -400,7 +417,7 @@ app.post('/api/deleteJournalEntry', function(req, res) {
 				})
 			);
 			
-			db.close();
+			client.close();
 		});
 	});
 });
@@ -411,5 +428,5 @@ app.get("*", (req, res) => {
 
 // Listen for an incoming connection
 server.listen(port, function() {
-	console.log("Server is listening...\n");
+	console.log("Server is running...\n");
 });
