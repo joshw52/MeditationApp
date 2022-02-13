@@ -24,30 +24,6 @@ module.exports = {
                 test: /\.css$/i,
                 use: ["style-loader", "css-loader"],
             },
-            // {
-            //     test: /\.(gif|png|jpe?g|svg)$/i,
-            //     use: [
-            //         'file-loader',
-            //         {
-            //             loader: 'image-webpack-loader',
-            //             options: {
-            //                 disable: true, // webpack@2.x and newer
-            //             },
-            //         },
-            //     ],
-            // },
-            // {
-            //     test: /\.(gif|png|jpe?g|svg)$/i,
-            //     use: [
-            //         {
-            //             loader: 'url-loader',
-            //             options: {
-            //                 limit: 10000,
-            //                 esModule: false
-            //             },
-            //         },
-            //     ]
-            // }
             {
                 test: /\.(png|svg|jpg|jpeg|gif)$/i,
                 type: 'asset/resource',
