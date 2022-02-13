@@ -54,7 +54,6 @@ app.post('/api/account', function(req, res) {
 		username: req.body.accountUsername,
 		password: encrypt(req.body.accountPassword),
 		email: req.body.accountEmail,
-		zipcode: req.body.accountZip,
 		defaultMeditationTime: 600,
 	}
 
@@ -232,7 +231,6 @@ app.get('/api/accountInfoLoad', function(req, res) {
 					firstname: user.firstname,
 					lastname: user.lastname,
 					email: user.email,
-					zipcode: user.zipcode
 				})
 			);
 			
@@ -254,7 +252,6 @@ app.post('/api/accountModify', function(req, res) {
 					email: req.body.accountEmail,
 					firstname: req.body.accountFirstName,
 					lastname: req.body.accountLastName,
-					zipcode: req.body.accountZip
 				}
 			}, function(err) {
 				if (err) throw err;

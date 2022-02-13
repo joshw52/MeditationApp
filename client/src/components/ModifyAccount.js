@@ -15,7 +15,6 @@ class ModifyAccount extends React.Component {
             accountOldPassword: '',
             accountPassword: '',
             accountPasswordConfirm: '',
-            accountZip: '',
             pwordChangeMsg: '',
         };
     };
@@ -32,7 +31,6 @@ class ModifyAccount extends React.Component {
                 accountEmail: res.data.email,
                 accountFirstName: res.data.firstname,
                 accountLastName: res.data.lastname,
-                accountZip: res.data.zipcode,
             })
         });
     }
@@ -43,14 +41,12 @@ class ModifyAccount extends React.Component {
             accountEmail,
             accountFirstName,
             accountLastName,
-            accountZip,
         } = this.state;
 
         if (
             accountEmail === '' ||
             accountFirstName === '' ||
-            accountLastName === '' ||
-            accountZip === ''
+            accountLastName === ''
         ) {
             this.setState({
                 accountMsg: "All fields must be filled out!",
@@ -60,7 +56,6 @@ class ModifyAccount extends React.Component {
                 accountEmail,
                 accountFirstName,
                 accountLastName,
-                accountZip,
                 username,
             }).then(res => {
                 const { accountModified, accountMsg } = res.data;
@@ -123,7 +118,6 @@ class ModifyAccount extends React.Component {
             accountOldPassword,
             accountPassword,
             accountPasswordConfirm,
-            accountZip,
             pwordChangeMsg,
         } = this.state;
 
@@ -151,13 +145,6 @@ class ModifyAccount extends React.Component {
                         placeholder="Email"
                         type='text'
                         value={accountEmail}
-                    />
-                    <input
-                        name="accountZip"
-                        onChange={this.onChange}
-                        placeholder="Zip Code"
-                        type='text'
-                        value={accountZip}
                     />
                     <div className="accountModButtons">
                         <input

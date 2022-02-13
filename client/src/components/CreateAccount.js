@@ -16,7 +16,6 @@ class CreateAccount extends React.Component {
             accountPassword: '',
             accountPasswordConfirm: '',
             accountUsername: '',
-            accountZip: '',
         };
     };
 
@@ -28,7 +27,6 @@ class CreateAccount extends React.Component {
             accountPassword,
             accountPasswordConfirm,
             accountUsername,
-            accountZip,
         } = this.state;
 
         if (
@@ -37,8 +35,7 @@ class CreateAccount extends React.Component {
             accountLastName === '' ||
             accountPassword === '' ||
             accountPasswordConfirm === '' ||
-            accountUsername === '' ||
-            accountZip === ''
+            accountUsername === ''
         ) {
             this.setState({
                 accountError: "All fields must be filled out!",
@@ -61,7 +58,6 @@ class CreateAccount extends React.Component {
                 accountLastName,
                 accountPassword,
                 accountUsername,
-                accountZip,
             }).then(res => {
                 const { accountCreated, accountMsg } = res.data;
 
@@ -90,7 +86,6 @@ class CreateAccount extends React.Component {
             accountPassword,
             accountPasswordConfirm,
             accountUsername,
-            accountZip,
         } = this.state;
 
         return (
@@ -138,13 +133,6 @@ class CreateAccount extends React.Component {
                         placeholder="Email"
                         type='text'
                         value={accountEmail}
-                    />
-                    <input
-                        name="accountZip"
-                        onChange={this.onChange}
-                        placeholder="Zip Code"
-                        type='text'
-                        value={accountZip}
                     />
                     <input
                         className="loginSite"
