@@ -55,7 +55,7 @@ class Login extends React.Component {
         return (
             <div>
                 <h1>Meditation Tracker</h1>
-                <div className="meditationForm">
+                <form className="meditationForm">
                     <input
                         onChange={this.onChange}
                         name="loginUsername"
@@ -81,7 +81,7 @@ class Login extends React.Component {
                     <div>
                         No account? <Link to='createaccount'>Create One</Link>
                     </div>
-                </div>
+                </form>
             </div>
         );
     }

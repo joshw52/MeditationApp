@@ -15,15 +15,14 @@
     "path": "^0.12.7",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "react-router-dom": "^6.2.1",
-    "react-scripts": "^5.0.0"
+    "react-router-dom": "^6.2.1"
   },
   "proxy": "http://localhost:8080",
   "scripts": {
     "build": "webpack --mode production",
     "eslint-fix": "eslint --fix \"src/**/*.js\"",
     "format": "prettier --write \"src/**/*.js\"",
-    "start": "webpack serve",
+    "start": "webpack serve --config ./webpack.config.js --mode development",
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "webpack --watch"
   },
@@ -52,8 +51,6 @@
     "eslint": "^8.8.0",
     "eslint-config-react": "^1.1.7",
     "eslint-plugin-react": "^7.28.0",
-    "file-loader": "^6.2.0",
-    "image-webpack-loader": "^8.1.0",
     "prettier": "2.5.1",
     "style-loader": "^3.3.1",
     "webpack": "^5.68.0",
