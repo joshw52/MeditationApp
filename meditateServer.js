@@ -38,21 +38,14 @@ app.use(parser.urlencoded({ extended: true }));
 
 app.use(cors());
 
-// app.use(function(req, res, next) {
-// 	res.header("Access-Control-Allow-Origin", "*");
-// 	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-// 	next();
-// });
-
 // Session management
 app.use(sessions({
     cookie: {
-		ephemeral: true,
-		httpOnly: true,
-		maxAge: 4 * 60 * 24,	// Four hours
+		secure: true,
+		maxAge: 4 * 60 * 24, // Four hours
 	},
     resave: true,
-    saveUninitialized: true,
+    saveUninitialized: false,
     secret: process.env.SESSION_SECRET,
 	store: mongoSessionStore.create({
 		mongoUrl: mongoDBUrl,

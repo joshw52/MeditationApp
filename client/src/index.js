@@ -11,6 +11,8 @@ import history from './history';
 
 import './styles/meditation.css';
 
+axios.defaults.withCredentials = true;
+
 class App extends React.Component {
     state = {
         userLoggedIn: false,
@@ -19,7 +21,9 @@ class App extends React.Component {
     };
 
     componentDidMount() {
-        console.log("mounting::", this.state);
+        const username = localStorage.getItem('meditateUsername');
+        console.log("mounting::", username);
+        if (username) this.homePageNavigate(username);
     }
     
     changeDefaultMeditationTime = (username, newTime) => axios
