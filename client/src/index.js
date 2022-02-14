@@ -15,6 +15,7 @@ class App extends React.Component {
     state = {
         userLoggedIn: false,
         userMeditationTime: 600,
+        username: null,
     };
     
     changeDefaultMeditationTime = (username, newTime) => axios
@@ -31,6 +32,7 @@ class App extends React.Component {
         .then(res => {
             this.setState({
                 userLoggedIn: res.data.loggedIn,
+                username,
             }, () => {
                 if (res.data.loggedIn) history.push("/home");
             })
@@ -38,7 +40,12 @@ class App extends React.Component {
 
     userLogout = () => axios
         .post("/api/userLogout")
-        .then(res => this.setState({ userLoggedIn: false }));
+        .then(res => {
+            this.setState(
+                { userLoggedIn: false },
+                () => history.push("/")
+            );
+        });
 
     render () {
         const appPropsAndState = {

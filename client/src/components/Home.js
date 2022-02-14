@@ -11,7 +11,7 @@ export const Home = ({
     changeDefaultMeditationTime,
     userLogout,
     userMeditationTime,
-    userSession,
+    username,
 }) => {
     const [meditateTab, setMeditateTab] = useState("home");
 
@@ -20,7 +20,7 @@ export const Home = ({
             case "accountMod":
                 return (
                     <ModifyAccount
-                        username={userSession}
+                        username={username}
                     />
                 );
             case "meditate":
@@ -29,13 +29,13 @@ export const Home = ({
                         changeDefaultMeditationTime={changeDefaultMeditationTime}
                         changeMeditationTab={setMeditateTab}
                         userMeditationTime={userMeditationTime}
-                        username={userSession}
+                        username={username}
                     />
                 );
             case "progress":
                 return (
                     <Calendar
-                        username={userSession}
+                        username={username}
                     />
                 );
             default:
@@ -47,11 +47,6 @@ export const Home = ({
         }
     }, [meditateTab]);
 
-    const logout = () => {
-        userLogout();
-        history.push("/");
-    }
-
     return (
         <div>
             <div className="menubar">
@@ -60,7 +55,7 @@ export const Home = ({
                     <li onClick={() => setMeditateTab("meditate")}>Meditation</li>
                     <li onClick={() => setMeditateTab("progress")}>Progress</li>
                     <li onClick={() => setMeditateTab("accountMod")}>Account</li>
-                    <li onClick={logout}>Logout</li>
+                    <li onClick={userLogout}>Logout</li>
                 </ul>
             </div>
             {renderMeditationPage()}

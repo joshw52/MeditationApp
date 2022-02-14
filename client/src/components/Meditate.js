@@ -5,7 +5,7 @@ import moment from 'moment-timezone';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 
-const gong = new Audio('https://soundbible.com/grab.php?id=1815&type=mp3');
+const gong = new Audio("https://soundbible.com/grab.php?id=1815&type=mp3");
 
 export const getHoursMinutesSeconds = userTime => {
     const hours = Math.floor(userTime / 3600);
@@ -54,7 +54,7 @@ class Meditate extends React.Component {
             currentBrightness: 0,
             defaultTimeChanged: false,
             incrementFraction: -1,
-            journalEntry: '',
+            journalEntry: "",
             journalView: false,
             meditateHours: hours,
             meditateMinutes: minutes,
@@ -111,9 +111,9 @@ class Meditate extends React.Component {
 
         let incrementFraction = 100 / getTotalSeconds(updatedHrs, updatedMin, updatedSec);
         const buddhaTimerStyle = {
-            display: 'initial',
+            display: "initial",
             filter: `invert(${this.state.currentBrightness}%)`,
-            opacity: '0.85',
+            opacity: "0.85",
         };
 
         this.setState({
@@ -190,7 +190,7 @@ class Meditate extends React.Component {
 	        meditateDateTime: moment().unix(),
 	        meditateDuration: this.state.timeMeditated,
 	        journalEntry: this.state.journalEntry
-        }).then(() => this.props.changeMeditationTab('progress'));
+        }).then(() => this.props.changeMeditationTab("progress"));
     }
 
     setDefaultTime = () => {
@@ -233,69 +233,69 @@ class Meditate extends React.Component {
         return (
             <div>
                 {journalView ?
-                    <div className='meditationJournal'>
+                    <div className="meditationJournal">
                         <h3>Log your meditation</h3>
                         <textarea
-                            className='journalEntry'
-                            name='journalEntry'
+                            className="journalEntry"
+                            name="journalEntry"
                             onChange={this.modifyEntry}
                             value={journalEntry}
                         />
                         <input
-                            className='logJournal'
+                            className="logJournal"
                             onClick={this.submitMeditationEntry}
-                            type='submit'
-                            value='Log Journal'
+                            type="submit"
+                            value="Log Journal"
                         />
                     </div> :
-                    <div className='meditationTimer'>
-                        <div className='timerAdjust'>
-                            <div className='timerRow'>
+                    <div className="meditationTimer">
+                        <div className="timerAdjust">
+                            <div className="timerRow">
                                 <input
-                                    className='timerInput'
+                                    className="timerInput"
                                     disabled={timerRunning}
-                                    name='meditateHours'
+                                    name="meditateHours"
                                     onChange={this.modifyEntry}
                                     value={meditateHours}
                                 />
                                 <input
-                                    className='timerInput'
+                                    className="timerInput"
                                     disabled={timerRunning}
-                                    name='meditateMinutes'
+                                    name="meditateMinutes"
                                     onChange={this.modifyEntry}
                                     value={meditateMinutes}
                                 />
                                 <input
-                                    className='timerInput'
+                                    className="timerInput"
                                     disabled={timerRunning}
-                                    name='meditateSeconds'
+                                    name="meditateSeconds"
                                     onChange={this.modifyEntry}
                                     value={meditateSeconds}
                                 />
                             </div>
                         </div>
 
-                        <div className='timerRow'>
+                        <div className="timerRow">
                             <button disabled={timerRunning} onClick={this.startTimer}>Start</button>
                             <button onClick={this.stopTimer}>Stop</button>
                             <button onClick={this.resetTimer}>Reset</button>
                             <button disabled={timerRunning} onClick={this.setDefaultTime}>Set Default Time</button>
                             <button
-                                className='info'
+                                className="info"
                                 onClick={this.displayTimerInfo}
                             >
                                 <FontAwesomeIcon icon={faInfoCircle} />
                             </button>
                         </div>
 
-                        {defaultTimeChanged && <div id='defaultTimeMsg'>Default time changed!</div>}
+                        {defaultTimeChanged && <div id="defaultTimeMsg">Default time changed!</div>}
 
                         {timerInfoShow &&
-                            <div className='infoText'>
+                            <div className="infoText">
                                 <p>Here you can record a meditation session.  A gong will sound both when the
-                                session starts and when it ends.  Press <span className='textSpan'>Start</span> to
-                                start the timer, <span className='textSpan'>Stop</span> to stop it, <span className='textSpan'>Reset</span> to
-                                go back to the beginning, or <span className='textSpan'>Set Default Time</span> to
+                                session starts and when it ends.  Press <span className="textSpan">Start</span> to
+                                start the timer, <span className="textSpan">Stop</span> to stop it, <span className="textSpan">Reset</span> to
+                                go back to the beginning, or <span className="textSpan">Set Default Time</span> to
                                 personalize your default meditation time.  You can adjust the time with either the up 
                                 and down arrows, or you can click on the numbers and enter in the appropriate time.
                                 You will be prompted to make a journal entry after the meditation session ends, where
@@ -304,12 +304,12 @@ class Meditate extends React.Component {
                         }
 
                         <div
-                            className='buddhaFill'
+                            className="buddhaFill"
                             style={{ opacity: timerRunning && buddhaTimerStyle.opacity }}
                         >
                             <img
-                                className='buddhaFillImg'
-                                src='http://www.vagabondtemple.com/wp-content/uploads/2016/07/mantra-om-1292602.png'
+                                className="buddhaFillImg"
+                                src="http://www.vagabondtemple.com/wp-content/uploads/2016/07/mantra-om-1292602.png"
                                 style={{
                                     display: timerRunning && buddhaTimerStyle.display,
                                     filter: timerRunning && buddhaTimerStyle.filter,
