@@ -8,6 +8,9 @@ module.exports = {
         historyApiFallback: true,
         hot: true,
         port: 8000,
+        proxy: {
+            '/api': 'http://localhost:8080',
+        },
         static: path.resolve(__dirname, './dist'),
     },
     devtool: 'inline-source-map',

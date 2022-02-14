@@ -57,50 +57,61 @@ app.post('/api/account', function(req, res) {
 		defaultMeditationTime: 600,
 	}
 
-	// Insert the account
-	mongo.connect(url, function(err, client) {
-		const db = client.db('meditation');	
-		if (err) console.log('[Account Connect Error]', err);
-
-		db.collection('users').findOne({
-			username: req.body.accountUsername,
-		}, function(err, item) {
-			if (err) console.log('[User FindOne Error]', err);
-
-			if (item !== null) {
-				res.setHeader('Content-Type', 'application/json');
-				res.end(
-					JSON.stringify({
-						accountCreated: false,
-						accountMsg: "Username is already taken",
-					})
-				);
-
-				client.close();
-			} else {
-				db.collection('users').insertOne(newUser, function(err, docs) {
-					if (err) throw err;
-
+	// Server-side validation of password length
+	if (newUser.password.length < 8) {
+		res.setHeader('Content-Type', 'application/json');
+		res.end(
+			JSON.stringify({
+				accountCreated: false,
+				accountMsg: "Password must be at least 8 characters",
+			})
+		);
+	} else {
+		// Attempt to insert the account
+		mongo.connect(url, function(err, client) {
+			const db = client.db(database);	
+			if (err) console.log('[Database Connect Error]', err);
+	
+			db.collection('users').findOne({
+				username: req.body.accountUsername,
+			}, function(err, item) {
+				if (err) console.log('[User FindOne Error]', err);
+	
+				if (item !== null) {
 					res.setHeader('Content-Type', 'application/json');
 					res.end(
 						JSON.stringify({
-							accountCreated: true,
-							accountMsg: '',
+							accountCreated: false,
+							accountMsg: "Username is already taken",
 						})
 					);
-
+	
 					client.close();
-				});
-			}
+				} else {
+					db.collection('users').insertOne(newUser, function(err, docs) {
+						if (err) console.log('[Create New User Error]', err);
+	
+						res.setHeader('Content-Type', 'application/json');
+						res.end(
+							JSON.stringify({
+								accountCreated: true,
+								accountMsg: '',
+							})
+						);
+	
+						client.close();
+					});
+				}
+			});
 		});
-	});
+	}
 })
 
 // Check that the login credentials are correct, 
 // that the username exists and that the password is correct
 app.post('/api/login', function(req, res) {
 	mongo.connect(url, function(err, client) {
-		const db = client.db('meditation');		
+		const db = client.db(database);		
 		if (err) throw err;
 		
 		// Look for username
@@ -160,7 +171,7 @@ app.post('/api/killUserSession', function(req, res) {
 
 app.post('/api/setMeditationTime', function(req, res) {
 	mongo.connect(url, function(err, client) {
-		const db = client.db('meditation');	
+		const db = client.db(database);	
 		db.collection('users').findOne({
 			username: req.body.username,
 		}, function(err, item) {
@@ -198,7 +209,7 @@ app.post('/api/meditationEntry', function(req, res) {
 
 	// Insert the meditation entry to the database
 	mongo.connect(url, function(err, client) {
-		const db = client.db('meditation');	
+		const db = client.db(database);	
 		if (err) throw err;
 		
 		db.collection('meditationrecord').insertOne(meditationEntry, function(err, docs) {
@@ -218,7 +229,7 @@ app.post('/api/meditationEntry', function(req, res) {
 
 app.get('/api/accountInfoLoad', function(req, res) {
 	mongo.connect(url, function(err, client) {
-		const db = client.db('meditation');	
+		const db = client.db(database);	
 		if (err) throw err;
 		db.collection('users').findOne({
 			username: req.query.username
@@ -242,7 +253,7 @@ app.get('/api/accountInfoLoad', function(req, res) {
 app.post('/api/accountModify', function(req, res) {
 	// Modify the account if the user clicked Modify and not Cancel
 	mongo.connect(url, function(err, client) {
-		const db = client.db('meditation');	
+		const db = client.db(database);	
 		if (err) throw err;
 	
 		db.collection('users').update(
@@ -272,7 +283,7 @@ app.post('/api/accountModify', function(req, res) {
 
 app.post('/api/accountLoginModify', function(req, res) {
 	mongo.connect(url, function(err, client) {
-		const db = client.db('meditation');	
+		const db = client.db(database);	
 		if (err) throw err;
 		
 		db.collection('users').findOne({
@@ -318,7 +329,7 @@ app.post('/api/accountLoginModify', function(req, res) {
 app.get('/api/progress', function(req, res) {
 	if (userLogin) {
 		mongo.connect(url, function(err, client) {
-			const db = client.db('meditation');	
+			const db = client.db(database);	
 			if (err) throw err;
 			
 			db.collection('meditationrecord').find({
@@ -369,7 +380,7 @@ app.post('/api/modifyJournalEntry', function(req, res) {
 
 	// Update the record
 	mongo.connect(url, function(err, client) {
-		const db = client.db('meditation');	
+		const db = client.db(database);	
 		if (err) throw err;
 		
 		db.collection('meditationrecord').update(
@@ -399,7 +410,7 @@ app.post('/api/deleteJournalEntry', function(req, res) {
 	
 	// Delete the record
 	mongo.connect(url, function(err, client) {
-		const db = client.db('meditation');	
+		const db = client.db(database);	
 		if (err) throw err;
 		
 		db.collection('meditationrecord').remove({
