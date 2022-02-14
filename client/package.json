@@ -17,7 +17,11 @@
     "react-dom": "^17.0.2",
     "react-router-dom": "^6.2.1"
   },
-  "proxy": "http://localhost:8080",
+  "proxy": {
+    "/api/*": {
+      "target": "http://localhost:8080"
+    }
+  },
   "scripts": {
     "build": "webpack --mode production",
     "eslint-fix": "eslint --fix \"src/**/*.js\"",
