@@ -453,7 +453,6 @@ app.post('/api/deleteJournalEntry', function(req, res) {
 });
 
 app.get("*", (req, res) => {
-	console.log('SESSION::', req.session)
     res.sendFile(path.join(__dirname, "client", "index.html"));
 });
 

@@ -22,7 +22,6 @@ class App extends React.Component {
 
     componentDidMount() {
         const username = localStorage.getItem('meditateUsername');
-        console.log("mounting::", username);
         if (username) this.homePageNavigate(username);
     }
     
