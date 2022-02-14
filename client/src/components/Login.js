@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 import history from '../history';
 
-export const Login = ({ checkUserSession }) => {
+export const Login = ({ homePageNavigate }) => {
     const [loginError, setLoginError] = useState('');
     const [loginPassword, setLoginPassword] = useState('');
     const [loginUsername, setLoginUsername] = useState('');
@@ -18,16 +18,11 @@ export const Login = ({ checkUserSession }) => {
             const {
                 loginAccepted,
                 loginMsg,
-                loginSession,
-                userMeditationTime
             } = res.data;
             if (!loginAccepted) setLoginError(loginMsg);
-            else {
-                checkUserSession(loginSession, userMeditationTime);
-                history.push('/home');
-            }
+            else homePageNavigate(loginUsername);
         });
-    }, [checkUserSession, loginPassword, loginUsername, setLoginError]);
+    }, [loginPassword, loginUsername, setLoginError]);
 
     return (
         <div>

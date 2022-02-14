@@ -13,34 +13,9 @@ import './styles/meditation.css';
 
 class App extends React.Component {
     state = {
+        userLoggedIn: false,
         userMeditationTime: 600,
-        userSession: null,
     };
-
-    checkUserSession = (userSession, userMeditationTime) => axios
-        .post('/api/checkUserSession', {
-            userSession,
-        })
-        .then(res => {
-            const { canMeditate, userSession } = res.data;
-
-            if (canMeditate)
-                this.setState({
-                    userMeditationTime: Number(userMeditationTime),
-                    userSession,
-                });
-            else
-                this.setState({
-                    userMeditationTime: 600,
-                    userSession: null,
-                });
-        });
-
-    killSession = () => axios
-        .post('/api/killUserSession', {
-            userSession: this.state.userSession,
-        })
-        .then(() => this.updateSession(null));
     
     changeDefaultMeditationTime = (username, newTime) => axios
         .post('/api/setMeditationTime', {
@@ -51,13 +26,21 @@ class App extends React.Component {
             userMeditationTime: Number(res.data.defaultMeditationTime),
         }));
 
+    homePageNavigate = username => axios
+        .post('/api/userLoggedIn', { username })
+        .then(res => {
+            if (res.data.loggedIn) history.push('/home');
+            this.setState({
+                userLoggedIn: res.data.loggedIn,
+            })
+        });
+
     render () {
         const appPropsAndState = {
             ...this.props,
             ...this.state,
             changeDefaultMeditationTime: this.changeDefaultMeditationTime,
-            checkUserSession: this.checkUserSession,
-            killSession: this.killSession,
+            homePageNavigate: this.homePageNavigate,
         }
 
         return (
@@ -74,7 +57,7 @@ class App extends React.Component {
                     />
                     <Route
                         path="/home"
-                        element={this.state.userSession
+                        element={this.state.userLoggedIn
                             ? <Home {...appPropsAndState} />
                             : <Login {...appPropsAndState} />
                         }

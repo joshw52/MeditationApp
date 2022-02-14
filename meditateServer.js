@@ -2,6 +2,8 @@ const express = require('express');
 const parser = require('body-parser');
 const cors = require('cors');
 const path = require('path');
+const cookieParser = require("cookie-parser");
+const sessions = require('express-session');
 
 const mongo = require('mongodb').MongoClient;
 const OID = require('mongodb').ObjectID;
@@ -21,15 +23,26 @@ function encrypt(str) {
 
 const port = process.env.PORT || 8080;
 
+// Session management
+app.use(sessions({
+    cookie: {
+		ephemeral: true,
+		httpOnly: true,
+		maxAge: 4 * 60 * 24,	// Four hours
+	},
+    resave: true,
+    saveUninitialized: true,
+    secret: process.env.SESSION_SECRET,
+}));
+app.use(cookieParser());
+
+// Database configuration
 const username = process.env.DB_USER || '';
 const password = process.env.DB_PASS || '';
 const cluster = process.env.DB_CLUSTER || '';
 const database = process.env.DB_NAME || 'meditation';
 
-// const url = `mongodb://:@${cluster}/?retryWrites=true&w=majority`;
 const url = `mongodb+srv://${username}:${password}@${cluster}.mongodb.net/test?retryWrites=true&w=majority&useNewUrlParser=true&useUnifiedTopology=true`;
-
-var userLogin = '';
 
 app.set('port', port);
 
@@ -132,14 +145,14 @@ app.post('/api/login', function(req, res) {
 					})
 				);
 			} else {
-				userLogin = req.body.loginUsername;
+				req.session.loggedIn = true;
+				req.session.username = req.body.loginUsername;
 				
 				res.setHeader('Content-Type', 'application/json');
 				res.end(
 					JSON.stringify({
 						loginAccepted: true,
 						loginMsg: "The entry is correct!",
-						loginSession: userLogin,
 						userMeditationTime: item.defaultMeditationTime,
 					})
 				);
@@ -150,184 +163,182 @@ app.post('/api/login', function(req, res) {
 	});
 });
 
-// Go to the home page, or redirect to the login if a user isn't logged in
-app.post('/api/checkUserSession', function(req, res) {
-	let canMeditate = false;
-	if (userLogin && req.body.userSession === userLogin)
-		canMeditate = true;
-	res.setHeader('Content-Type', 'application/json');
-	res.end(JSON.stringify({ canMeditate, userSession: userLogin }));
-});
-
-// Log out of the site
-app.post('/api/killUserSession', function(req, res) {
-	userLogin = '';
-
+app.post('/api/userLoggedIn', function(req, res) {
 	res.setHeader('Content-Type', 'application/json');
 	res.end(JSON.stringify({
-		canMeditate: false,
+		loggedIn: !!req.session.username && !!req.session.loggedIn,
 	}));
 });
 
 app.post('/api/setMeditationTime', function(req, res) {
-	mongo.connect(url, function(err, client) {
-		const db = client.db(database);	
-		db.collection('users').findOne({
-			username: req.body.username,
-		}, function(err, item) {
-			if (err) throw err;
+	if (req.session.userid) {
+		mongo.connect(url, function(err, client) {
+			const db = client.db(database);	
+			db.collection('users').findOne({
+				username: req.body.username,
+			}, function(err, item) {
+				if (err) throw err;
 
-			if (item) {
-				db.collection('users').update(
-					{ username: req.body.username },
-					{ $set: {
-						defaultMeditationTime: req.body.userMeditationTime,
-					}},
-					function(err) {
-						if (err) throw err;
-
-						res.setHeader('Content-Type', 'application/json');
-						res.end(JSON.stringify({
+				if (item) {
+					db.collection('users').update(
+						{ username: req.body.username },
+						{ $set: {
 							defaultMeditationTime: req.body.userMeditationTime,
-						}));
+						}},
+						function(err) {
+							if (err) throw err;
 
-						client.close();
-					}
-				);
-			}
+							res.setHeader('Content-Type', 'application/json');
+							res.end(JSON.stringify({
+								defaultMeditationTime: req.body.userMeditationTime,
+							}));
+
+							client.close();
+						}
+					);
+				}
+			});
 		});
-	});
+	}
 });
 
 app.post('/api/meditationEntry', function(req, res) {
-	const meditationEntry = {
-		username: req.body.user,
-		meditateDateTime: req.body.meditateDateTime,
-		meditateDuration: req.body.meditateDuration,
-		journalEntry: req.body.journalEntry
-	}
+	if (req.session.userid) {
+		const meditationEntry = {
+			username: req.body.user,
+			meditateDateTime: req.body.meditateDateTime,
+			meditateDuration: req.body.meditateDuration,
+			journalEntry: req.body.journalEntry
+		}
 
-	// Insert the meditation entry to the database
-	mongo.connect(url, function(err, client) {
-		const db = client.db(database);	
-		if (err) throw err;
-		
-		db.collection('meditationrecord').insertOne(meditationEntry, function(err, docs) {
+		// Insert the meditation entry to the database
+		mongo.connect(url, function(err, client) {
+			const db = client.db(database);	
 			if (err) throw err;
-						
-			res.setHeader('Content-Type', 'application/json');
-			res.end(
-				JSON.stringify({
-					meditationEntryMsg: 'Meditation Entry Made!',
-				})
-			);
-	
-			client.close();
+			
+			db.collection('meditationrecord').insertOne(meditationEntry, function(err, docs) {
+				if (err) throw err;
+							
+				res.setHeader('Content-Type', 'application/json');
+				res.end(
+					JSON.stringify({
+						meditationEntryMsg: 'Meditation Entry Made!',
+					})
+				);
+		
+				client.close();
+			});
 		});
-	});
+	}
 });
 
 app.get('/api/accountInfoLoad', function(req, res) {
-	mongo.connect(url, function(err, client) {
-		const db = client.db(database);	
-		if (err) throw err;
-		db.collection('users').findOne({
-			username: req.query.username
-		}, function(err, user) {
+	if (req.session.userid) {
+		mongo.connect(url, function(err, client) {
+			const db = client.db(database);	
 			if (err) throw err;
-			
-			res.setHeader('Content-Type', 'application/json');
-			res.end(
-				JSON.stringify({
-					firstname: user.firstname,
-					lastname: user.lastname,
-					email: user.email,
-				})
-			);
-			
-			client.close();
+			db.collection('users').findOne({
+				username: req.query.username
+			}, function(err, user) {
+				if (err) throw err;
+				
+				res.setHeader('Content-Type', 'application/json');
+				res.end(
+					JSON.stringify({
+						firstname: user.firstname,
+						lastname: user.lastname,
+						email: user.email,
+					})
+				);
+				
+				client.close();
+			});
 		});
-	});
+	}
 });
 
 app.post('/api/accountModify', function(req, res) {
-	// Modify the account if the user clicked Modify and not Cancel
-	mongo.connect(url, function(err, client) {
-		const db = client.db(database);	
-		if (err) throw err;
-	
-		db.collection('users').update(
-			{ username: req.body.username },
-			{ $set:
-				{
-					email: req.body.accountEmail,
-					firstname: req.body.accountFirstName,
-					lastname: req.body.accountLastName,
+	if (req.session.userid) {
+		// Modify the account if the user clicked Modify and not Cancel
+		mongo.connect(url, function(err, client) {
+			const db = client.db(database);	
+			if (err) throw err;
+		
+			db.collection('users').update(
+				{ username: req.body.username },
+				{ $set:
+					{
+						email: req.body.accountEmail,
+						firstname: req.body.accountFirstName,
+						lastname: req.body.accountLastName,
+					}
+				}, function(err) {
+					if (err) throw err;
+
+					res.setHeader('Content-Type', 'application/json');
+					res.end(
+						JSON.stringify({
+							accountModified: true,
+							accountMsg: 'Account Modified!',
+						})
+					);
+
+					client.close();
 				}
-			}, function(err) {
-				if (err) throw err;
-
-				res.setHeader('Content-Type', 'application/json');
-				res.end(
-					JSON.stringify({
-						accountModified: true,
-						accountMsg: 'Account Modified!',
-					})
-				);
-
-				client.close();
-			}
-		);
-	});
+			);
+		});
+	}
 });
 
 app.post('/api/accountLoginModify', function(req, res) {
-	mongo.connect(url, function(err, client) {
-		const db = client.db(database);	
-		if (err) throw err;
-		
-		db.collection('users').findOne({
-			username: req.body.username
-		}, function(err, item) {
+	if (req.session.userid) {
+		mongo.connect(url, function(err, client) {
+			const db = client.db(database);	
 			if (err) throw err;
 			
-			if (item.password !== encrypt(req.body.accountOldPassword)) {
-				res.setHeader('Content-Type', 'application/json');
-				res.end(
-					JSON.stringify({
-						pwordChangeMsg: 'Old Password Incorrect!',
-					})
-				);
+			db.collection('users').findOne({
+				username: req.body.username
+			}, function(err, item) {
+				if (err) throw err;
+				
+				if (item.password !== encrypt(req.body.accountOldPassword)) {
+					res.setHeader('Content-Type', 'application/json');
+					res.end(
+						JSON.stringify({
+							pwordChangeMsg: 'Old Password Incorrect!',
+						})
+					);
 
-				client.close();
-			}
-			else {
-				db.collection('users').update(
-					{ username: req.body.username },
-					{ $set:
-						{
-							password: encrypt(req.body.accountPassword)
+					client.close();
+				}
+				else {
+					db.collection('users').update(
+						{ username: req.body.username },
+						{ $set:
+							{
+								password: encrypt(req.body.accountPassword)
+							}
+						}, function(err) {
+							if (err) throw err;
+
+							res.setHeader('Content-Type', 'application/json');
+							res.end(
+								JSON.stringify({
+									pwordChangeMsg: 'Password Changed!',
+								})
+							);
+
+							client.close();
 						}
-					}, function(err) {
-						if (err) throw err;
-
-						res.setHeader('Content-Type', 'application/json');
-						res.end(
-							JSON.stringify({
-								pwordChangeMsg: 'Password Changed!',
-							})
-						);
-
-						client.close();
-					}
-				);
-			}
+					);
+				}
+			});
 		});
-	});
+	}
 });
 
 app.get('/api/progress', function(req, res) {
-	if (userLogin) {
+	if (req.session.userid) {
 		mongo.connect(url, function(err, client) {
 			const db = client.db(database);	
 			if (err) throw err;
@@ -376,58 +387,62 @@ app.get('/api/progress', function(req, res) {
 
 // Modify the journal entry in the collection, using the id to find it
 app.post('/api/modifyJournalEntry', function(req, res) {	
-	const jeid = new OID(req.body.journalID);
+	if (req.session.userid) {
+		const jeid = new OID(req.body.journalID);
 
-	// Update the record
-	mongo.connect(url, function(err, client) {
-		const db = client.db(database);	
-		if (err) throw err;
-		
-		db.collection('meditationrecord').update(
-			{ _id: jeid },
-			{ $set:
-				{ journalEntry: req.body.journalEntry }
-			},
-			function(err, docs) {
+		// Update the record
+		mongo.connect(url, function(err, client) {
+			const db = client.db(database);	
+			if (err) throw err;
+			
+			db.collection('meditationrecord').update(
+				{ _id: jeid },
+				{ $set:
+					{ journalEntry: req.body.journalEntry }
+				},
+				function(err, docs) {
+					if (err) throw err;
+
+					res.setHeader('Content-Type', 'application/json');
+					res.end(
+						JSON.stringify({
+							journalModified: true,
+						})
+					);
+
+					client.close();
+				}
+			);
+		});
+	}
+});
+
+// Delete a journal entry
+app.post('/api/deleteJournalEntry', function(req, res) {
+	if (req.session.userid) {
+		const jdid = new OID(req.body.journalID);
+	
+		// Delete the record
+		mongo.connect(url, function(err, client) {
+			const db = client.db(database);	
+			if (err) throw err;
+			
+			db.collection('meditationrecord').remove({
+				_id: jdid
+			}, function(err) {
 				if (err) throw err;
 
 				res.setHeader('Content-Type', 'application/json');
 				res.end(
 					JSON.stringify({
-						journalModified: true,
+						journalDeleted: true,
 					})
 				);
-
+				
 				client.close();
-			}
-		);
-	});
-});
-
-// Delete a journal entry
-app.post('/api/deleteJournalEntry', function(req, res) {
-	const jdid = new OID(req.body.journalID);
-	
-	// Delete the record
-	mongo.connect(url, function(err, client) {
-		const db = client.db(database);	
-		if (err) throw err;
-		
-		db.collection('meditationrecord').remove({
-			_id: jdid
-		}, function(err) {
-			if (err) throw err;
-
-			res.setHeader('Content-Type', 'application/json');
-			res.end(
-				JSON.stringify({
-					journalDeleted: true,
-				})
-			);
-			
-			client.close();
+			});
 		});
-	});
+	}
 });
 
 app.get("*", (req, res) => {
