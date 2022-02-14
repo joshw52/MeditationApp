@@ -17,6 +17,10 @@ class App extends React.Component {
         userMeditationTime: 600,
         username: null,
     };
+
+    componentDidMount() {
+        console.log("mounting::", this.state);
+    }
     
     changeDefaultMeditationTime = (username, newTime) => axios
         .post("/api/setMeditationTime", {
@@ -32,6 +36,7 @@ class App extends React.Component {
         .then(res => {
             this.setState({
                 userLoggedIn: res.data.loggedIn,
+                userMeditationTime: res.data.userMeditationTime,
                 username,
             }, () => {
                 if (res.data.loggedIn) history.push("/home");

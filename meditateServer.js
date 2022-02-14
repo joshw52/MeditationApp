@@ -3,6 +3,7 @@ const parser = require('body-parser');
 const cors = require('cors');
 const path = require('path');
 const sessions = require('express-session');
+const mongoSessionStore = require('connect-mongo');
 
 const mongo = require('mongodb').MongoClient;
 const OID = require('mongodb').ObjectID;
@@ -22,25 +23,13 @@ function encrypt(str) {
 
 const port = process.env.PORT || 8080;
 
-// Session management
-app.use(sessions({
-    cookie: {
-		ephemeral: true,
-		httpOnly: true,
-		maxAge: 4 * 60 * 24,	// Four hours
-	},
-    resave: true,
-    saveUninitialized: true,
-    secret: process.env.SESSION_SECRET,
-}));
-
 // Database configuration
 const username = process.env.DB_USER || '';
 const password = process.env.DB_PASS || '';
 const cluster = process.env.DB_CLUSTER || '';
 const database = process.env.DB_NAME || 'meditation';
 
-const url = `mongodb+srv://${username}:${password}@${cluster}.mongodb.net/test?retryWrites=true&w=majority&useNewUrlParser=true&useUnifiedTopology=true`;
+const mongoDBUrl = `mongodb+srv://${username}:${password}@${cluster}.mongodb.net/test?retryWrites=true&w=majority&useNewUrlParser=true&useUnifiedTopology=true`;
 
 app.set('port', port);
 
@@ -54,6 +43,22 @@ app.use(cors());
 // 	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 // 	next();
 // });
+
+// Session management
+app.use(sessions({
+    cookie: {
+		ephemeral: true,
+		httpOnly: true,
+		maxAge: 4 * 60 * 24,	// Four hours
+	},
+    resave: true,
+    saveUninitialized: true,
+    secret: process.env.SESSION_SECRET,
+	store: mongoSessionStore.create({
+		mongoUrl: mongoDBUrl,
+		dbName: database,
+	}),
+}));
 
 app.use(express.static(path.join(__dirname, "client", "dist")));
 
@@ -79,7 +84,7 @@ app.post('/api/account', function(req, res) {
 		);
 	} else {
 		// Attempt to insert the account
-		mongo.connect(url, function(err, client) {
+		mongo.connect(mongoDBUrl, function(err, client) {
 			const db = client.db(database);	
 			if (err) throw err;
 	
@@ -121,7 +126,7 @@ app.post('/api/account', function(req, res) {
 // Check that the login credentials are correct, 
 // that the username exists and that the password is correct
 app.post('/api/login', function(req, res) {
-	mongo.connect(url, function(err, client) {
+	mongo.connect(mongoDBUrl, function(err, client) {
 		const db = client.db(database);		
 		if (err) throw err;
 		
@@ -163,10 +168,28 @@ app.post('/api/login', function(req, res) {
 
 // Check if user logged in
 app.get('/api/userLoggedIn', function(req, res) {
-	res.setHeader('Content-Type', 'application/json');
-	res.end(JSON.stringify({
-		loggedIn: !!req.session.username && !!req.session.loggedIn,
-	}));
+	if (!!req.session.username && !!req.session.loggedIn) {
+		mongo.connect(mongoDBUrl, function(err, client) {
+			const db = client.db(database);		
+			if (err) throw err;
+			
+			// Look for username
+			db.collection('users').findOne({
+				username: req.session.username,
+			}, function(err, item) {
+				if (err) throw err;
+
+				res.setHeader('Content-Type', 'application/json');
+				res.end(JSON.stringify({
+					loggedIn: !!req.session.username && !!req.session.loggedIn,
+					userMeditationTime: item.defaultMeditationTime,
+					username: req.session.username,
+				}));
+				
+				client.close();
+			});
+		});
+	}
 });
 
 // Log out and kill session
@@ -176,7 +199,7 @@ app.post('/api/userLogout',(req, res) => {
 });
 
 app.post('/api/setMeditationTime', function(req, res) {
-	mongo.connect(url, function(err, client) {
+	mongo.connect(mongoDBUrl, function(err, client) {
 		const db = client.db(database);	
 		db.collection('users').findOne({
 			username: req.body.username,
@@ -214,7 +237,7 @@ app.post('/api/meditationEntry', function(req, res) {
 	}
 
 	// Insert the meditation entry to the database
-	mongo.connect(url, function(err, client) {
+	mongo.connect(mongoDBUrl, function(err, client) {
 		const db = client.db(database);	
 		if (err) throw err;
 		
@@ -234,7 +257,7 @@ app.post('/api/meditationEntry', function(req, res) {
 });
 
 app.get('/api/accountInfoLoad', function(req, res) {
-	mongo.connect(url, function(err, client) {
+	mongo.connect(mongoDBUrl, function(err, client) {
 		const db = client.db(database);	
 		if (err) throw err;
 		db.collection('users').findOne({
@@ -258,7 +281,7 @@ app.get('/api/accountInfoLoad', function(req, res) {
 
 app.post('/api/accountModify', function(req, res) {
 	// Modify the account if the user clicked Modify and not Cancel
-	mongo.connect(url, function(err, client) {
+	mongo.connect(mongoDBUrl, function(err, client) {
 		const db = client.db(database);	
 		if (err) throw err;
 	
@@ -288,7 +311,7 @@ app.post('/api/accountModify', function(req, res) {
 });
 
 app.post('/api/accountLoginModify', function(req, res) {
-	mongo.connect(url, function(err, client) {
+	mongo.connect(mongoDBUrl, function(err, client) {
 		const db = client.db(database);	
 		if (err) throw err;
 		
@@ -334,7 +357,7 @@ app.post('/api/accountLoginModify', function(req, res) {
 
 app.get('/api/progress', function(req, res) {
 	// if (req.session.username) {
-	mongo.connect(url, function(err, client) {
+	mongo.connect(mongoDBUrl, function(err, client) {
 		const db = client.db(database);	
 		if (err) throw err;
 		
@@ -385,7 +408,7 @@ app.post('/api/modifyJournalEntry', function(req, res) {
 	const jeid = new OID(req.body.journalID);
 
 	// Update the record
-	mongo.connect(url, function(err, client) {
+	mongo.connect(mongoDBUrl, function(err, client) {
 		const db = client.db(database);	
 		if (err) throw err;
 		
@@ -415,7 +438,7 @@ app.post('/api/deleteJournalEntry', function(req, res) {
 	const jdid = new OID(req.body.journalID);
 
 	// Delete the record
-	mongo.connect(url, function(err, client) {
+	mongo.connect(mongoDBUrl, function(err, client) {
 		const db = client.db(database);	
 		if (err) throw err;
 		
@@ -437,6 +460,7 @@ app.post('/api/deleteJournalEntry', function(req, res) {
 });
 
 app.get("*", (req, res) => {
+	console.log('SESSION::', req.session)
     res.sendFile(path.join(__dirname, "client", "index.html"));
 });
 
