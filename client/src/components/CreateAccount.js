@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 import history from '../history';
 
-const CreateAccount = () => {
+export const CreateAccount = () => {
     const [accountEmail, setAccountEmail] = useState('');
     const [accountError, setAccountError] = useState('');
     const [accountFirstName, setAccountFirstName] = useState('');
@@ -106,5 +106,3 @@ const CreateAccount = () => {
         </div>
     );
 };
-
-export default CreateAccount;

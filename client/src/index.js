@@ -3,8 +3,8 @@ import ReactDOM from 'react-dom';
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import axios from 'axios';
 
-import CreateAccount from './components/CreateAccount';
-import Login from './components/Login';
+import { CreateAccount } from './components/CreateAccount';
+import { Login } from './components/Login';
 import Home from './components/Home';
 
 import history from './history';

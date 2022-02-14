@@ -70,12 +70,12 @@ app.post('/api/account', function(req, res) {
 		// Attempt to insert the account
 		mongo.connect(url, function(err, client) {
 			const db = client.db(database);	
-			if (err) console.log('[Database Connect Error]', err);
+			if (err) throw err;
 	
 			db.collection('users').findOne({
 				username: req.body.accountUsername,
 			}, function(err, item) {
-				if (err) console.log('[User FindOne Error]', err);
+				if (err) throw err;
 	
 				if (item !== null) {
 					res.setHeader('Content-Type', 'application/json');
@@ -89,7 +89,7 @@ app.post('/api/account', function(req, res) {
 					client.close();
 				} else {
 					db.collection('users').insertOne(newUser, function(err, docs) {
-						if (err) console.log('[Create New User Error]', err);
+						if (err) throw err;
 	
 						res.setHeader('Content-Type', 'application/json');
 						res.end(
