@@ -2,7 +2,6 @@ const express = require('express');
 const parser = require('body-parser');
 const cors = require('cors');
 const path = require('path');
-const cookieParser = require("cookie-parser");
 const sessions = require('express-session');
 
 const mongo = require('mongodb').MongoClient;
@@ -34,7 +33,6 @@ app.use(sessions({
     saveUninitialized: true,
     secret: process.env.SESSION_SECRET,
 }));
-app.use(cookieParser());
 
 // Database configuration
 const username = process.env.DB_USER || '';
