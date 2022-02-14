@@ -18,10 +18,7 @@ export const Login = ({ homePageNavigate }) => {
                 loginMsg,
             } = res.data;
             if (!loginAccepted) setLoginError(loginMsg);
-            else {
-                localStorage.setItem('meditateUsername', loginUsername);
-                homePageNavigate(loginUsername);
-            }
+            else homePageNavigate(loginUsername);
         });
     }, [loginPassword, loginUsername, setLoginError]);
 

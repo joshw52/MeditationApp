@@ -11,19 +11,12 @@ import history from './history';
 
 import './styles/meditation.css';
 
-axios.defaults.withCredentials = true;
-
 class App extends React.Component {
     state = {
         userLoggedIn: false,
         userMeditationTime: 600,
         username: null,
     };
-
-    componentDidMount() {
-        const username = localStorage.getItem('meditateUsername');
-        if (username) this.homePageNavigate(username);
-    }
     
     changeDefaultMeditationTime = (username, newTime) => axios
         .post("/api/setMeditationTime", {
