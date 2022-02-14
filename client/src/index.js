@@ -1,11 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import axios from 'axios';
 
 import { CreateAccount } from './components/CreateAccount';
 import { Login } from './components/Login';
-import Home from './components/Home';
+import { Home } from './components/Home';
 
 import history from './history';
 
@@ -18,7 +18,7 @@ class App extends React.Component {
     };
     
     changeDefaultMeditationTime = (username, newTime) => axios
-        .post('/api/setMeditationTime', {
+        .post("/api/setMeditationTime", {
             userMeditationTime: newTime,
             username,
         })
@@ -27,13 +27,18 @@ class App extends React.Component {
         }));
 
     homePageNavigate = username => axios
-        .post('/api/userLoggedIn', { username })
+        .get("/api/userLoggedIn", { username })
         .then(res => {
-            if (res.data.loggedIn) history.push('/home');
             this.setState({
                 userLoggedIn: res.data.loggedIn,
+            }, () => {
+                if (res.data.loggedIn) history.push("/home");
             })
         });
+
+    userLogout = () => axios
+        .post("/api/userLogout")
+        .then(res => this.setState({ userLoggedIn: false }));
 
     render () {
         const appPropsAndState = {
@@ -41,6 +46,7 @@ class App extends React.Component {
             ...this.state,
             changeDefaultMeditationTime: this.changeDefaultMeditationTime,
             homePageNavigate: this.homePageNavigate,
+            userLogout: this.userLogout,
         }
 
         return (
@@ -68,4 +74,4 @@ class App extends React.Component {
     }
 }
 
-ReactDOM.render(<App />, document.getElementById('root'));
+ReactDOM.render(<App />, document.getElementById("root"));

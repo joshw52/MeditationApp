@@ -163,11 +163,17 @@ app.post('/api/login', function(req, res) {
 	});
 });
 
-app.post('/api/userLoggedIn', function(req, res) {
+// Check if user logged in
+app.get('/api/userLoggedIn', function(req, res) {
 	res.setHeader('Content-Type', 'application/json');
 	res.end(JSON.stringify({
 		loggedIn: !!req.session.username && !!req.session.loggedIn,
 	}));
+});
+
+// Log out and kill session
+app.post('/api/userLogout',(req, res) => {
+    req.session.destroy();
 });
 
 app.post('/api/setMeditationTime', function(req, res) {

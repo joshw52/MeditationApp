@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 
 import Calendar from './Calendar.js';
 import Meditate from './Meditate.js';
@@ -7,44 +7,32 @@ import Welcome from './Welcome.js';
 
 import history from '../history';
 
-class Home extends React.Component {
-    constructor(props) {
-        super(props);
+export const Home = ({
+    changeDefaultMeditationTime,
+    userLogout,
+    userMeditationTime,
+    userSession,
+}) => {
+    const [meditateTab, setMeditateTab] = useState("home");
 
-        this.state = {
-            meditateTab: 'home',
-        };
-    };
-
-    changeMeditationTab = meditateTab => {
-        this.setState({ meditateTab });
-    }
-
-    renderMeditationPage = () => {
-        const {
-            changeDefaultMeditationTime,
-            userMeditationTime,
-            userSession
-        } = this.props;
-        const { meditateTab } = this.state;
-
+    const renderMeditationPage = useCallback(() => {
         switch (meditateTab) {
-            case 'accountMod':
+            case "accountMod":
                 return (
                     <ModifyAccount
                         username={userSession}
                     />
                 );
-            case 'meditate':
+            case "meditate":
                 return (
                     <Meditate
                         changeDefaultMeditationTime={changeDefaultMeditationTime}
-                        changeMeditationTab={this.changeMeditationTab}
+                        changeMeditationTab={setMeditateTab}
                         userMeditationTime={userMeditationTime}
                         username={userSession}
                     />
                 );
-            case 'progress':
+            case "progress":
                 return (
                     <Calendar
                         username={userSession}
@@ -53,33 +41,29 @@ class Home extends React.Component {
             default:
                 return (
                     <Welcome
-                        changeMeditationTab={this.changeMeditationTab}
+                        changeMeditationTab={setMeditateTab}
                     />
                 );
         }
+    }, [meditateTab]);
+
+    const logout = () => {
+        userLogout();
+        history.push("/");
     }
 
-    logout = () => {
-        this.props.killSession();
-        history.push('/');
-    }
-
-    render () {
-        return (
-            <div>
-                <div className="menubar">
-                    <ul>
-                        <li onClick={() => this.changeMeditationTab('home')}>Home</li>
-                        <li onClick={() => this.changeMeditationTab('meditate')}>Meditation</li>
-                        <li onClick={() => this.changeMeditationTab('progress')}>Progress</li>
-                        <li onClick={() => this.changeMeditationTab('accountMod')}>Account</li>
-                        <li onClick={this.logout}>Logout</li>
-                    </ul>
-                </div>
-                {this.renderMeditationPage()}
+    return (
+        <div>
+            <div className="menubar">
+                <ul>
+                    <li onClick={() => setMeditateTab("home")}>Home</li>
+                    <li onClick={() => setMeditateTab("meditate")}>Meditation</li>
+                    <li onClick={() => setMeditateTab("progress")}>Progress</li>
+                    <li onClick={() => setMeditateTab("accountMod")}>Account</li>
+                    <li onClick={logout}>Logout</li>
+                </ul>
             </div>
-        );
-    }
+            {renderMeditationPage()}
+        </div>
+    );
 }
-
-export default Home;
