@@ -160,32 +160,6 @@ app.post('/api/login', function(req, res) {
 	});
 });
 
-// Check if user logged in
-app.get('/api/userLoggedIn', function(req, res) {
-	if (!!req.session.username && !!req.session.loggedIn) {
-		mongo.connect(mongoDBUrl, function(err, client) {
-			const db = client.db(database);		
-			if (err) throw err;
-			
-			// Look for username
-			db.collection('users').findOne({
-				username: req.session.username,
-			}, function(err, item) {
-				if (err) throw err;
-
-				res.setHeader('Content-Type', 'application/json');
-				res.end(JSON.stringify({
-					loggedIn: !!req.session.username && !!req.session.loggedIn,
-					userMeditationTime: item.defaultMeditationTime,
-					username: req.session.username,
-				}));
-				
-				client.close();
-			});
-		});
-	}
-});
-
 // Log out and kill session
 app.post('/api/userLogout',(req, res) => {
     req.session.destroy();

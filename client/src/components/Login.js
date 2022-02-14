@@ -16,9 +16,10 @@ export const Login = ({ homePageNavigate }) => {
             const {
                 loginAccepted,
                 loginMsg,
+                userMeditationTime,
             } = res.data;
             if (!loginAccepted) setLoginError(loginMsg);
-            else homePageNavigate(loginUsername);
+            else homePageNavigate(loginUsername, userMeditationTime);
         });
     }, [loginPassword, loginUsername, setLoginError]);
 

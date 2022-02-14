@@ -27,17 +27,15 @@ class App extends React.Component {
             userMeditationTime: Number(res.data.defaultMeditationTime),
         }));
 
-    homePageNavigate = username => axios
-        .get("/api/userLoggedIn", { username })
-        .then(res => {
-            this.setState({
-                userLoggedIn: res.data.loggedIn,
-                userMeditationTime: res.data.userMeditationTime,
+    homePageNavigate = (username, userMeditationTime) =>
+        this.setState(
+            {
+                userLoggedIn: true,
+                userMeditationTime,
                 username,
-            }, () => {
-                if (res.data.loggedIn) history.push("/home");
-            })
-        });
+            },
+            () => history.push("/home")
+        );
 
     userLogout = () => axios
         .post("/api/userLogout")
