@@ -32,6 +32,7 @@ const database = process.env.DB_NAME || 'meditation';
 const mongoDBUrl = `mongodb+srv://${username}:${password}@${cluster}.mongodb.net/test?retryWrites=true&w=majority&useNewUrlParser=true&useUnifiedTopology=true`;
 
 app.set('port', port);
+app.enable('trust proxy'); 
 
 app.use(parser.json());
 app.use(parser.urlencoded({ extended: true }));
