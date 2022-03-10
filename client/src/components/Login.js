@@ -49,7 +49,7 @@ export const Login = ({ homePageNavigate }) => {
                 />
                 {loginError.length ? <div className="errMsg">{loginError}</div> : null}
                 <div>
-                    No account? <Link to="createaccount">Create One</Link>
+                    No account? <Link to="/createaccount">Create One</Link>
                 </div>
             </form>
         </div>

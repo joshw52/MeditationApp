@@ -29,11 +29,11 @@ class App extends React.Component {
 
     homePageNavigate = (username, userMeditationTime) =>
         this.setState(
-            {
+            () => ({
                 userLoggedIn: true,
                 userMeditationTime,
                 username,
-            },
+            }),
             () => history.push("/home")
         );
 
@@ -41,7 +41,7 @@ class App extends React.Component {
         .post("/api/userLogout")
         .then(res => {
             this.setState(
-                { userLoggedIn: false },
+                () => ({ userLoggedIn: false }),
                 () => history.push("/")
             );
         });

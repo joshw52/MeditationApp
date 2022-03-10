@@ -7,6 +7,9 @@ const API = process.env.NODE_ENV === 'production' ? 'https://meditateapp.herokua
 module.exports = {
     devServer: {
         compress: true,
+        headers: {
+            'X-Frame-Options': 'sameorigin'
+        },
         historyApiFallback: true,
         hot: true,
         port: 8000,
