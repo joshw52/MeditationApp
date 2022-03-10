@@ -4,11 +4,13 @@ const cors = require('cors');
 const path = require('path');
 const sessions = require('express-session');
 const mongoSessionStore = require('connect-mongo');
+const helmet = require("helmet");
 
 const mongo = require('mongodb').MongoClient;
 const OID = require('mongodb').ObjectID;
 
 const app = express();
+
 const server = require('http').createServer(app);
 
 const crypto = require('crypto');
@@ -36,6 +38,9 @@ app.enable('trust proxy');
 
 app.use(parser.json());
 app.use(parser.urlencoded({ extended: true }));
+
+
+app.use(helmet());
 
 app.use(cors());
 
