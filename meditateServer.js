@@ -19,8 +19,7 @@ require('dotenv').config();
 
 // Encrypt a string
 function encrypt(str) {
-  const cipher = crypto.createCipher('aes-256-ctr', 'N58Q2ae9');
-  return cipher.update(str, 'utf8', 'hex') + cipher.final('hex');
+  return crypto.createHmac('sha256', 'Reofdj49jfsFfj893cjosc8').update(str).digest('hex');
 }
 
 const port = process.env.PORT || 8080;
@@ -39,7 +38,6 @@ app.enable('trust proxy');
 app.use(parser.json());
 app.use(parser.urlencoded({ extended: true }));
 
-
 app.use(helmet());
 
 app.use(cors());
@@ -47,7 +45,8 @@ app.use(cors());
 // Session management
 app.use(sessions({
     cookie: {
-		secure: true,
+		httpOnly: false,
+		secure: process.env.NODE_ENV === 'production',
 		maxAge: 4 * 60 * 24, // Four hours
 	},
     resave: true,
@@ -59,7 +58,10 @@ app.use(sessions({
 	}),
 }));
 
-app.use(express.static(path.join(__dirname, "client", "dist")));
+app.get('/api/isAuthenticated', function(req, res) {
+	const isAuthenticated = req.sessionID && req.session.loggedIn && req.session.username;
+	res.end(JSON.stringify({ isAuthenticated: !!isAuthenticated }));
+});
 
 app.post('/api/account', function(req, res) {
 	// The user entry to be made
@@ -230,26 +232,28 @@ app.post('/api/meditationEntry', function(req, res) {
 });
 
 app.get('/api/accountInfoLoad', function(req, res) {
-	mongo.connect(mongoDBUrl, function(err, client) {
-		const db = client.db(database);	
-		if (err) throw err;
-		db.collection('users').findOne({
-			username: req.query.username
-		}, function(err, user) {
+	if (req.session.username) {
+		mongo.connect(mongoDBUrl, function(err, client) {
+			const db = client.db(database);	
 			if (err) throw err;
-			
-			res.setHeader('Content-Type', 'application/json');
-			res.end(
-				JSON.stringify({
-					firstname: user.firstname,
-					lastname: user.lastname,
-					email: user.email,
-				})
-			);
-			
-			client.close();
+			db.collection('users').findOne({
+				username: req.query.username
+			}, function(err, user) {
+				if (err) throw err;
+				
+				res.setHeader('Content-Type', 'application/json');
+				res.end(
+					JSON.stringify({
+						firstname: user.firstname,
+						lastname: user.lastname,
+						email: user.email,
+					})
+				);
+				
+				client.close();
+			});
 		});
-	});
+	}
 });
 
 app.post('/api/accountModify', function(req, res) {
@@ -329,51 +333,44 @@ app.post('/api/accountLoginModify', function(req, res) {
 });
 
 app.get('/api/progress', function(req, res) {
-	// if (req.session.username) {
-	mongo.connect(mongoDBUrl, function(err, client) {
-		const db = client.db(database);	
-		if (err) throw err;
-		
-		db.collection('meditationrecord').find({
-			$and: [
-				{
-					username: {
-						$eq: req.query.user
-					}
-				},
-				{
-					meditateDateTime: {
-						$lte: Number(req.query.endTimestamp),
-					}
-				},
-				{
-					meditateDateTime: {
-						$gte: Number(req.query.startTimestamp),
-					}
-				}
-			]
-		}).toArray(function(err, meditationRecords) {
+	if (req.session.username) {
+		mongo.connect(mongoDBUrl, function(err, client) {
+			const db = client.db(database);	
 			if (err) throw err;
 			
-			res.setHeader('Content-Type', 'application/json');
-			res.end(
-				JSON.stringify({
-					meditationRecords,
-					recordsFound: true,
-				})
-			);
+			db.collection('meditationrecord').find({
+				$and: [
+					{
+						username: {
+							$eq: req.query.user
+						}
+					},
+					{
+						meditateDateTime: {
+							$lte: Number(req.query.endTimestamp),
+						}
+					},
+					{
+						meditateDateTime: {
+							$gte: Number(req.query.startTimestamp),
+						}
+					}
+				]
+			}).toArray(function(err, meditationRecords) {
+				if (err) throw err;
+				
+				res.setHeader('Content-Type', 'application/json');
+				res.end(
+					JSON.stringify({
+						meditationRecords,
+						recordsFound: true,
+					})
+				);
 
-			client.close();
+				client.close();
+			});
 		});
-	});
-	// } else {
-	// 	res.setHeader('Content-Type', 'application/json');
-	// 	res.end(
-	// 		JSON.stringify({
-	// 			recordsFound: false,
-	// 		})
-	// 	);
-	// }
+	}
 });
 
 // Modify the journal entry in the collection, using the id to find it
