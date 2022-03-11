@@ -19,7 +19,7 @@ require('dotenv').config();
 
 // Encrypt a string
 function encrypt(str) {
-  return crypto.createHmac('sha256', 'Reofdj49jfsFfj893cjosc8').update(str).digest('hex');
+  return crypto.createHmac('sha256', process.env.HMAC_SECRET).update(str).digest('hex');
 }
 
 const port = process.env.PORT || 8080;
