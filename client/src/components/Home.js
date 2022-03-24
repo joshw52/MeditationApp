@@ -1,11 +1,9 @@
 import React, { useCallback, useState } from 'react';
 
 import Calendar from './Calendar.js';
-import Meditate from './Meditate.js';
+import { Meditate } from './Meditate.js';
 import ModifyAccount from './ModifyAccount.js';
 import Welcome from './Welcome.js';
-
-import history from '../history';
 
 export const Home = ({
     changeDefaultMeditationTime,
@@ -61,4 +59,4 @@ export const Home = ({
             {renderMeditationPage()}
         </div>
     );
-}
+};

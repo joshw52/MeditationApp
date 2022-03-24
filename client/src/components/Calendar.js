@@ -5,7 +5,7 @@ import moment from 'moment-timezone';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBook, faInfoCircle, faTimesCircle } from '@fortawesome/free-solid-svg-icons'
 
-import { getHoursMinutesSeconds } from './Meditate';
+import { getHoursMinutesSeconds } from '../helpers';
 
 class Calendar extends React.Component {
     constructor(props) {
