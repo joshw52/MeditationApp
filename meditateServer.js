@@ -45,9 +45,9 @@ app.use(cors());
 // Session management
 app.use(sessions({
     cookie: {
-		httpOnly: false,
+		httpOnly: true,
 		secure: process.env.NODE_ENV === 'production',
-		maxAge: 4 * 60 * 24, // Four hours
+		maxAge: process.env.MAX_AGE,
 	},
     resave: true,
     saveUninitialized: false,
@@ -237,7 +237,7 @@ app.get('/api/accountInfoLoad', function(req, res) {
 			const db = client.db(database);	
 			if (err) throw err;
 			db.collection('users').findOne({
-				username: req.query.username
+				username: req.session.username
 			}, function(err, user) {
 				if (err) throw err;
 				
