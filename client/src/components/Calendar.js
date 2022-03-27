@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import axios from 'axios';
 import moment from 'moment-timezone';
 
@@ -7,30 +7,24 @@ import { faBook, faInfoCircle, faTimesCircle } from '@fortawesome/free-solid-svg
 
 import { getHoursMinutesSeconds } from '../helpers';
 
-class Calendar extends React.Component {
-    constructor(props) {
-        super(props);
+export const Calendar = props => {
+    const {
+        username,
+    } = props;
+    const [displayProgressInfo, setDisplayProgressInfo] = useState(false);
+    const [journalEntry, setJournalEntry] = useState('');
+    const [journalDetails, setJournalDetails] = useState({});
+    const [journalID, setJournalID] = useState(null);
+    const [journalModify, setJournalModify] = useState(false);
+    const [meditationRecords, setMeditationRecords] = useState([]);
+    const [progressMonth, setProgressMonth] = useState(moment().format('MMMM'));
+    const [progressYear, setProgressYear] = useState(moment().format('YYYY'));
 
-        this.state = {
-            displayProgressInfo: false,
-            journalEntry: '',
-            journalID: null,
-            journalModify: false,
-            meditationRecords: [],
-            progressMonth: moment().format('MMMM'),
-            progressYear: moment().format('YYYY'),
-        };
-    };
+    useEffect(() => {
+        getJournalEntries();
+    }, []);
 
-    componentDidMount() {
-        this.getJournalEntries();
-    }
-
-    getJournalEntries = () => {
-        const {
-            progressMonth,
-            progressYear,
-        } = this.state;
+    const getJournalEntries = () => {
         const startTimestamp = moment(`${progressYear}-${progressMonth}`, 'YYYY-MMMM')
             .startOf('month').startOf('day').unix();
         const endTimestamp = moment(`${progressYear}-${progressMonth}`, 'YYYY-MMMM')
@@ -39,67 +33,47 @@ class Calendar extends React.Component {
             params: {
                 endTimestamp,
                 startTimestamp,
-                username: this.props.username
+                username,
             }
-        }).then(res => {
-            this.setState({
-                meditationRecords: res.data.meditationRecords,
-            });
-        });
+        }).then(res => setMeditationRecords(res.data.meditationRecords));
     }
 
-    onChange = event => {
+    const onChange = event => {
         const { name, value } = event.target;
-        this.setState({
+        setJournalDetails({
+            ...journalDetails,
             [name]: value,
         });
-
-        // if (name !== 'journalEntry')
-        this.getJournalEntries();
+        getJournalEntries();
     }
 
-    modifyJournalEntry = ({ journalEntry, _id }) => {
-        this.setState({
-            journalEntry,
-            journalID: _id,
-            journalModify: true,
-        });
+    const modifyJournalEntry = ({ journalEntry, _id }) => {
+        setJournalEntry(journalEntry);
+        setJournalID(_id);
+        setJournalModify(true);
     }
 
-    cancelModifyJournal = () => {
-        this.setState({
-            journalEntry: '',
-            journalID: null,
-            journalModify: false,
-        });
+    const cancelModifyJournal = () => {
+        setJournalEntry('');
+        setJournalID(null);
+        setJournalModify(false);
     }
 
-    submitJournalModify = () => {
-        const {
-            journalEntry,
-            journalID,
-        } = this.state;
-
-        axios.post("/api/modifyJournalEntry", {
+    const submitJournalModify = () => {axios.post("/api/modifyJournalEntry", {
             journalEntry,
             journalID,
         }).then(() => this.getJournalEntries());
 
-        this.cancelModifyJournal();
+        cancelModifyJournal();
     }
     
-    deleteJournalEntry = record => {
+    const deleteJournalEntry = record => {
         axios.post("/api/deleteJournalEntry", {
             journalID: record._id
-        }).then(() => this.getJournalEntries());
+        }).then(() => getJournalEntries());
     }
 
-    renderCalendarDays = () => {
-        const {
-            meditationRecords,
-            progressMonth,
-            progressYear,
-        } = this.state;
+    const renderCalendarDays = () => {
         const progressCalendarMonth = `${progressYear}-${progressMonth}`;
         const firstDay = moment(progressCalendarMonth, 'YYYY-MMMM').startOf('month').startOf('week');
         const lastDay = moment(progressCalendarMonth, 'YYYY-MMMM').endOf('month').endOf('week');
@@ -108,25 +82,25 @@ class Calendar extends React.Component {
         const progressDay = moment(firstDay);
 
         const displayRecord = record => {
-            const {
+            const [
                 hours,
                 minutes,
                 seconds
-            } = getHoursMinutesSeconds(Number(record.meditateDuration));
+             ] = getHoursMinutesSeconds(Number(record.meditateDuration));
         
             return (
                 <div className='dayRecord' key={`${record._id}`}>
                     {`${hours}:${minutes}:${seconds}`}
                     <button
                         className='editJournal'
-                        onClick={() => this.modifyJournalEntry(record)}
+                        onClick={() => modifyJournalEntry(record)}
                         type='submit'
                     >
                         <FontAwesomeIcon icon={faBook} />
                     </button>
                     <button
                         className='deleteJournal'
-                        onClick={() => this.deleteJournalEntry(record)}
+                        onClick={() => deleteJournalEntry(record)}
                         type='submit'
                     >
                         <FontAwesomeIcon icon={faTimesCircle} />
@@ -167,7 +141,7 @@ class Calendar extends React.Component {
         return progressCalendarWeeks;
     }
 
-    renderYearSelection = () => {
+    const renderYearSelection = () => {
         const years = [];
         const currentYear = moment().year();
 
@@ -178,105 +152,91 @@ class Calendar extends React.Component {
         return years;
     }
 
-    toggleProgressInfo = () => {
-        this.setState(state => ({
-            displayProgressInfo: !state.displayProgressInfo,
-        }));
-    }
+    const toggleProgressInfo = () => setDisplayProgressInfo(!state.displayProgressInfo);
 
-    render () {
-        const {
-            displayProgressInfo,
-            journalEntry,
-            journalModify,
-        } = this.state;
-
-        return (
-            <Fragment>
-                {journalModify ?
-                    <div className='meditationJournal'>
-                        <h3>Modify your journal entry</h3>
-                        <textarea
-                            className='journalEntry'
-                            name='journalEntry'
-                            onChange={this.onChange}
-                            value={journalEntry}
+    return (
+        <Fragment>
+            {journalModify ?
+                <div className='meditationJournal'>
+                    <h3>Modify your journal entry</h3>
+                    <textarea
+                        className='journalEntry'
+                        name='journalEntry'
+                        onChange={onChange}
+                        value={journalEntry}
+                    />
+                    <div className="journalModButtons">
+                        <input
+                            className='logJournal'
+                            onClick={cancelModifyJournal}
+                            type='submit'
+                            value='Cancel'
                         />
-                        <div className="journalModButtons">
-                            <input
-                                className='logJournal'
-                                onClick={this.cancelModifyJournal}
-                                type='submit'
-                                value='Cancel'
-                            />
-                            <input
-                                className='logJournal'
-                                onClick={this.submitJournalModify}
-                                type='submit'
-                                value='Modify Journal'
-                            />
-                        </div>
-                    </div> :
-                    <div className='progressCalendarContainer'>
-                        <select
-                            className='progressSelect'
-                            defaultValue={moment().format('MMMM')}
-                            name='progressMonth'
-                            onChange={this.onChange}
-                        >
-                            {moment.months().map(month => (
-                                <option key={month} value={month}>{month}</option>
-                            ))}
-                        </select>
-
-                        <select
-                            className='progressSelect'
-                            defaultValue={moment().format('YYYY')}
-                            onChange={this.onChange}
-                            name='progressYear'
-                        >
-                            {this.renderYearSelection()}
-                        </select>
-
-                        
-                        <button className='info' onClick={this.toggleProgressInfo}>
-                            <FontAwesomeIcon icon={faInfoCircle} />
-                        </button>
-
-                        {displayProgressInfo && (
-                            <div className='infoText'>
-                                <p>
-                                    Here you can see the progress you've made in meditating. 
-                                    If you've recorded a meditation session, you can see the
-                                    time you meditated, display and modify the journal entry you 
-                                    made <FontAwesomeIcon icon={faBook} />, delete a meditation
-                                    entry <FontAwesomeIcon icon={faTimesCircle} />, and see what
-                                    time of the day you meditated.
-                                </p>
-                            </div>
-                        )}
-
-                        <table className='progressCalendar'>
-                            <thead>
-                                <tr>
-                                    <th>Sun</th>
-                                    <th>Mon</th>
-                                    <th>Tue</th>
-                                    <th>Wed</th>
-                                    <th>Thu</th>
-                                    <th>Fri</th>
-                                    <th>Sat</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {this.renderCalendarDays()}
-                            </tbody>
-                        </table>
+                        <input
+                            className='logJournal'
+                            onClick={submitJournalModify}
+                            type='submit'
+                            value='Modify Journal'
+                        />
                     </div>
-                }
-            </Fragment>
-        );
-    }
-}
+                </div> :
+                <div className='progressCalendarContainer'>
+                    <select
+                        className='progressSelect'
+                        defaultValue={moment().format('MMMM')}
+                        name='progressMonth'
+                        onChange={onChange}
+                    >
+                        {moment.months().map(month => (
+                            <option key={month} value={month}>{month}</option>
+                        ))}
+                    </select>
 
-export default Calendar;
+                    <select
+                        className='progressSelect'
+                        defaultValue={moment().format('YYYY')}
+                        onChange={onChange}
+                        name='progressYear'
+                    >
+                        {renderYearSelection()}
+                    </select>
+
+                    
+                    <button className='info' onClick={toggleProgressInfo}>
+                        <FontAwesomeIcon icon={faInfoCircle} />
+                    </button>
+
+                    {displayProgressInfo && (
+                        <div className='infoText'>
+                            <p>
+                                Here you can see the progress you've made in meditating. 
+                                If you've recorded a meditation session, you can see the
+                                time you meditated, display and modify the journal entry you 
+                                made <FontAwesomeIcon icon={faBook} />, delete a meditation
+                                entry <FontAwesomeIcon icon={faTimesCircle} />, and see what
+                                time of the day you meditated.
+                            </p>
+                        </div>
+                    )}
+
+                    <table className='progressCalendar'>
+                        <thead>
+                            <tr>
+                                <th>Sun</th>
+                                <th>Mon</th>
+                                <th>Tue</th>
+                                <th>Wed</th>
+                                <th>Thu</th>
+                                <th>Fri</th>
+                                <th>Sat</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {renderCalendarDays()}
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </Fragment>
+    );
+};

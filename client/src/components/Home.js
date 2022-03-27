@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 
-import Calendar from './Calendar.js';
+import { Calendar } from './Calendar.js';
 import { Meditate } from './Meditate.js';
 import ModifyAccount from './ModifyAccount.js';
 import Welcome from './Welcome.js';
