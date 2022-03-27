@@ -19,7 +19,7 @@ export const Meditate = props => {
         userMeditationTime,
         username,
     } = props;
-    const [meditationTimer, setMeditationTimer] = useState(0);
+    const [timerActive, setTimerActive] = useState(false);
 
     const [buddhaTimerStyle, setBuddhaTimerStyle] = useState({});
     const [currentBrightness, setCurrentBrightness] = useState(0);
@@ -32,11 +32,42 @@ export const Meditate = props => {
     const [timerInfoShow, setTimerInfoShow] = useState(false);
     const [timerRunning, setTimerRunning] = useState(false);
 
+    useEffect(() => {
+        let interval = null;
+        if (timerActive) {
+            interval = setInterval(() => {
+                let totalTime = getTotalSeconds(...meditateDuration) - 1;
+    
+                if (totalTime < 0) {
+                    clearInterval(interval);
+                    setTimerActive(false);
+                    gong.play();
+                    setBuddhaTimerStyle({});
+                    setIncrementFraction(-1);
+                    setJournalView(true);
+                    setTimerRunning(false);
+                } else {
+                    const newTime = getHoursMinutesSeconds(totalTime);
+    
+                    setBuddhaTimerStyle({
+                        display: "initial",
+                        filter: `invert(${currentBrightness}%)`,
+                        opacity: "0.85",
+                    });
+                    setCurrentBrightness(currentBrightness + incrementFraction);
+                    setMeditateDuration(newTime);
+                }
+            }, 1000);
+        } else {
+            setTimerActive(false);
+        }
+        return () => clearInterval(interval);
+    }, [timerActive, meditateDuration]);
+
     const resetTimer = () => {
         const duration = getHoursMinutesSeconds(userMeditationTime);
-        clearInterval(meditationTimer);
+        setTimerActive(false);
         setMeditateDuration(duration);
-        setMeditationTimer(0);
         setTimeMeditated(userMeditationTime);
         setTimerRunning(false);
     }
@@ -51,12 +82,11 @@ export const Meditate = props => {
         const newDuration = formatTime(...meditateDuration);
 
         let newIncrementFraction = 100 / getTotalSeconds(...newDuration);
-        const newBuddhaTimerStyle = {
+        setBuddhaTimerStyle({
             display: "initial",
             filter: `invert(${currentBrightness}%)`,
             opacity: "0.85",
-        };
-        setBuddhaTimerStyle(newBuddhaTimerStyle);
+        });
         setDefaultTimeChanged(false);
         setIncrementFraction(newIncrementFraction);
         setMeditateDuration(newDuration);
@@ -65,34 +95,11 @@ export const Meditate = props => {
 
         gong.play();
 
-        const newMeditationTime = useInterval(() => {
-            let totalTime = getTotalSeconds(...meditateDuration) - 1;
-
-            if (totalTime < 0) {
-                clearInterval(meditationTimer);
-                setMeditationTimer(0);
-                gong.play();
-                setBuddhaTimerStyle({});
-                setIncrementFraction(-1);
-                setJournalView(true);
-                setTimerRunning(false);
-            } else {
-                const newTime = getHoursMinutesSeconds(totalTime);
-
-                setBuddhaTimerStyle({
-                    ...newBuddhaTimerStyle,
-                    filter: `invert(${currentBrightness}%)`,
-                });
-                setCurrentBrightness(currentBrightness + incrementFraction);
-                setMeditateDuration(newTime);
-            }
-        }, 1000);
-        setMeditationTimer(newMeditationTime);
+        setTimerActive(true);
     }, [meditateDuration]);
 
     const stopTimer = () => {
-        clearInterval(meditationTimer);
-        setMeditationTimer(0);
+        setTimerActive(false);
         setCurrentBrightness(0);
         setIncrementFraction(-1);
         setTimerRunning(false);
@@ -142,21 +149,21 @@ export const Meditate = props => {
                                 className="timerInput"
                                 disabled={timerRunning}
                                 name="meditateHours"
-                                onChange={e => setMeditateHours(e.target.value)}
+                                onChange={e => setMeditateDuration(e.target.value, meditateDuration[1], meditateDuration[2])}
                                 value={meditateDuration[0]}
                             />
                             <input
                                 className="timerInput"
                                 disabled={timerRunning}
                                 name="meditateMinutes"
-                                onChange={e => setMeditateMinutes(e.target.value)}
+                                onChange={e => setMeditateDuration(meditateDuration[0], e.target.value, meditateDuration[2])}
                                 value={meditateDuration[1]}
                             />
                             <input
                                 className="timerInput"
                                 disabled={timerRunning}
                                 name="meditateSeconds"
-                                onChange={e => setMeditateSeconds(e.target.value)}
+                                onChange={e => setMeditateDuration(meditateDuration[0], meditateDuration[1], e.target.value)}
                                 value={meditateDuration[2]}
                             />
                         </div>
