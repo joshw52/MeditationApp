@@ -38,7 +38,14 @@ app.enable('trust proxy');
 app.use(parser.json());
 app.use(parser.urlencoded({ extended: true }));
 
-app.use(helmet());
+app.use(helmet({
+	contentSecurityPolicy: {
+		directives: {
+			...helmet.contentSecurityPolicy.getDefaultDirectives(),
+			"script-src": ["'self'"],
+		},
+	},
+}));
 
 app.use(cors());
 
