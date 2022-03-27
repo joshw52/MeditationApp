@@ -4,7 +4,6 @@ const cors = require('cors');
 const path = require('path');
 const sessions = require('express-session');
 const mongoSessionStore = require('connect-mongo');
-const helmet = require("helmet");
 
 const mongo = require('mongodb').MongoClient;
 const OID = require('mongodb').ObjectID;
@@ -37,15 +36,6 @@ app.enable('trust proxy');
 
 app.use(parser.json());
 app.use(parser.urlencoded({ extended: true }));
-
-app.use(helmet({
-	contentSecurityPolicy: {
-		directives: {
-			...helmet.contentSecurityPolicy.getDefaultDirectives(),
-			"script-src": ["'self'"],
-		},
-	},
-}));
 
 app.use(cors());
 
