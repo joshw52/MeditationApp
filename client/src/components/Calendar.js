@@ -185,7 +185,7 @@ export const Calendar = props => {
                         className='progressSelect'
                         defaultValue={moment().format('MMMM')}
                         name='progressMonth'
-                        onChange={onChange}
+                        onChange={e => setProgressMonth(e.target.value)}
                     >
                         {moment.months().map(month => (
                             <option key={month} value={month}>{month}</option>
@@ -195,7 +195,7 @@ export const Calendar = props => {
                     <select
                         className='progressSelect'
                         defaultValue={moment().format('YYYY')}
-                        onChange={onChange}
+                        onChange={e => setProgressYear(e.target.value)}
                         name='progressYear'
                     >
                         {renderYearSelection()}
