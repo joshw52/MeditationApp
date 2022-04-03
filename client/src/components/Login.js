@@ -1,13 +1,13 @@
-import React, { useCallback, useState } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 
-export const Login = ({ homePageNavigate }) => {
+const Login = ({ homePageNavigate }) => {
     const [loginError, setLoginError] = useState("");
     const [loginPassword, setLoginPassword] = useState("");
     const [loginUsername, setLoginUsername] = useState("");
 
-    const loginMeditation = useCallback(clickEvent => {
+    const loginMeditation = clickEvent => {
         clickEvent.preventDefault();
         axios.post("/api/login", {
             loginPassword,
@@ -21,7 +21,7 @@ export const Login = ({ homePageNavigate }) => {
             if (!loginAccepted) setLoginError(loginMsg);
             else homePageNavigate(loginUsername, userMeditationTime);
         });
-    }, [loginPassword, loginUsername, setLoginError]);
+    };
 
     return (
         <div>
@@ -55,3 +55,5 @@ export const Login = ({ homePageNavigate }) => {
         </div>
     );
 };
+
+export default Login;

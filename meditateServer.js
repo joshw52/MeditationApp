@@ -16,14 +16,12 @@ const crypto = require('crypto');
 
 require('dotenv').config();
 
-// Encrypt a string
 function encrypt(str) {
   return crypto.createHmac('sha256', process.env.HMAC_SECRET).update(str).digest('hex');
 }
 
 const port = process.env.PORT || 8080;
 
-// Database configuration
 const username = process.env.DB_USER || '';
 const password = process.env.DB_PASS || '';
 const cluster = process.env.DB_CLUSTER || '';
@@ -39,25 +37,24 @@ app.use(parser.urlencoded({ extended: true }));
 
 app.use(cors());
 
-// Session management
 app.use(sessions({
     cookie: {
 		httpOnly: true,
-		secure: process.env.NODE_ENV === 'production',
 		maxAge: 4 * 60 * 24 * 1000,
+		secure: process.env.NODE_ENV === 'production',
 	},
     resave: true,
     saveUninitialized: false,
     secret: process.env.SESSION_SECRET,
 	store: mongoSessionStore.create({
-		mongoUrl: mongoDBUrl,
 		dbName: database,
+		mongoUrl: mongoDBUrl,
 	}),
 }));
 
-app.get('/api/isAuthenticated', function(req, res) {
-	const isAuthenticated = req.sessionID && req.session.loggedIn && req.session.username;
-	res.end(JSON.stringify({ isAuthenticated: !!isAuthenticated }));
+app.get('/api/isLoggedIn', function(req, res) {
+	const isLoggedIn = req.sessionID && req.session.loggedIn && req.session.username;
+	res.end(JSON.stringify({ isLoggedIn: !!isLoggedIn }));
 });
 
 app.post('/api/account', function(req, res) {
@@ -71,8 +68,17 @@ app.post('/api/account', function(req, res) {
 		defaultMeditationTime: 600,
 	}
 
+	// Server-side validation of non-empty fields
+	if (!newUser.firstname || !newUser.lastname || !newUser.username || !newUser.password || !newUser.email) {
+		res.setHeader('Content-Type', 'application/json');
+		res.end(
+			JSON.stringify({
+				accountCreated: false,
+				accountMsg: "All fields must be filled out!",
+			})
+		);
 	// Server-side validation of password length
-	if (newUser.password.length < 8) {
+	} else if (newUser.password.length < 8) {
 		res.setHeader('Content-Type', 'application/json');
 		res.end(
 			JSON.stringify({
@@ -127,6 +133,19 @@ app.post('/api/login', function(req, res) {
 	mongo.connect(mongoDBUrl, function(err, client) {
 		const db = client.db(database);		
 		if (err) throw err;
+
+		// Check that username and password aren't empty
+		if (!req.body.loginUsername || !req.body.loginPassword) {
+			res.setHeader('Content-Type', 'application/json');
+			res.end(
+				JSON.stringify({
+					loginAccepted: false,
+					loginMsg: "Please enter all fields!",
+					loginSession: null,
+					userMeditationTime: null,
+				})
+			);
+		}
 		
 		// Look for username
 		db.collection('users').findOne({

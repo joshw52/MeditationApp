@@ -4,24 +4,28 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import axios from 'axios';
 
 import { CreateAccount } from './components/CreateAccount';
-import { Login } from './components/Login';
+import Login from './components/Login';
 import { Home } from './components/Home';
+import IsLoggedIn from './components/IsLoggedIn';
 
 import history from './history';
 
 import './styles/meditation.css';
 
 const App = props => {
-    const [userLoggedIn, setUserLoggedIn] = useState(false);
+    // const [userLoggedIn, setUserLoggedIn] = useState(false);
     const [userMeditationTime, setUserMeditationTime] = useState(600);
     const [username, setUsername] = useState(null);
-    useEffect(() => {
-        axios
-            .get("/api/isAuthenticated", { withCredentials: true })
-            .then(res => {
-                setUserLoggedIn(res.data.isAuthenticated)
-            });
-    }, [username, history.location]);
+
+    // useEffect(() => {
+    //     axios
+    //         .get("/api/isLoggedIn", { withCredentials: true })
+    //         .then(res => {
+    //             console.log('isLoggedIn::', res.data);
+    //             setUserLoggedIn(true);
+    //             homePageNavigate(username, userMeditationTime);
+    //         });
+    // }, [username, history.location]);
     
     const changeDefaultMeditationTime = (username, newTime) => axios
         .post("/api/setMeditationTime", {
@@ -33,7 +37,6 @@ const App = props => {
         });
 
     const homePageNavigate = (uname, meditationTime) => {
-        setUserLoggedIn(true);
         setUserMeditationTime(meditationTime);
         setUsername(uname);
         history.push("/home");
@@ -41,15 +44,13 @@ const App = props => {
 
     const userLogout = () => axios
         .post("/api/userLogout")
-        .then(() => {
-            setUserLoggedIn(false);
-            history.push("/");
-        });
+        .then(() => history.push("/"));
 
     const appPropsAndState = {
         ...props,
         changeDefaultMeditationTime,
         homePageNavigate,
+        // userLoggedIn,
         userLogout,
         userMeditationTime,
         username,
@@ -59,20 +60,21 @@ const App = props => {
         <Router history={history}>
             <Routes>
                 <Route
+                    element={<Login {...appPropsAndState} />}
                     exact
                     path="/"
-                    element={<Login {...appPropsAndState} />}
                 />
                 <Route
-                    path="/createaccount"
                     element={<CreateAccount {...appPropsAndState} />}
+                    path="/createaccount"
                 />
                 <Route
-                    path="/home"
-                    element={userLoggedIn
-                        ? <Home {...appPropsAndState} />
-                        : <Login {...appPropsAndState} />
+                    element={
+                        <IsLoggedIn>
+                            <Home {...appPropsAndState} />
+                        </IsLoggedIn>
                     }
+                    path="/home"
                 />
             </Routes>
         </Router>
