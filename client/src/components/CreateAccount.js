@@ -2,7 +2,7 @@ import React, { useCallback, useState } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 
-export const CreateAccount = () => {
+const CreateAccount = () => {
     const navigate = useNavigate();
 
     const [accountEmail, setAccountEmail] = useState("");
@@ -86,3 +86,5 @@ export const CreateAccount = () => {
         </div>
     );
 };
+
+export default CreateAccount;

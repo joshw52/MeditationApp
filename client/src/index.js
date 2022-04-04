@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
-import { CreateAccount } from './components/CreateAccount';
+import CreateAccount from './components/CreateAccount';
 import Login from './components/Login';
 import { Home } from './components/Home';
 import AuthProvider from './AuthProvider';
