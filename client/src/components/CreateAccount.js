@@ -7,8 +7,6 @@ export const CreateAccount = () => {
 
     const [accountEmail, setAccountEmail] = useState("");
     const [accountError, setAccountError] = useState("");
-    const [accountFirstName, setAccountFirstName] = useState("");
-    const [accountLastName, setAccountLastName] = useState("");
     const [accountPassword, setAccountPassword] = useState("");
     const [accountPasswordConfirm, setAccountPasswordConfirm] = useState("");
     const [accountUsername, setAccountUsername] = useState("");
@@ -17,8 +15,6 @@ export const CreateAccount = () => {
         clickEvent.preventDefault();
         if (
             accountEmail === "" ||
-            accountFirstName === "" ||
-            accountLastName === "" ||
             accountPassword === "" ||
             accountPasswordConfirm === "" ||
             accountUsername === ""
@@ -34,8 +30,6 @@ export const CreateAccount = () => {
         } else {
             axios.post("/api/account", {
                 accountEmail,
-                accountFirstName,
-                accountLastName,
                 accountPassword,
                 accountUsername,
             }).then(res => {
@@ -44,26 +38,12 @@ export const CreateAccount = () => {
                 if (accountCreated && !accountMsg) navigate("/");
             });
         }
-    }, [accountEmail, accountFirstName, accountLastName, accountPassword, accountUsername, setAccountError]);
+    }, [accountEmail, accountPassword, accountUsername, setAccountError]);
 
     return (
         <div>
             <h1>Create an Account</h1>
             <form className="meditationForm" onSubmit={createNewAccount}>
-                <input
-                    name="accountFirstName"
-                    onChange={e => setAccountFirstName(e.target.value)}
-                    placeholder="First Name"
-                    type="text"
-                    value={accountFirstName}
-                />
-                <input
-                    name="accountLastName"
-                    onChange={e => setAccountLastName(e.target.value)}
-                    placeholder="Last Name"
-                    type="text"
-                    value={accountLastName}
-                />
                 <input
                     name="accountUsername"
                     onChange={e => setAccountUsername(e.target.value)}

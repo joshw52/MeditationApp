@@ -60,8 +60,6 @@ app.get('/api/isAuthenticated', function(req, res) {
 app.post('/api/account', function(req, res) {
 	// The user entry to be made
 	const newUser = {
-		firstname: req.body.accountFirstName,
-		lastname: req.body.accountLastName,
 		username: req.body.accountUsername,
 		password: encrypt(req.body.accountPassword),
 		email: req.body.accountEmail,
@@ -69,7 +67,7 @@ app.post('/api/account', function(req, res) {
 	}
 
 	// Server-side validation of non-empty fields
-	if (!newUser.firstname || !newUser.lastname || !newUser.username || !newUser.password || !newUser.email) {
+	if (!newUser.username || !newUser.password || !newUser.email) {
 		res.setHeader('Content-Type', 'application/json');
 		res.end(
 			JSON.stringify({
@@ -263,13 +261,7 @@ app.get('/api/accountInfoLoad', function(req, res) {
 				if (err) throw err;
 				
 				res.setHeader('Content-Type', 'application/json');
-				res.end(
-					JSON.stringify({
-						firstname: user.firstname,
-						lastname: user.lastname,
-						email: user.email,
-					})
-				);
+				res.end(JSON.stringify({ email: user.email }));
 				
 				client.close();
 			});
@@ -286,13 +278,8 @@ app.post('/api/accountModify', function(req, res) {
 		
 			db.collection('users').update(
 				{ username: req.session.username },
-				{ $set:
-					{
-						email: req.body.accountEmail,
-						firstname: req.body.accountFirstName,
-						lastname: req.body.accountLastName,
-					}
-				}, function(err) {
+				{ $set: { email: req.body.accountEmail }},
+				function(err) {
 					if (err) throw err;
 
 					res.setHeader('Content-Type', 'application/json');

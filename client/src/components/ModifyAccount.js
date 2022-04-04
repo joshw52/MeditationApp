@@ -3,8 +3,6 @@ import axios from 'axios';
 
 const ModifyAccount = () => {
     const [accountEmail, setAccountEmail] = useState("");
-    const [accountFirstName, setAccountFirstName] = useState("");
-    const [accountLastName, setAccountLastName] = useState("");
     const [accountOldPassword, setAccountOldPassword] = useState("");
     const [accountPassword, setAccountPassword] = useState("");
     const [accountPasswordConfirm, setAccountPasswordConfirm] = useState("");
@@ -12,28 +10,18 @@ const ModifyAccount = () => {
     const [pwordMsg, setPwordMsg] = useState("");
 
     const loadAccountInformation = () => 
-        axios.get('/api/accountInfoLoad').then(res => {
-            setAccountEmail(res.data.email);
-            setAccountFirstName(res.data.firstname);
-            setAccountLastName(res.data.lastname);
-        });
+        axios.get('/api/accountInfoLoad').then(res => setAccountEmail(res.data.email));
 
     useEffect(() => {
         loadAccountInformation();
-    }, [accountEmail, accountFirstName, accountLastName]);
+    }, [accountEmail]);
 
     const modifyAccount = () => {
-        if (
-            accountEmail === '' ||
-            accountFirstName === '' ||
-            accountLastName === ''
-        ) {
+        if (accountEmail === '') {
             setAccountMsg("All fields must be filled out!");
         } else {
             axios.post("/api/accountModify", {
                 accountEmail,
-                accountFirstName,
-                accountLastName,
             }).then(res => {
                 const { accountModified, accountMsg } = res.data;
                 setAccountMsg(accountModified ? accountMsg : 'Account Modification Error');
@@ -67,20 +55,6 @@ const ModifyAccount = () => {
         <div className="accountModification">
             <h2>Modify Account Information</h2>
             <div className="meditationForm">
-                <input
-                    name="accountFirstName"
-                    onChange={e => setAccountFirstName(e.target.value)}
-                    placeholder="First Name"
-                    type='text'
-                    value={accountFirstName}
-                />
-                <input
-                    name="accountLastName"
-                    onChange={e => setAccountLastName(e.target.value)}
-                    placeholder="Last Name"
-                    type='text'
-                    value={accountLastName}
-                />
                 <input
                     name="accountEmail"
                     onChange={e => setAccountEmail(e.target.value)}
