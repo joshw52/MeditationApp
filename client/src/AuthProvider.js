@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-import { AuthContext } from '../authContext';
+import { AuthContext } from './authContext';
 
 const AuthProvider = ({ children }) => {
     const [loggedIn, setLoggedIn] = useState(false);
@@ -20,12 +20,9 @@ const AuthProvider = ({ children }) => {
             postLoginAction();
         });
     
-    const onLogout = postLogoutAction => axios
+    const onLogout = () => axios
         .post("/api/userLogout")
-        .then(() => {
-            setLoggedIn(false);
-            postLogoutAction();
-        });
+        .then(() => setLoggedIn(false));
     
     const loggedInContextValues = {
         loggedIn,

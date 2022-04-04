@@ -53,7 +53,7 @@ app.use(sessions({
 }));
 
 app.get('/api/isAuthenticated', function(req, res) {
-	const isAuthenticated = req.sessionID && req.session.loggedIn && req.session.username;
+	const isAuthenticated = req.sessionID && req.session.username;
 	res.end(JSON.stringify({ isAuthenticated: !!isAuthenticated }));
 });
 
@@ -137,14 +137,7 @@ app.post('/api/login', function(req, res) {
 		// Check that username and password aren't empty
 		if (!req.body.loginUsername || !req.body.loginPassword) {
 			res.setHeader('Content-Type', 'application/json');
-			res.end(
-				JSON.stringify({
-					loginAccepted: false,
-					loginMsg: "Please enter all fields!",
-					loginSession: null,
-					userMeditationTime: null,
-				})
-			);
+			res.end(JSON.stringify({ loginAccepted: false }));
 		}
 		
 		// Look for username
@@ -156,26 +149,12 @@ app.post('/api/login', function(req, res) {
 			// If the username is not found or the login password doesn't match the user's password
 			if (!item || encrypt(req.body.loginPassword) !== item.password) {
 				res.setHeader('Content-Type', 'application/json');
-				res.end(
-					JSON.stringify({
-						loginAccepted: false,
-						loginMsg: "Invalid Credentials",
-						loginSession: null,
-						userMeditationTime: null,
-					})
-				);
+				res.end(JSON.stringify({ loginAccepted: false }));
 			} else {
-				req.session.loggedIn = true;
 				req.session.username = req.body.loginUsername;
 				
 				res.setHeader('Content-Type', 'application/json');
-				res.end(
-					JSON.stringify({
-						loginAccepted: true,
-						loginMsg: "The entry is correct!",
-						userMeditationTime: item.defaultMeditationTime,
-					})
-				);
+				res.end(JSON.stringify({ loginAccepted: true }));
 			}
 			
 			client.close();

@@ -1,5 +1,4 @@
 import React, { useContext, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 import { AuthContext } from '../authContext';
 
@@ -9,13 +8,9 @@ import ModifyAccount from './ModifyAccount.js';
 import Welcome from './Welcome.js';
 
 export const Home = () => {
-    const navigate = useNavigate();
-
     const { onLogout } = useContext(AuthContext);
 
     const [meditateTab, setMeditateTab] = useState("home");
-
-    const logout = () => onLogout(() => navigate("/"));
 
     const renderMeditationPage = () => {
         switch (meditateTab) {
@@ -46,7 +41,7 @@ export const Home = () => {
                     <li onClick={() => setMeditateTab("meditate")}>Meditation</li>
                     <li onClick={() => setMeditateTab("progress")}>Progress</li>
                     <li onClick={() => setMeditateTab("accountMod")}>Account</li>
-                    <li onClick={logout}>Logout</li>
+                    <li onClick={onLogout}>Logout</li>
                 </ul>
             </div>
             {renderMeditationPage()}

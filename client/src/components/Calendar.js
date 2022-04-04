@@ -7,7 +7,7 @@ import { faBook, faInfoCircle, faTimesCircle } from '@fortawesome/free-solid-svg
 
 import { getHoursMinutesSeconds } from '../helpers';
 
-export const Calendar = props => {
+export const Calendar = () => {
     const [displayProgressInfo, setDisplayProgressInfo] = useState(false);
     const [journalEntry, setJournalEntry] = useState('');
     const [journalDetails, setJournalDetails] = useState({});
@@ -19,7 +19,7 @@ export const Calendar = props => {
 
     useEffect(() => {
         getJournalEntries();
-    }, []);
+    }, [journalDetails]);
 
     const getJournalEntries = () => {
         const startTimestamp = moment(`${progressYear}-${progressMonth}`, 'YYYY-MMMM')
@@ -40,7 +40,6 @@ export const Calendar = props => {
             ...journalDetails,
             [name]: value,
         });
-        getJournalEntries();
     }
 
     const modifyJournalEntry = ({ journalEntry, _id }) => {
@@ -58,8 +57,7 @@ export const Calendar = props => {
     const submitJournalModify = () => {axios.post("/api/modifyJournalEntry", {
             journalEntry,
             journalID,
-        }).then(() => this.getJournalEntries());
-
+        }).then(() => getJournalEntries());
         cancelModifyJournal();
     }
     
@@ -148,7 +146,7 @@ export const Calendar = props => {
         return years;
     }
 
-    const toggleProgressInfo = () => setDisplayProgressInfo(!state.displayProgressInfo);
+    const toggleProgressInfo = () => setDisplayProgressInfo(!displayProgressInfo);
 
     return (
         <Fragment>

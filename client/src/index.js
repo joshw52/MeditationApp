@@ -5,7 +5,8 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { CreateAccount } from './components/CreateAccount';
 import Login from './components/Login';
 import { Home } from './components/Home';
-import AuthProvider from './components/AuthProvider';
+import AuthProvider from './AuthProvider';
+import { PrivateRoute } from './PrivateRoute';
 
 import history from './history';
 
@@ -24,7 +25,11 @@ const App = () => (
                     path="/createaccount"
                 />
                 <Route
-                    element={<Home />}
+                    element={
+                        <PrivateRoute>
+                            <Home />
+                        </PrivateRoute>
+                    }
                     path="/home"
                 />
                 <Route
