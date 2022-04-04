@@ -8,13 +8,11 @@ import { Home } from './components/Home';
 import AuthProvider from './AuthProvider';
 import { PrivateRoute } from './PrivateRoute';
 
-import history from './history';
-
 import './styles/meditation.css';
 
 const App = () => (
     <AuthProvider>
-        <Router history={history}>
+        <Router>
             <Routes>
                 <Route
                     element={<Login />}
