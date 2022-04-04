@@ -162,7 +162,7 @@ app.post('/api/login', function(req, res) {
 
 // Log out and kill session
 app.post('/api/userLogout',(req, res) => {
-    req.session.destroy();
+	if (req.session) req.session.destroy();
 	res.end();
 });
 

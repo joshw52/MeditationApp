@@ -34,7 +34,6 @@ const AuthProvider = ({ children }) => {
         onLogin,
         onLogout,
     };
-    console.log("loggedIn::", loggedIn)
 
     return (
         <AuthContext.Provider value={loggedInContextValues}>
