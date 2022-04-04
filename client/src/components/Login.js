@@ -1,19 +1,20 @@
 import React, { useContext, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { AuthContext } from '../authContext';
 
 const Login = () => {
-    const navigate = useNavigate();
-
     const { onLogin } = useContext(AuthContext);
 
     const [loginError, setLoginError] = useState("");
     const [loginPassword, setLoginPassword] = useState("");
     const [loginUsername, setLoginUsername] = useState("");
 
+    const handleLoginError = loginAccepted =>
+        setLoginError(loginAccepted ? "" : "Invalid Credentials") ;
+
     const loginMeditation = clickEvent => {
         clickEvent.preventDefault();
-        onLogin(loginUsername, loginPassword, () => navigate("/home"));
+        onLogin(loginUsername, loginPassword, handleLoginError);
     };
 
     return (

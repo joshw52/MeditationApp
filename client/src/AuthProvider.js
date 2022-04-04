@@ -15,13 +15,13 @@ const AuthProvider = ({ children }) => {
         onAuthCheck();
     }, []);
 
-    const onLogin = (loginUsername, loginPassword, postLoginAction) =>
+    const onLogin = (loginUsername, loginPassword, onLoginError) =>
         axios.post("/api/login", {
             loginPassword,
             loginUsername,
         }).then(res => {
             setLoggedIn(res.data.loginAccepted);
-            postLoginAction();
+            if (!res.data.loginAccepted) onLoginError(res.data.loginAccepted);
         });
     
     const onLogout = () => axios
