@@ -3,7 +3,7 @@ import axios from 'axios';
 
 import { AuthContext } from '../authContext';
 
-const IsLoggedIn = ({ children }) => {
+const AuthProvider = ({ children }) => {
     const [loggedIn, setLoggedIn] = useState(false);
 
     const onAuthCheck = () =>
@@ -24,7 +24,7 @@ const IsLoggedIn = ({ children }) => {
         .post("/api/userLogout")
         .then(() => {
             setLoggedIn(false);
-            postLogoutAction("/");
+            postLogoutAction();
         });
     
     const loggedInContextValues = {
@@ -41,4 +41,4 @@ const IsLoggedIn = ({ children }) => {
     );
 }
 
-export default IsLoggedIn;
+export default AuthProvider;

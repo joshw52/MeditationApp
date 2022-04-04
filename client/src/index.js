@@ -5,14 +5,14 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { CreateAccount } from './components/CreateAccount';
 import Login from './components/Login';
 import { Home } from './components/Home';
-import IsLoggedIn from './components/IsLoggedIn';
+import AuthProvider from './components/AuthProvider';
 
 import history from './history';
 
 import './styles/meditation.css';
 
 const App = () => (
-    <IsLoggedIn>
+    <AuthProvider>
         <Router history={history}>
             <Routes>
                 <Route
@@ -33,7 +33,7 @@ const App = () => (
                 />
             </Routes>
         </Router>
-    </IsLoggedIn>
+    </AuthProvider>
 );
 
 ReactDOM.render(<App />, document.getElementById("root"));
