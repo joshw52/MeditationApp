@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
 import { AuthContext } from './authContext';
@@ -10,6 +10,10 @@ const AuthProvider = ({ children }) => {
         axios
             .get('/api/isAuthenticated', { withCredentials: true })
             .then(res => setLoggedIn(res.data.isAuthenticated));
+    
+    useEffect(() => {
+        onAuthCheck();
+    }, []);
 
     const onLogin = (loginUsername, loginPassword, postLoginAction) =>
         axios.post("/api/login", {
@@ -30,6 +34,7 @@ const AuthProvider = ({ children }) => {
         onLogin,
         onLogout,
     };
+    console.log("loggedIn::", loggedIn)
 
     return (
         <AuthContext.Provider value={loggedInContextValues}>

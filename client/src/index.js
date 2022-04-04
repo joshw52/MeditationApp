@@ -7,6 +7,7 @@ import Login from './components/Login';
 import { Home } from './components/Home';
 import AuthProvider from './AuthProvider';
 import { PrivateRoute } from './PrivateRoute';
+import { RefreshRedirect } from './RefreshRedirect';
 
 import './styles/meditation.css';
 
@@ -15,7 +16,11 @@ const App = () => (
         <Router>
             <Routes>
                 <Route
-                    element={<Login />}
+                    element={
+                        <RefreshRedirect>
+                            <Login />
+                        </RefreshRedirect>
+                    }
                     path="/"
                 />
                 <Route
