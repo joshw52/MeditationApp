@@ -12,13 +12,7 @@ import {
     gong,
 } from '../helpers';
 
-export const Meditate = props => {
-    const {
-        changeDefaultMeditationTime,
-        changeMeditationTab,
-        userMeditationTime,
-        username,
-    } = props;
+export const Meditate = ({ changeMeditationTab }) => {
     const [timerActive, setTimerActive] = useState(false);
 
     const [buddhaTimerStyle, setBuddhaTimerStyle] = useState({});
@@ -31,6 +25,7 @@ export const Meditate = props => {
     const [timeMeditated, setTimeMeditated] = useState(userMeditationTime);
     const [timerInfoShow, setTimerInfoShow] = useState(false);
     const [timerRunning, setTimerRunning] = useState(false);
+    const [userMeditationTime, setUserMeditationTime] = useState(600);
 
     useEffect(() => {
         let interval = null;
@@ -63,6 +58,18 @@ export const Meditate = props => {
         }
         return () => clearInterval(interval);
     }, [timerActive, meditateDuration]);
+
+    const getDefaultMeditationTime = () => axios
+        .get("/api/meditationTime")
+        .then(res => setUserMeditationTime(Number(res.data.defaultMeditationTime)));
+
+    const setDefaultMeditationTime = newTime => axios
+        .post("/api/meditationTime", { userMeditationTime: newTime })
+        .then(res => setUserMeditationTime(Number(res.data.defaultMeditationTime)));
+
+    useEffect(() => {
+        getDefaultMeditationTime();
+    }, []);
 
     const resetTimer = () => {
         const duration = getHoursMinutesSeconds(userMeditationTime);
@@ -107,26 +114,22 @@ export const Meditate = props => {
 
     const submitMeditationEntry = () => {
         axios.post("/api/meditationEntry", {
-            username,
+	        journalEntry,
 	        meditateDateTime: moment().unix(),
 	        meditateDuration: timeMeditated,
-	        journalEntry,
         }).then(() => changeMeditationTab("progress"));
     };
 
     const setDefaultTime = () => {
         const updatedTime = formatTime(...meditateDuration);
 
-        changeDefaultMeditationTime(
-            username,
-            getTotalSeconds(...updatedTime)
-        );
+        setDefaultMeditationTime(getTotalSeconds(...updatedTime));
         setDefaultTimeChanged(true);
     };
 
     return (
         <div>
-            {journalView ?
+            {journalView  ?
                 <div className="meditationJournal">
                     <h3>Log your meditation</h3>
                     <textarea

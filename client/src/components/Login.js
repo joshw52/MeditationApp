@@ -1,26 +1,19 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import { Link } from 'react-router-dom';
+import React, { useContext, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { AuthContext } from '../authContext';
 
-const Login = ({ homePageNavigate }) => {
+const Login = () => {
+    const navigate = useNavigate();
+
+    const { onLogin } = useContext(AuthContext);
+
     const [loginError, setLoginError] = useState("");
     const [loginPassword, setLoginPassword] = useState("");
     const [loginUsername, setLoginUsername] = useState("");
 
     const loginMeditation = clickEvent => {
         clickEvent.preventDefault();
-        axios.post("/api/login", {
-            loginPassword,
-            loginUsername,
-        }).then(res => {
-            const {
-                loginAccepted,
-                loginMsg,
-                userMeditationTime,
-            } = res.data;
-            if (!loginAccepted) setLoginError(loginMsg);
-            else homePageNavigate(loginUsername, userMeditationTime);
-        });
+        onLogin(loginUsername, loginPassword, () => navigate("/home"));
     };
 
     return (

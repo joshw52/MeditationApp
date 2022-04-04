@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
-const ModifyAccount = ({ username }) => {
+const ModifyAccount = () => {
     const [accountEmail, setAccountEmail] = useState("");
     const [accountFirstName, setAccountFirstName] = useState("");
     const [accountLastName, setAccountLastName] = useState("");
@@ -12,9 +12,7 @@ const ModifyAccount = ({ username }) => {
     const [pwordMsg, setPwordMsg] = useState("");
 
     const loadAccountInformation = () => 
-        axios.get('/api/accountInfoLoad', {
-            params: { username }
-        }).then(res => {
+        axios.get('/api/accountInfoLoad').then(res => {
             setAccountEmail(res.data.email);
             setAccountFirstName(res.data.firstname);
             setAccountLastName(res.data.lastname);
@@ -22,7 +20,7 @@ const ModifyAccount = ({ username }) => {
 
     useEffect(() => {
         loadAccountInformation();
-    }, [username]);
+    }, [accountEmail, accountFirstName, accountLastName]);
 
     const modifyAccount = () => {
         if (
@@ -36,7 +34,6 @@ const ModifyAccount = ({ username }) => {
                 accountEmail,
                 accountFirstName,
                 accountLastName,
-                username,
             }).then(res => {
                 const { accountModified, accountMsg } = res.data;
                 setAccountMsg(accountModified ? accountMsg : 'Account Modification Error');
@@ -59,7 +56,6 @@ const ModifyAccount = ({ username }) => {
             axios.post("/api/accountLoginModify", {
                 accountOldPassword,
                 accountPassword,
-                username,
             }).then(res => {
                 const { pwordChangeMsg } = res.data;
                 setPwordMsg(pwordChangeMsg);
@@ -69,7 +65,7 @@ const ModifyAccount = ({ username }) => {
 
     return (
         <div className="accountModification">
-            <h2>Modify Account for {username}</h2>
+            <h2>Modify Account Information</h2>
             <div className="meditationForm">
                 <input
                     name="accountFirstName"

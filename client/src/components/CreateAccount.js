@@ -1,10 +1,10 @@
 import React, { useCallback, useState } from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
-
-import history from '../history';
+import { Link, useNavigate } from 'react-router-dom';
 
 export const CreateAccount = () => {
+    const navigate = useNavigate();
+
     const [accountEmail, setAccountEmail] = useState("");
     const [accountError, setAccountError] = useState("");
     const [accountFirstName, setAccountFirstName] = useState("");
@@ -41,7 +41,7 @@ export const CreateAccount = () => {
             }).then(res => {
                 const { accountCreated, accountMsg } = res.data;
                 setAccountError(!accountCreated ? accountMsg : "");
-                if (accountCreated && !accountMsg) history.push("/");
+                if (accountCreated && !accountMsg) navigate("/");
             });
         }
     }, [accountEmail, accountFirstName, accountLastName, accountPassword, accountUsername, setAccountError]);

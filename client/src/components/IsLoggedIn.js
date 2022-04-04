@@ -1,20 +1,44 @@
-import React, { useEffect, useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import React, { useState } from 'react';
 import axios from 'axios';
+
+import { AuthContext } from '../authContext';
 
 const IsLoggedIn = ({ children }) => {
     const [loggedIn, setLoggedIn] = useState(false);
 
-    const getAuthStatus = () =>
+    const onAuthCheck = () =>
         axios
-            .get('/api/isLoggedIn', { withCredentials: true })
-            .then(res => setLoggedIn(res.data.isLoggedIn));
-    
-    useEffect(() => {
-        getAuthStatus();
-    }, []);
+            .get('/api/isAuthenticated', { withCredentials: true })
+            .then(res => setLoggedIn(res.data.isAuthenticated));
 
-    return loggedIn ? children : <Navigate to={"/"} />;
+    const onLogin = (loginUsername, loginPassword, postLoginAction) =>
+        axios.post("/api/login", {
+            loginPassword,
+            loginUsername,
+        }).then(res => {
+            setLoggedIn(res.data.loginAccepted);
+            postLoginAction();
+        });
+    
+    const onLogout = postLogoutAction => axios
+        .post("/api/userLogout")
+        .then(() => {
+            setLoggedIn(false);
+            postLogoutAction("/");
+        });
+    
+    const loggedInContextValues = {
+        loggedIn,
+        onAuthCheck,
+        onLogin,
+        onLogout,
+    };
+
+    return (
+        <AuthContext.Provider value={loggedInContextValues}>
+          {children}
+        </AuthContext.Provider>
+    );
 }
 
 export default IsLoggedIn;

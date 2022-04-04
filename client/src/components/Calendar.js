@@ -8,9 +8,6 @@ import { faBook, faInfoCircle, faTimesCircle } from '@fortawesome/free-solid-svg
 import { getHoursMinutesSeconds } from '../helpers';
 
 export const Calendar = props => {
-    const {
-        username,
-    } = props;
     const [displayProgressInfo, setDisplayProgressInfo] = useState(false);
     const [journalEntry, setJournalEntry] = useState('');
     const [journalDetails, setJournalDetails] = useState({});
@@ -33,7 +30,6 @@ export const Calendar = props => {
             params: {
                 endTimestamp,
                 startTimestamp,
-                username,
             }
         }).then(res => setMeditationRecords(res.data.meditationRecords));
     }
