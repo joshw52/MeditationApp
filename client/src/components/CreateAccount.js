@@ -22,10 +22,7 @@ const CreateAccount = () => {
             setAccountError("All fields must be filled out!");
         } else if (accountPassword !== accountPasswordConfirm) {
             setAccountError("Passwords do not match!");
-        } else if (
-            accountPassword.length < 8 ||
-            accountPasswordConfirm.length < 8
-        ) {
+        } else if (accountPassword.length < 8) {
             setAccountError("Password must be at least 8 characters");
         } else {
             axios.post("/api/account", {
