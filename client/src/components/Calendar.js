@@ -10,7 +10,6 @@ import { getHoursMinutesSeconds } from '../helpers';
 const Calendar = () => {
     const [displayProgressInfo, setDisplayProgressInfo] = useState(false);
     const [journalEntry, setJournalEntry] = useState('');
-    const [journalDetails, setJournalDetails] = useState({});
     const [journalID, setJournalID] = useState(null);
     const [journalModify, setJournalModify] = useState(false);
     const [meditationRecords, setMeditationRecords] = useState([]);
@@ -19,7 +18,7 @@ const Calendar = () => {
 
     useEffect(() => {
         getJournalEntries();
-    }, [journalDetails]);
+    }, []);
 
     const getJournalEntries = () => {
         const startTimestamp = moment(`${progressYear}-${progressMonth}`, 'YYYY-MMMM')
@@ -32,14 +31,6 @@ const Calendar = () => {
                 startTimestamp,
             }
         }).then(res => setMeditationRecords(res.data.meditationRecords));
-    }
-
-    const onChange = event => {
-        const { name, value } = event.target;
-        setJournalDetails({
-            ...journalDetails,
-            [name]: value,
-        });
     }
 
     const modifyJournalEntry = ({ journalEntry, _id }) => {
@@ -156,7 +147,7 @@ const Calendar = () => {
                     <textarea
                         className='journalEntry'
                         name='journalEntry'
-                        onChange={onChange}
+                        onChange={e => setJournalEntry(e.target.value)}
                         value={journalEntry}
                     />
                     <div className="journalModButtons">
