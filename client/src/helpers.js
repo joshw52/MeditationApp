@@ -1,3 +1,8 @@
+/**
+ * Converts total time in seconds to [hours, minutes, seconds]
+ * @param {*} userTime - total time in seconds
+ * @returns [hours, minutes, seconds]
+ */
 export const getHoursMinutesSeconds = userTime => {
     const hours = Math.floor(userTime / 3600);
     const minutes = Math.floor((userTime - (hours * 3600)) / 60);
@@ -7,11 +12,29 @@ export const getHoursMinutesSeconds = userTime => {
     return [String(hours), String(minutes), String(seconds)];
 };
 
+/**
+ * Takes time in hours, minutes, and seconds and gets total
+ * number of seconds
+ * @param {*} hours 
+ * @param {*} minutes 
+ * @param {*} seconds 
+ * @returns total number of seconds
+ */
 export const getTotalSeconds = (hours, minutes, seconds) =>
     (Number(hours) * 3600) + (Number(minutes) * 60) + Number(seconds);
 
+/**
+ * Gong sound
+ */
 export const gong = new Audio("https://soundbible.com/grab.php?id=1815&type=mp3");
 
+/**
+ * Take hours, minutes, and seconds, and format for display
+ * @param {*} hours 
+ * @param {*} minutes 
+ * @param {*} seconds 
+ * @returns formatted hours, minutes, seconds
+ */
 export const formatTime = (hours, minutes, seconds) => {
     let updatedHrs = hours;
     let updatedMin = minutes;

@@ -21,7 +21,7 @@ const Meditate = ({ changeMeditationTab }) => {
     const [incrementFraction, setIncrementFraction] = useState(-1);
     const [journalEntry, setJournalEntry] = useState("");
     const [journalView, setJournalView] = useState(false);
-    const [meditateDuration, setMeditateDuration] = useState(getHoursMinutesSeconds(userMeditationTime));
+    const [meditateDuration, setMeditateDuration] = useState(getHoursMinutesSeconds(600));
     const [timeMeditated, setTimeMeditated] = useState(userMeditationTime);
     const [timerInfoShow, setTimerInfoShow] = useState(false);
     const [timerRunning, setTimerRunning] = useState(false);
@@ -61,26 +61,28 @@ const Meditate = ({ changeMeditationTab }) => {
 
     const getDefaultMeditationTime = () => axios
         .get("/api/meditationTime")
-        .then(res => setUserMeditationTime(Number(res.data.defaultMeditationTime)));
+        .then(res => {
+            setUserMeditationTime(Number(res.data.defaultMeditationTime));
+            setMeditateDuration(getHoursMinutesSeconds(res.data.defaultMeditationTime));
+        });
 
     const setDefaultMeditationTime = newTime => axios
         .post("/api/meditationTime", { userMeditationTime: newTime })
-        .then(res => setUserMeditationTime(Number(res.data.defaultMeditationTime)));
+        .then(res => {
+            setUserMeditationTime(newTime);
+            setMeditateDuration(newTime);
+        });
 
     useEffect(() => {
         getDefaultMeditationTime();
     }, []);
 
-    const resetTimer = () => {
+    const resetTimer = useCallback(() => {
         const duration = getHoursMinutesSeconds(userMeditationTime);
         setTimerActive(false);
         setMeditateDuration(duration);
         setTimeMeditated(userMeditationTime);
         setTimerRunning(false);
-    }
-
-    useEffect(() => {
-        resetTimer();
     }, [userMeditationTime]);
 
     const displayTimerInfo = () => setTimerInfoShow(!timerInfoShow);
@@ -107,8 +109,6 @@ const Meditate = ({ changeMeditationTab }) => {
 
     const stopTimer = () => {
         setTimerActive(false);
-        setCurrentBrightness(0);
-        setIncrementFraction(-1);
         setTimerRunning(false);
     };
 
@@ -122,7 +122,6 @@ const Meditate = ({ changeMeditationTab }) => {
 
     const setDefaultTime = () => {
         const updatedTime = formatTime(...meditateDuration);
-
         setDefaultMeditationTime(getTotalSeconds(...updatedTime));
         setDefaultTimeChanged(true);
     };
@@ -152,21 +151,21 @@ const Meditate = ({ changeMeditationTab }) => {
                                 className="timerInput"
                                 disabled={timerRunning}
                                 name="meditateHours"
-                                onChange={e => setMeditateDuration(e.target.value, meditateDuration[1], meditateDuration[2])}
+                                onChange={e => setMeditateDuration([e.target.value, meditateDuration[1], meditateDuration[2]])}
                                 value={meditateDuration[0]}
                             />
                             <input
                                 className="timerInput"
                                 disabled={timerRunning}
                                 name="meditateMinutes"
-                                onChange={e => setMeditateDuration(meditateDuration[0], e.target.value, meditateDuration[2])}
+                                onChange={e => setMeditateDuration([meditateDuration[0], e.target.value, meditateDuration[2]])}
                                 value={meditateDuration[1]}
                             />
                             <input
                                 className="timerInput"
                                 disabled={timerRunning}
                                 name="meditateSeconds"
-                                onChange={e => setMeditateDuration(meditateDuration[0], meditateDuration[1], e.target.value)}
+                                onChange={e => setMeditateDuration([meditateDuration[0], meditateDuration[1], e.target.value])}
                                 value={meditateDuration[2]}
                             />
                         </div>

@@ -198,8 +198,8 @@ app.post('/api/meditationTime', function(req, res) {
 				if (err) throw err;
 
 				if (item) {
-					db.collection('users').update(
-						{ username: req.session.username },
+					db.collection('users').findOneAndUpdate(
+						{ _id: item._id },
 						{ $set: {
 							defaultMeditationTime: req.body.userMeditationTime,
 						}},
@@ -208,7 +208,7 @@ app.post('/api/meditationTime', function(req, res) {
 
 							res.setHeader('Content-Type', 'application/json');
 							res.end(JSON.stringify({
-								defaultMeditationTime: updatedItem.userMeditationTime,
+								defaultMeditationTime: updatedItem.value.defaultMeditationTime,
 							}));
 
 							client.close();
