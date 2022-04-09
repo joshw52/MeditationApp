@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 import CreateAccount from './components/CreateAccount';
 import Login from './components/Login';
-import { Home } from './components/Home';
+import Home from './components/Home';
 import AuthProvider from './AuthProvider';
 import { PrivateRoute } from './PrivateRoute';
 import { RefreshRedirect } from './RefreshRedirect';

@@ -7,7 +7,7 @@ import { faBook, faInfoCircle, faTimesCircle } from '@fortawesome/free-solid-svg
 
 import { getHoursMinutesSeconds } from '../helpers';
 
-export const Calendar = () => {
+const Calendar = () => {
     const [displayProgressInfo, setDisplayProgressInfo] = useState(false);
     const [journalEntry, setJournalEntry] = useState('');
     const [journalDetails, setJournalDetails] = useState({});
@@ -234,3 +234,5 @@ export const Calendar = () => {
         </Fragment>
     );
 };
+
+export default Calendar;

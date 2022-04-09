@@ -12,7 +12,7 @@ import {
     gong,
 } from '../helpers';
 
-export const Meditate = ({ changeMeditationTab }) => {
+const Meditate = ({ changeMeditationTab }) => {
     const [timerActive, setTimerActive] = useState(false);
 
     const [buddhaTimerStyle, setBuddhaTimerStyle] = useState({});
@@ -218,3 +218,5 @@ export const Meditate = ({ changeMeditationTab }) => {
         </div>
     );
 };
+
+export default Meditate;

@@ -2,12 +2,12 @@ import React, { useContext, useState } from 'react';
 
 import { AuthContext } from '../authContext';
 
-import { Calendar } from './Calendar.js';
-import { Meditate } from './Meditate.js';
+import Calendar from './Calendar.js';
+import Meditate from './Meditate.js';
 import ModifyAccount from './ModifyAccount.js';
 import Welcome from './Welcome.js';
 
-export const Home = () => {
+const Home = () => {
     const { onLogout } = useContext(AuthContext);
 
     const [meditateTab, setMeditateTab] = useState("home");
@@ -15,21 +15,13 @@ export const Home = () => {
     const renderMeditationPage = () => {
         switch (meditateTab) {
             case "accountMod":
-                return (
-                    <ModifyAccount />
-                );
+                return <ModifyAccount />;
             case "meditate":
-                return (
-                    <Meditate changeMeditationTab={setMeditateTab} />
-                );
+                return <Meditate changeMeditationTab={setMeditateTab} />;
             case "progress":
-                return (
-                    <Calendar />
-                );
+                return <Calendar />;
             default:
-                return (
-                    <Welcome changeMeditationTab={setMeditateTab} />
-                );
+                return <Welcome changeMeditationTab={setMeditateTab} />;
         }
     };
 
@@ -48,3 +40,5 @@ export const Home = () => {
         </div>
     );
 };
+
+export default Home;

@@ -3,10 +3,10 @@ import axios from 'axios';
 
 const ModifyAccount = () => {
     const [accountEmail, setAccountEmail] = useState("");
+    const [accountMsg, setAccountMsg] = useState("");
     const [accountOldPassword, setAccountOldPassword] = useState("");
     const [accountPassword, setAccountPassword] = useState("");
     const [accountPasswordConfirm, setAccountPasswordConfirm] = useState("");
-    const [accountMsg, setAccountMsg] = useState("");
     const [pwordMsg, setPwordMsg] = useState("");
 
     const loadAccountInformation = () => 
@@ -14,20 +14,17 @@ const ModifyAccount = () => {
 
     useEffect(() => {
         loadAccountInformation();
-    }, [accountEmail]);
+    }, []);
 
-    const modifyAccount = () => {
-        if (accountEmail === '') {
-            setAccountMsg("All fields must be filled out!");
-        } else {
-            axios.post("/api/accountModify", {
-                accountEmail,
-            }).then(res => {
-                const { accountModified, accountMsg } = res.data;
-                setAccountMsg(accountModified ? accountMsg : 'Account Modification Error');
-            });
-        }
-    }
+    const modifyAccount = () =>
+        accountEmail === ''
+            ? setAccountMsg("All fields must be filled out!")
+            : axios.post("/api/accountModify", {
+                    accountEmail,
+                }).then(res => {
+                    const { accountModified, accountMsg } = res.data;
+                    setAccountMsg(accountModified ? accountMsg : 'Account Modification Error');
+                });
 
     const changePassword = () => {
         if (
@@ -35,11 +32,11 @@ const ModifyAccount = () => {
             accountPassword === '' ||
             accountPasswordConfirm === ''
         ) {
-            setAccountMsg("All fields must be filled out!");
+            setPwordMsg("All fields must be filled out!");
         } else if (accountPassword !== accountPasswordConfirm) {
-            setAccountMsg("New Password and Confirmation don't match!");
-        } else if (accountPassword.length < 8 || accountPasswordConfirm.length < 8) {
-            setAccountMsg("New Password must be at least 8 characters");
+            setPwordMsg("New Password and Confirmation don't match!");
+        } else if (accountPassword.length < 8) {
+            setPwordMsg("New Password must be at least 8 characters");
         } else{
             axios.post("/api/accountLoginModify", {
                 accountOldPassword,
