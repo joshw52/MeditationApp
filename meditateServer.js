@@ -451,9 +451,9 @@ app.post('/api/deleteJournalEntry', function(req, res) {
 //     res.sendFile(path.join(__dirname, "client", "index.html"));
 // });
 
-// app.use(express.static(path.resolve(__dirname, "./client/build")));
-app.get("*", function (request, response) {
-  response.sendFile(path.resolve(__dirname, "./client/build", "index.html"));
+app.use(express.static(path.resolve(__dirname, "./client/build")));
+app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "./client", "index.html"));
 });
 
 // Listen for an incoming connection
