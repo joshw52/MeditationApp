@@ -445,13 +445,6 @@ app.post('/api/deleteJournalEntry', function(req, res) {
 	}
 });
 
-// app.use('*', express.static(path.join(__dirname, "client", "build")));
-
-// app.get("*", (req, res) => {
-//     res.sendFile(path.join(__dirname, "client", "index.html"));
-// });
-
-app.use(express.static(path.resolve(__dirname, "./client/build")));
 app.get("*", (req, res) => {
     res.sendFile(path.join(__dirname, "./client", "index.html"));
 });
