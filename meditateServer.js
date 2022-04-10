@@ -27,7 +27,7 @@ const password = process.env.DB_PASS || '';
 const cluster = process.env.DB_CLUSTER || '';
 const database = process.env.DB_NAME || 'meditation';
 
-const mongoDBUrl = `mongodb+srv://${username}:${password}@${cluster}.mongodb.net/test?retryWrites=true&w=majority&useNewUrlParser=true&useUnifiedTopology=true`;
+const mongoDBUrl = `mongodb+srv://${username}:${password}@${cluster}.mongodb.net/%2Ftest%3FretryWrites%3Dtrue%26w%3Dmajority%26useNewUrlParser%3Dtrue%26useUnifiedTopology%3Dtrue`;
 
 app.set('port', port);
 app.enable('trust proxy'); 
