@@ -28,14 +28,14 @@ const cluster = process.env.DB_CLUSTER || '';
 const database = process.env.DB_NAME || 'meditation';
 
 const mongoDBUrl = `mongodb+srv://${username}:${password}@${cluster}.mongodb.net/${database}?retryWrites=true&w=majority&useNewUrlParser=true&useUnifiedTopology=true`;
-console.log("mongoDBUrl", mongoDBUrl)
+
 app.set('port', port);
 app.enable('trust proxy'); 
 
 app.use(parser.json());
 app.use(parser.urlencoded({ extended: true }));
 
-app.use(cors());
+// app.use(cors());
 
 app.use(sessions({
     cookie: {
