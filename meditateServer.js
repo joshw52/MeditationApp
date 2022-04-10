@@ -35,7 +35,7 @@ app.enable('trust proxy');
 app.use(parser.json());
 app.use(parser.urlencoded({ extended: true }));
 
-// app.use(cors());
+app.use(cors());
 
 app.use(sessions({
     cookie: {
