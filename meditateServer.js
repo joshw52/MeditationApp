@@ -445,7 +445,7 @@ app.post('/api/deleteJournalEntry', function(req, res) {
 	}
 });
 
-app.use('*', express.static(path.join(__dirname, "client", "build")));
+app.get('*', express.static(path.join(__dirname, "client", "build")));
 
 // Listen for an incoming connection
 server.listen(port, function() {
