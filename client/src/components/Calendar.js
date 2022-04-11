@@ -18,7 +18,7 @@ const Calendar = () => {
 
     useEffect(() => {
         getJournalEntries();
-    }, []);
+    }, [journalModify]);
 
     const getJournalEntries = () => {
         const startTimestamp = moment(`${progressYear}-${progressMonth}`, 'YYYY-MMMM')
