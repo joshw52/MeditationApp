@@ -201,7 +201,7 @@ app.post('/api/meditationTime', function(req, res) {
 					db.collection('users').findOneAndUpdate(
 						{ _id: item._id },
 						{ $set: {
-							defaultMeditationTime: req.body.userMeditationTime,
+							defaultMeditationTime: req.body.defaultMeditationTime,
 						}},
 						function(err, updatedItem) {
 							if (err) throw err;

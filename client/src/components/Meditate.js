@@ -67,10 +67,12 @@ const Meditate = ({ changeMeditationTab }) => {
         });
 
     const setDefaultMeditationTime = newTime => axios
-        .post("/api/meditationTime", { userMeditationTime: newTime })
-        .then(res => {
-            setUserMeditationTime(newTime);
-            setMeditateDuration(newTime);
+        .post("/api/meditationTime", { defaultMeditationTime: newTime })
+        .then(() => {
+            setDefaultTimeChanged(true);
+            setUserMeditationTime(Number(newTime));
+            setMeditateDuration(getHoursMinutesSeconds(newTime));
+            setTimeMeditated(newTime);
         });
 
     useEffect(() => {
@@ -123,7 +125,6 @@ const Meditate = ({ changeMeditationTab }) => {
     const setDefaultTime = () => {
         const updatedTime = formatTime(...meditateDuration);
         setDefaultMeditationTime(getTotalSeconds(...updatedTime));
-        setDefaultTimeChanged(true);
     };
 
     return (
