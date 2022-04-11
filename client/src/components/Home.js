@@ -10,7 +10,12 @@ import Welcome from './Welcome.js';
 const Home = () => {
     const { onLogout } = useContext(AuthContext);
 
-    const [meditateTab, setMeditateTab] = useState("home");
+    const [meditateTab, setMeditateTab] = useState(localStorage.getItem('meditationTab') || 'home');
+
+    const onUpdateTab = tab => {
+        localStorage.setItem('meditationTab', tab);
+        setMeditateTab(tab);
+    }
 
     const renderMeditationPage = () => {
         switch (meditateTab) {
@@ -29,10 +34,10 @@ const Home = () => {
         <div>
             <div className="menubar">
                 <ul>
-                    <li onClick={() => setMeditateTab("home")}>Home</li>
-                    <li onClick={() => setMeditateTab("meditate")}>Meditation</li>
-                    <li onClick={() => setMeditateTab("progress")}>Progress</li>
-                    <li onClick={() => setMeditateTab("accountMod")}>Account</li>
+                    <li onClick={() => onUpdateTab("home")}>Home</li>
+                    <li onClick={() => onUpdateTab("meditate")}>Meditation</li>
+                    <li onClick={() => onUpdateTab("progress")}>Progress</li>
+                    <li onClick={() => onUpdateTab("accountMod")}>Account</li>
                     <li onClick={onLogout}>Logout</li>
                 </ul>
             </div>
