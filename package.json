@@ -20,7 +20,8 @@
     "uuid": "^8.3.2"
   },
   "engines": {
-    "node": "16.14.0"
+    "node": "v18.12.1",
+    "npm": "8.19.2"
   },
   "scripts": {
     "build": "cd client && npm run build",
