@@ -206,7 +206,7 @@ const Meditate = ({ changeMeditationTab }) => {
                     >
                         <img
                             className="buddhaFillImg"
-                            src="https://vagabondtemple.com/wp-content/uploads/2016/07/mantra-om-1292602.png"
+                            src="../images/om.png"
                             style={{
                                 display: timerRunning && buddhaTimerStyle.display,
                                 filter: timerRunning && buddhaTimerStyle.filter,
