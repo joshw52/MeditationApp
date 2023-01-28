@@ -5,6 +5,8 @@ import moment from 'moment-timezone';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 
+import om from '../images/om.png';
+
 import {
     formatTime,
     getHoursMinutesSeconds,
@@ -206,7 +208,7 @@ const Meditate = ({ changeMeditationTab }) => {
                     >
                         <img
                             className="buddhaFillImg"
-                            src="../images/om.png"
+                            src={om}
                             style={{
                                 display: timerRunning && buddhaTimerStyle.display,
                                 filter: timerRunning && buddhaTimerStyle.filter,
