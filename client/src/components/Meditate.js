@@ -24,10 +24,10 @@ const Meditate = ({ changeMeditationTab }) => {
     const [journalEntry, setJournalEntry] = useState("");
     const [journalView, setJournalView] = useState(false);
     const [meditateDuration, setMeditateDuration] = useState(getHoursMinutesSeconds(600));
+    const [userMeditationTime, setUserMeditationTime] = useState(600);
     const [timeMeditated, setTimeMeditated] = useState(userMeditationTime);
     const [timerInfoShow, setTimerInfoShow] = useState(false);
     const [timerRunning, setTimerRunning] = useState(false);
-    const [userMeditationTime, setUserMeditationTime] = useState(600);
 
     useEffect(() => {
         let interval = null;
