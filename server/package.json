@@ -4,24 +4,24 @@
   "description": "Backend for meditation app",
   "main": "meditateServer.js",
   "dependencies": {
-    "body-parser": "^1.19.1",
-    "braces": "^3.0.2",
-    "connect-mongo": "^4.6.0",
+    "body-parser": "^2.2.0",
+    "braces": "^3.0.3",
+    "connect-mongo": "^5.1.0",
     "cors": "^2.8.5",
-    "dotenv": "^16.0.0",
-    "express": "^4.17.2",
-    "express-session": "^1.17.2",
+    "dotenv": "^17.2.0",
+    "express": "^5.1.0",
+    "express-session": "^1.18.2",
     "http": "^0.0.1-security",
     "mongo": "^0.1.0",
-    "mongodb": "^4.3.1",
-    "mongoose": "^6.4.6",
+    "mongodb": "^6.18.0",
+    "mongoose": "^8.16.4",
     "path": "^0.12.7",
-    "pm2": "^5.1.2",
-    "uuid": "^8.3.2"
+    "pm2": "^6.0.8",
+    "uuid": "^11.1.0"
   },
   "engines": {
-    "node": "v18.12.1",
-    "npm": "8.19.2"
+    "node": "v22.17.1",
+    "npm": "10.9.2"
   },
   "scripts": {
     "build": "cd client && npm run build",
@@ -31,18 +31,16 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
-    "@babel/plugin-proposal-class-properties": "^7.16.7",
-    "@babel/preset-env": "^7.16.11",
-    "@babel/preset-react": "^7.16.7",
-    "babel": "^6.23.0",
-    "babel-core": "^4.7.16",
-    "babel-loader": "^8.2.3",
-    "css-loader": "^6.6.0",
-    "eslint": "^8.9.0",
-    "eslint-config-react": "^1.1.7",
-    "eslint-plugin-react": "^7.28.0",
-    "prettier": "^2.5.1",
-    "style-loader": "^3.3.1",
-    "webpack-cli": "^4.9.2"
+    "@babel/cli": "^7.28.0",
+    "@babel/core": "^7.28.0",
+    "@babel/plugin-transform-class-properties": "^7.27.1",
+    "@babel/preset-env": "^7.28.0",
+    "@babel/preset-react": "^7.27.1",
+    "babel-loader": "^10.0.0",
+    "css-loader": "^7.1.2",
+    "eslint": "^9.31.0",
+    "prettier": "^3.6.2",
+    "style-loader": "^4.0.0",
+    "webpack-cli": "^6.0.1"
   }
 }
