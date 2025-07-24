@@ -1,5 +1,7 @@
 # Use the latest LTS version of Node.js
-FROM node:alpine
+ARG NODE_VERSION=22.17.1
+
+FROM node:${NODE_VERSION}-alpine
  
 # Set the working directory inside the container
 WORKDIR /app

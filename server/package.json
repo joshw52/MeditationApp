@@ -24,9 +24,6 @@
     "npm": "10.9.2"
   },
   "scripts": {
-    "build": "cd client && npm run build",
-    "heroku-prebuild": "cd client && npm install --dev",
-    "heroku-postbuild": "cd client && npm install && npm run build",
     "start": "npm install && node meditateServer.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
