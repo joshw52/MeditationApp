@@ -1,20 +1,23 @@
-const express = require('express');
-const parser = require('body-parser');
-const cors = require('cors');
-const path = require('path');
-const sessions = require('express-session');
-const mongoSessionStore = require('connect-mongo');
+import express from 'express';
+import parser from 'body-parser';
+import cors from 'cors';
+import crypto from 'crypto';
+import path from 'path';
+import http from 'http';
+import dotenv from 'dotenv'
+import sessions from 'express-session';
+import mongoSessionStore from 'connect-mongo';
+import { MongoClient, ObjectId } from 'mongodb';
+import { fileURLToPath } from 'url';
 
-const mongo = require('mongodb').MongoClient;
-const OID = require('mongodb').ObjectID;
+const mongo = MongoClient;
+const OID = ObjectId;
 
 const app = express();
 
-const server = require('http').createServer(app);
+const server = http.createServer(app);
 
-const crypto = require('crypto');
-
-require('dotenv').config();
+dotenv.config();
 
 function encrypt(str) {
   return crypto.createHmac('sha256', process.env.HMAC_SECRET).update(str).digest('hex');
@@ -27,7 +30,11 @@ const password = process.env.DB_PASS || '';
 const cluster = process.env.DB_CLUSTER || '';
 const database = process.env.DB_NAME || 'meditation';
 
-const mongoDBUrl = `mongodb+srv://${username}:${password}@${cluster}.mongodb.net/${database}?retryWrites=true&w=majority&useNewUrlParser=true&useUnifiedTopology=true`;
+const mongoDBUrl = `mongodb+srv://${username}:${password}@${cluster}.mongodb.net/${database}?retryWrites=true&w=majority&tls=true`;
+
+const client = new MongoClient(mongoDBUrl);
+await client.connect();
+const db = client.db(database);
 
 app.set('port', port);
 app.enable('trust proxy'); 
@@ -54,10 +61,10 @@ app.use(sessions({
 
 app.get('/api/isAuthenticated', function(req, res) {
 	const isAuthenticated = req.sessionID && req.session.username;
-	res.end(JSON.stringify({ isAuthenticated: !!isAuthenticated }));
+	res.json({ isAuthenticated: !!isAuthenticated });
 });
 
-app.post('/api/account', function(req, res) {
+app.post('/api/account', async function(req, res) {
 	// The user entry to be made
 	const newUser = {
 		username: req.body.accountUsername,
@@ -68,96 +75,70 @@ app.post('/api/account', function(req, res) {
 
 	// Server-side validation of non-empty fields
 	if (!newUser.username || !newUser.password || !newUser.email) {
-		res.setHeader('Content-Type', 'application/json');
-		res.end(
-			JSON.stringify({
-				accountCreated: false,
-				accountMsg: "All fields must be filled out!",
-			})
-		);
+		res.json({
+			accountCreated: false,
+			accountMsg: "All fields must be filled out!",
+		});
 	// Server-side validation of password length
 	} else if (newUser.password.length < 8) {
-		res.setHeader('Content-Type', 'application/json');
-		res.end(
-			JSON.stringify({
-				accountCreated: false,
-				accountMsg: "Password must be at least 8 characters",
-			})
-		);
+		res.json({
+			accountCreated: false,
+			accountMsg: "Password must be at least 8 characters",
+		});
 	} else {
 		// Attempt to insert the account
-		mongo.connect(mongoDBUrl, function(err, client) {
-			const db = client.db(database);	
-			if (err) throw err;
-	
-			db.collection('users').findOne({
+		try {
+			const item = await db.collection('users').findOne({
 				username: req.body.accountUsername,
-			}, function(err, item) {
-				if (err) throw err;
-	
-				if (item !== null) {
-					res.setHeader('Content-Type', 'application/json');
-					res.end(
-						JSON.stringify({
-							accountCreated: false,
-							accountMsg: "Username is already taken",
-						})
-					);
-	
-					client.close();
-				} else {
-					db.collection('users').insertOne(newUser, function(err, docs) {
-						if (err) throw err;
-	
-						res.setHeader('Content-Type', 'application/json');
-						res.end(
-							JSON.stringify({
-								accountCreated: true,
-								accountMsg: '',
-							})
-						);
-	
-						client.close();
+			});
+
+			if (item !== null) {
+				res.json({
+					accountCreated: false,
+					accountMsg: "Username is already taken",
+				});
+			} else {
+				const item = db.collection('users').insertOne(newUser);
+
+				if (item) {
+					res.json({
+						accountCreated: true,
+						accountMsg: '',
 					});
 				}
-			});
-		});
+			}
+		} catch (err) {
+			console.error(err);
+			res.status(500).end();
+		}
 	}
 })
 
 // Check that the login credentials are correct, 
 // that the username exists and that the password is correct
-app.post('/api/login', function(req, res) {
-	mongo.connect(mongoDBUrl, function(err, client) {
-		const db = client.db(database);		
-		if (err) throw err;
-
+app.post('/api/login', async (req, res) => {
+	try {
 		// Check that username and password aren't empty
 		if (!req.body.loginUsername || !req.body.loginPassword) {
-			res.setHeader('Content-Type', 'application/json');
-			res.end(JSON.stringify({ loginAccepted: false }));
+			res.json({ loginAccepted: false });
 		}
 		
 		// Look for username
-		db.collection('users').findOne({
+		const item = await db.collection('users').findOne({
 			username: req.body.loginUsername,
-		}, function(err, item) {
-			if (err) throw err;
-			
-			// If the username is not found or the login password doesn't match the user's password
-			if (!item || encrypt(req.body.loginPassword) !== item.password) {
-				res.setHeader('Content-Type', 'application/json');
-				res.end(JSON.stringify({ loginAccepted: false }));
-			} else {
-				req.session.username = req.body.loginUsername;
-				
-				res.setHeader('Content-Type', 'application/json');
-				res.end(JSON.stringify({ loginAccepted: true }));
-			}
-			
-			client.close();
 		});
-	});
+
+		// If the username is not found or the login password doesn't match the user's password
+		if (!item || encrypt(req.body.loginPassword) !== item.password) {
+			res.json({ loginAccepted: false });
+		} else {
+			req.session.username = req.body.loginUsername;
+			res.json({ loginAccepted: true });
+		}
+	} catch (err) {
+		console.error(err);
+		res.status(500).end();
+	}
 });
 
 // Log out and kill session
@@ -176,12 +157,9 @@ app.get('/api/meditationTime', function(req, res) {
 				if (err) throw err;
 
 				if (item) {
-					res.setHeader('Content-Type', 'application/json');
-					res.end(JSON.stringify({
+					res.json({
 						defaultMeditationTime: item.defaultMeditationTime,
-					}));
-
-					client.close();
+					});
 				}
 			});
 		});
@@ -206,12 +184,9 @@ app.post('/api/meditationTime', function(req, res) {
 						function(err, updatedItem) {
 							if (err) throw err;
 
-							res.setHeader('Content-Type', 'application/json');
-							res.end(JSON.stringify({
+							res.json({
 								defaultMeditationTime: updatedItem.value.defaultMeditationTime,
-							}));
-
-							client.close();
+							});
 						}
 					);
 				}
@@ -236,15 +211,10 @@ app.post('/api/meditationEntry', function(req, res) {
 			
 			db.collection('meditationrecord').insertOne(meditationEntry, function(err, docs) {
 				if (err) throw err;
-							
-				res.setHeader('Content-Type', 'application/json');
-				res.end(
-					JSON.stringify({
-						meditationEntryMsg: 'Meditation Entry Made!',
-					})
-				);
-		
-				client.close();
+
+				res.json({
+					meditationEntryMsg: 'Meditation Entry Made!',
+				});
 			});
 		});
 	}
@@ -259,11 +229,8 @@ app.get('/api/accountInfoLoad', function(req, res) {
 				username: req.session.username
 			}, function(err, user) {
 				if (err) throw err;
-				
-				res.setHeader('Content-Type', 'application/json');
-				res.end(JSON.stringify({ email: user.email }));
-				
-				client.close();
+
+				res.json({ email: user.email });
 			});
 		});
 	}
@@ -282,15 +249,10 @@ app.post('/api/accountModify', function(req, res) {
 				function(err) {
 					if (err) throw err;
 
-					res.setHeader('Content-Type', 'application/json');
-					res.end(
-						JSON.stringify({
-							accountModified: true,
-							accountMsg: 'Account Modified!',
-						})
-					);
-
-					client.close();
+					res.json({
+						accountModified: true,
+						accountMsg: 'Account Modified!',
+					});
 				}
 			);
 		});
@@ -309,14 +271,9 @@ app.post('/api/accountLoginModify', function(req, res) {
 				if (err) throw err;
 				
 				if (item.password !== encrypt(req.body.accountOldPassword)) {
-					res.setHeader('Content-Type', 'application/json');
-					res.end(
-						JSON.stringify({
-							pwordChangeMsg: 'Old Password Incorrect!',
-						})
-					);
-
-					client.close();
+					res.json({
+						pwordChangeMsg: 'Old Password Incorrect!',
+					});
 				}
 				else {
 					db.collection('users').update(
@@ -328,14 +285,9 @@ app.post('/api/accountLoginModify', function(req, res) {
 						}, function(err) {
 							if (err) throw err;
 
-							res.setHeader('Content-Type', 'application/json');
-							res.end(
-								JSON.stringify({
-									pwordChangeMsg: 'Password Changed!',
-								})
-							);
-
-							client.close();
+							res.json({
+								pwordChangeMsg: 'Password Changed!',
+							});
 						}
 					);
 				}
@@ -370,16 +322,11 @@ app.get('/api/progress', function(req, res) {
 				]
 			}).toArray(function(err, meditationRecords) {
 				if (err) throw err;
-				
-				res.setHeader('Content-Type', 'application/json');
-				res.end(
-					JSON.stringify({
-						meditationRecords,
-						recordsFound: true,
-					})
-				);
 
-				client.close();
+				res.json({
+					meditationRecords,
+					recordsFound: true,
+				});
 			});
 		});
 	}
@@ -403,14 +350,9 @@ app.post('/api/modifyJournalEntry', function(req, res) {
 				function(err, docs) {
 					if (err) throw err;
 
-					res.setHeader('Content-Type', 'application/json');
-					res.end(
-						JSON.stringify({
-							journalModified: true,
-						})
-					);
-
-					client.close();
+					res.json({
+						journalModified: true,
+					});
 				}
 			);
 		});
@@ -432,23 +374,17 @@ app.post('/api/deleteJournalEntry', function(req, res) {
 			}, function(err) {
 				if (err) throw err;
 
-				res.setHeader('Content-Type', 'application/json');
-				res.end(
-					JSON.stringify({
-						journalDeleted: true,
-					})
-				);
-				
-				client.close();
+				res.json({
+					journalDeleted: true,
+				});
 			});
 		});
 	}
 });
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 app.use(express.static(path.resolve(__dirname, "./client/dist")));
-// app.get("*", (req, res) => {
-//     res.sendFile(path.join(__dirname, "./client/dist", "index.html"));
-// });
 
 // Listen for an incoming connection
 server.listen(port, function() {
