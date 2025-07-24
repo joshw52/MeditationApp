@@ -1,11 +1,11 @@
 import React, { useContext, useState } from 'react';
 
-import { AuthContext } from '../authContext';
+import { AuthContext } from '../authContext.js';
 
-import Calendar from './Calendar.js';
-import Meditate from './Meditate.js';
-import ModifyAccount from './ModifyAccount.js';
-import Welcome from './Welcome.js';
+import Calendar from './Calendar';
+import Meditate from './Meditate';
+import ModifyAccount from './ModifyAccount';
+import Welcome from './Welcome';
 
 const Home = () => {
     const { onLogout } = useContext(AuthContext);
