@@ -168,7 +168,7 @@ app.get("/api/meditationTime", requireLogin, async (req, res) => {
     });
     if (item) {
       res.json({
-        defaultMeditationTime: item.defaultMeditationTime,
+        defaultMeditationTime: item?.defaultMeditationTime,
       });
     }
   } catch (err) {
@@ -194,7 +194,7 @@ app.post("/api/meditationTime", requireLogin, async (req, res) => {
         },
       );
       res.json({
-        defaultMeditationTime: updatedItem.value.defaultMeditationTime,
+        defaultMeditationTime: updatedItem.defaultMeditationTime,
       });
     }
   } catch (err) {
@@ -246,7 +246,7 @@ app.post("/api/accountModify", requireLogin, async (req, res) => {
     // Modify the account if the user clicked Modify and not Cancel
     await db
       .collection("users")
-      .update(
+      .updateOne(
         { username: req.session.username },
         { $set: { email: req.body.accountEmail } },
       );
@@ -274,7 +274,7 @@ app.post("/api/accountLoginModify", requireLogin, async (req, res) => {
         pwordChangeMsg: "Old Password Incorrect!",
       });
     } else {
-      await db.collection("users").update(
+      await db.collection("users").updateOne(
         { username: req.session.username },
         {
           $set: {
@@ -340,7 +340,7 @@ app.post("/api/modifyJournalEntry", requireLogin, async (req, res) => {
     // Update the record
     await db
       .collection("meditationrecord")
-      .update({ _id: jeid }, { $set: { journalEntry: req.body.journalEntry } });
+      .updateOne({ _id: jeid }, { $set: { journalEntry: req.body.journalEntry } });
     res.json({
       journalModified: true,
     });
@@ -358,7 +358,7 @@ app.post("/api/deleteJournalEntry", requireLogin, async (req, res) => {
     const jdid = new OID(req.body.journalID);
 
     // Delete the record
-    await db.collection("meditationrecord").remove({
+    await db.collection("meditationrecord").deleteOne({
       _id: jdid,
     });
 
