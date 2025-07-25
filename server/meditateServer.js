@@ -10,7 +10,6 @@ import mongoSessionStore from "connect-mongo";
 import { MongoClient, ObjectId } from "mongodb";
 import { fileURLToPath } from "url";
 
-const mongo = MongoClient;
 const OID = ObjectId;
 
 const app = express();
