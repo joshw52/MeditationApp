@@ -24,6 +24,8 @@
     "npm": "10.9.2"
   },
   "scripts": {
+    "lint": "eslint . --fix",
+    "prettier": "prettier --write .",
     "start": "npm install && node meditateServer.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
