@@ -19,11 +19,11 @@ const ModifyAccount = () => {
     const modifyAccount = () =>
         accountEmail === ''
             ? setAccountMsg("All fields must be filled out!")
-            : axios.post("/api/accountModify", {
+            : axios.patch("/api/accountModify", {
                     accountEmail,
                 }).then(res => {
                     const { accountModified, accountMsg } = res.data;
-                    setAccountMsg(accountModified ? accountMsg : 'Account Modification Error');
+                    setAccountMsg(accountModified ? accountMsg : accountMsg || 'Account Modification Error');
                 });
 
     const changePassword = () => {
@@ -38,7 +38,7 @@ const ModifyAccount = () => {
         } else if (accountPassword.length < 8) {
             setPwordMsg("New Password must be at least 8 characters");
         } else{
-            axios.post("/api/accountLoginModify", {
+            axios.patch("/api/accountLoginModify", {
                 accountOldPassword,
                 accountPassword,
             }).then(res => {

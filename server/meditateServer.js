@@ -99,17 +99,31 @@ app.post("/api/account", async (req, res) => {
         accountMsg: "Password must be at least 8 characters",
       });
     } else {
-      // Attempt to insert the account
-      const item = await db.collection("users").findOne({
+      // Make sure username isn't taken
+      const foundUsername = await db.collection("users").findOne({
         username: req.body.accountUsername,
       });
 
-      if (item !== null) {
+      if (foundUsername !== null) {
         res.json({
           accountCreated: false,
           accountMsg: "Username is already taken",
         });
-      } else {
+      }
+
+      // Make sure email isn't taken
+      const foundEmail = await db.collection("users").findOne({
+        email: req.body.accountEmail,
+      });
+
+      if (foundEmail !== null) {
+        res.json({
+          accountCreated: false,
+          accountMsg: "Email is already taken",
+        });
+      }
+
+      if (!foundUsername && !foundEmail) {
         await db.collection("users").insertOne(newUser);
         res.json({
           accountCreated: true,
@@ -241,8 +255,19 @@ app.get("/api/accountInfoLoad", requireLogin, async (req, res) => {
   }
 });
 
-app.post("/api/accountModify", requireLogin, async (req, res) => {
+app.patch("/api/accountModify", requireLogin, async (req, res) => {
   try {
+    // Check that email isn't taken
+    const foundEmail = await db.collection("users").findOne({
+      email: req.body.accountEmail,
+    });
+    if (foundEmail && foundEmail.username !== req.session.username) {
+      return res.json({
+        accountModified: false,
+        accountMsg: "Email is already taken",
+      });
+    }
+
     // Modify the account if the user clicked Modify and not Cancel
     await db
       .collection("users")
@@ -264,7 +289,7 @@ app.post("/api/accountModify", requireLogin, async (req, res) => {
   }
 });
 
-app.post("/api/accountLoginModify", requireLogin, async (req, res) => {
+app.patch("/api/accountLoginModify", requireLogin, async (req, res) => {
   try {
     const item = await db.collection("users").findOne({
       username: req.session.username,
