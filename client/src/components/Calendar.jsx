@@ -45,7 +45,8 @@ const Calendar = () => {
         setJournalModify(false);
     }
 
-    const submitJournalModify = () => {axios.post("/api/modifyJournalEntry", {
+    const submitJournalModify = () => {
+        axios.patch("/api/modifyJournalEntry", {
             journalEntry,
             journalID,
         }).then(() => getJournalEntries());
@@ -53,9 +54,7 @@ const Calendar = () => {
     }
     
     const deleteJournalEntry = record => {
-        axios.post("/api/deleteJournalEntry", {
-            journalID: record._id
-        }).then(() => getJournalEntries());
+        axios.delete(`/api/deleteJournalEntry/${record._id}`).then(() => getJournalEntries());
     }
 
     const renderCalendarDays = () => {

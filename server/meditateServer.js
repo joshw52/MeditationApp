@@ -88,13 +88,13 @@ app.post("/api/account", async (req, res) => {
 
     // Server-side validation of non-empty fields
     if (!newUser.username || !newUser.password || !newUser.email) {
-      res.json({
+      return res.json({
         accountCreated: false,
         accountMsg: "All fields must be filled out!",
       });
       // Server-side validation of password length
     } else if (newUser.password.length < 8) {
-      res.json({
+      return res.json({
         accountCreated: false,
         accountMsg: "Password must be at least 8 characters",
       });
@@ -105,7 +105,7 @@ app.post("/api/account", async (req, res) => {
       });
 
       if (foundUsername !== null) {
-        res.json({
+        return res.json({
           accountCreated: false,
           accountMsg: "Username is already taken",
         });
@@ -117,7 +117,7 @@ app.post("/api/account", async (req, res) => {
       });
 
       if (foundEmail !== null) {
-        res.json({
+        return res.json({
           accountCreated: false,
           accountMsg: "Email is already taken",
         });
@@ -146,7 +146,7 @@ app.post("/api/login", async (req, res) => {
   try {
     // Check that username and password aren't empty
     if (!req.body.loginUsername || !req.body.loginPassword) {
-      res.json({ loginAccepted: false });
+      return res.json({ loginAccepted: false });
     }
 
     // Look for username
@@ -156,7 +156,7 @@ app.post("/api/login", async (req, res) => {
 
     // If the username is not found or the login password doesn't match the user's password
     if (!item || encrypt(req.body.loginPassword) !== item.password) {
-      res.json({ loginAccepted: false });
+      return res.json({ loginAccepted: false });
     } else {
       req.session.username = req.body.loginUsername;
       res.json({ loginAccepted: true });
@@ -193,7 +193,7 @@ app.get("/api/meditationTime", requireLogin, async (req, res) => {
   }
 });
 
-app.post("/api/meditationTime", requireLogin, async (req, res) => {
+app.patch("/api/meditationTime", requireLogin, async (req, res) => {
   try {
     const item = await db.collection("users").findOne({
       username: req.session.username,
@@ -358,7 +358,7 @@ app.get("/api/progress", requireLogin, async (req, res) => {
 });
 
 // Modify the journal entry in the collection, using the id to find it
-app.post("/api/modifyJournalEntry", requireLogin, async (req, res) => {
+app.patch("/api/modifyJournalEntry", requireLogin, async (req, res) => {
   try {
     const jeid = new OID(req.body.journalID);
 
@@ -378,9 +378,21 @@ app.post("/api/modifyJournalEntry", requireLogin, async (req, res) => {
 });
 
 // Delete a journal entry
-app.post("/api/deleteJournalEntry", requireLogin, async (req, res) => {
+app.delete("/api/deleteJournalEntry/:id", requireLogin, async (req, res) => {
   try {
-    const jdid = new OID(req.body.journalID);
+    const jdid = new OID(req.params.id);
+
+    // Check if the journal entry exists and belongs to the user
+    const journalEntry = await db.collection("meditationrecord").findOne({
+      _id: jdid,
+      username: req.session.username,
+    });
+
+    if (!journalEntry) {
+      return res.status(404).json({
+        journalDeleted: false,
+      });
+    }
 
     // Delete the record
     await db.collection("meditationrecord").deleteOne({

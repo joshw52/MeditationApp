@@ -69,7 +69,7 @@ const Meditate = ({ changeMeditationTab }) => {
         });
 
     const setDefaultMeditationTime = newTime => axios
-        .post("/api/meditationTime", { defaultMeditationTime: newTime })
+        .patch("/api/meditationTime", { defaultMeditationTime: newTime })
         .then(() => {
             setDefaultTimeChanged(true);
             setUserMeditationTime(Number(newTime));
