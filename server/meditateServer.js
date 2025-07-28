@@ -415,7 +415,11 @@ app.delete("/api/deleteJournalEntry/:id", requireLogin, async (req, res) => {
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-app.use(express.static(path.resolve(__dirname, "./client/dist")));
+app.use(express.static(path.resolve(__dirname, "./client/build")));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "./client/build", "index.html"));
+});
 
 // Listen for an incoming connection
 server.listen(port, function () {
