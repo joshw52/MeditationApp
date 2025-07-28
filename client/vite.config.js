@@ -9,9 +9,9 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:8080', // Proxy API requests to the server
+        target: 'http://server:8080', // Proxy API requests to the server
         changeOrigin: true,
-      }
-    }
-  }
+      },
+    },
+  },
 });

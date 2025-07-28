@@ -365,7 +365,10 @@ app.patch("/api/modifyJournalEntry", requireLogin, async (req, res) => {
     // Update the record
     await db
       .collection("meditationrecord")
-      .updateOne({ _id: jeid }, { $set: { journalEntry: req.body.journalEntry } });
+      .updateOne(
+        { _id: jeid },
+        { $set: { journalEntry: req.body.journalEntry } },
+      );
     res.json({
       journalModified: true,
     });
