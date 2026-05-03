@@ -44,7 +44,12 @@ app.enable("trust proxy");
 app.use(parser.urlencoded({ extended: true }));
 app.use(parser.json());
 
-app.use(cors());
+app.use(
+  cors({
+    origin: process.env.CLIENT_ORIGIN || "http://localhost:5173",
+    credentials: true,
+  }),
+);
 
 app.use(
   sessions({
