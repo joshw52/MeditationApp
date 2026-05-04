@@ -10,6 +10,7 @@ import mongoSessionStore from "connect-mongo";
 import { MongoClient, ObjectId } from "mongodb";
 import { fileURLToPath } from "url";
 import { csrfSync } from "csrf-sync";
+import { rateLimit } from "express-rate-limit";
 
 const OID = ObjectId;
 
@@ -21,6 +22,7 @@ dotenv.config();
 
 const SALT_ROUNDS = 12;
 const MAX_MEDITATION_SECONDS = 86400;
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const port = process.env.PORT || 8080;
 
@@ -52,7 +54,7 @@ app.use(
   sessions({
     cookie: {
       httpOnly: true,
-      maxAge: 4 * 60 * 24 * 1000,
+      maxAge: 24 * 60 * 60 * 1000,
       secure: process.env.NODE_ENV === "production",
     },
     resave: true,
@@ -66,6 +68,13 @@ app.use(
 );
 
 const { generateToken, csrfSynchronisedProtection } = csrfSync();
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 20,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+});
 
 app.use(csrfSynchronisedProtection);
 
@@ -86,7 +95,7 @@ const requireLogin = (req, res, next) => {
   }
 };
 
-app.post("/api/account", async (req, res) => {
+app.post("/api/account", authLimiter, async (req, res) => {
   try {
     const { accountUsername, accountPassword, accountEmail } = req.body;
 
@@ -101,6 +110,11 @@ app.post("/api/account", async (req, res) => {
       return res.json({
         accountCreated: false,
         accountMsg: "Password must be at least 8 characters",
+      });
+    } else if (!EMAIL_REGEX.test(accountEmail)) {
+      return res.json({
+        accountCreated: false,
+        accountMsg: "Invalid email address",
       });
     } else {
       // Make sure username isn't taken
@@ -152,7 +166,7 @@ app.post("/api/account", async (req, res) => {
 
 // Check that the login credentials are correct,
 // that the username exists and that the password is correct
-app.post("/api/login", async (req, res) => {
+app.post("/api/login", authLimiter, async (req, res) => {
   try {
     // Check that username and password aren't empty
     if (!req.body.loginUsername || !req.body.loginPassword) {
@@ -283,6 +297,13 @@ app.get("/api/accountInfoLoad", requireLogin, async (req, res) => {
 
 app.patch("/api/accountModify", requireLogin, async (req, res) => {
   try {
+    if (!req.body.accountEmail || !EMAIL_REGEX.test(req.body.accountEmail)) {
+      return res.json({
+        accountModified: false,
+        accountMsg: "Invalid email address",
+      });
+    }
+
     // Check that email isn't taken
     const foundEmail = await db.collection("users").findOne({
       email: req.body.accountEmail,
@@ -315,7 +336,7 @@ app.patch("/api/accountModify", requireLogin, async (req, res) => {
   }
 });
 
-app.patch("/api/accountLoginModify", requireLogin, async (req, res) => {
+app.patch("/api/accountLoginModify", requireLogin, authLimiter, async (req, res) => {
   try {
     const item = await db.collection("users").findOne({
       username: req.session.username,
