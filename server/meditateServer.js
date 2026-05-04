@@ -9,6 +9,7 @@ import sessions from "express-session";
 import mongoSessionStore from "connect-mongo";
 import { MongoClient, ObjectId } from "mongodb";
 import { fileURLToPath } from "url";
+import { csrfSync } from "csrf-sync";
 
 const OID = ObjectId;
 
@@ -67,6 +68,14 @@ app.use(
     }),
   }),
 );
+
+const { generateToken, csrfSynchronisedProtection } = csrfSync();
+
+app.use(csrfSynchronisedProtection);
+
+app.get("/api/csrf-token", (req, res) => {
+  res.json({ csrfToken: generateToken(req) });
+});
 
 app.get("/api/isAuthenticated", function (req, res) {
   const isAuthenticated = req.sessionID && req.session.username;
