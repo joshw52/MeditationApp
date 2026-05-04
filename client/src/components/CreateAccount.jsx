@@ -79,6 +79,7 @@ const CreateAccount = () => {
           onChange={(e) => setAccountEmail(e.target.value)}
           placeholder="Email"
           type="email"
+          value={accountEmail}
         />
         <input
           className="loginSite"
