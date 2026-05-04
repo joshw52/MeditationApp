@@ -383,7 +383,7 @@ app.patch("/api/modifyJournalEntry", requireLogin, async (req, res) => {
     await db
       .collection("meditationrecord")
       .updateOne(
-        { _id: jeid },
+        { _id: jeid, username: req.session.username },
         { $set: { journalEntry: req.body.journalEntry } },
       );
     res.json({
