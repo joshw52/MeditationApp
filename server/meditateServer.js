@@ -20,6 +20,7 @@ const server = http.createServer(app);
 dotenv.config();
 
 const SALT_ROUNDS = 12;
+const MAX_MEDITATION_SECONDS = 86400;
 
 const port = process.env.PORT || 8080;
 
@@ -206,7 +207,7 @@ app.get("/api/meditationTime", requireLogin, async (req, res) => {
 app.patch("/api/meditationTime", requireLogin, async (req, res) => {
   try {
     const newTime = Number(req.body.defaultMeditationTime);
-    if (!Number.isInteger(newTime) || newTime < 1 || newTime > 86400) {
+    if (!Number.isInteger(newTime) || newTime < 1 || newTime > MAX_MEDITATION_SECONDS) {
       return res.status(400).json({ defaultMeditationTime: null });
     }
 
@@ -236,10 +237,20 @@ app.patch("/api/meditationTime", requireLogin, async (req, res) => {
 
 app.post("/api/meditationEntry", requireLogin, async (req, res) => {
   try {
+    const meditateDateTime = Number(req.body.meditateDateTime);
+    const meditateDuration = Number(req.body.meditateDuration);
+
+    if (
+      !Number.isInteger(meditateDateTime) || meditateDateTime < 0 ||
+      !Number.isInteger(meditateDuration) || meditateDuration < 1 || meditateDuration > MAX_MEDITATION_SECONDS
+    ) {
+      return res.status(400).json({ meditationEntryMsg: "Invalid entry data" });
+    }
+
     const meditationEntry = {
       username: req.session.username,
-      meditateDateTime: req.body.meditateDateTime,
-      meditateDuration: req.body.meditateDuration,
+      meditateDateTime,
+      meditateDuration,
       journalEntry: req.body.journalEntry,
     };
 
