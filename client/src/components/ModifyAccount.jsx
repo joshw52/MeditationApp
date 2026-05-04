@@ -67,6 +67,7 @@ const ModifyAccount = () => {
           onChange={(e) => setAccountEmail(e.target.value)}
           placeholder="Email"
           type="email"
+          value={accountEmail}
         />
         <div className="accountModButtons">
           <input

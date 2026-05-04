@@ -377,6 +377,7 @@ button:hover {
 }
 
 input[type='text'],
+input[type='email'],
 input[type='password'],
 textarea {
   background-color: #000000;
