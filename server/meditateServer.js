@@ -1,7 +1,7 @@
 import express from "express";
 import parser from "body-parser";
 import cors from "cors";
-import crypto from "crypto";
+import bcrypt from "bcrypt";
 import path from "path";
 import http from "http";
 import dotenv from "dotenv";
@@ -19,12 +19,7 @@ const server = http.createServer(app);
 
 dotenv.config();
 
-function encrypt(str) {
-  return crypto
-    .createHmac("sha256", process.env.HMAC_SECRET)
-    .update(str)
-    .digest("hex");
-}
+const SALT_ROUNDS = 12;
 
 const port = process.env.PORT || 8080;
 
@@ -92,22 +87,16 @@ const requireLogin = (req, res, next) => {
 
 app.post("/api/account", async (req, res) => {
   try {
-    // The user entry to be made
-    const newUser = {
-      username: req.body.accountUsername,
-      password: encrypt(req.body.accountPassword),
-      email: req.body.accountEmail,
-      defaultMeditationTime: 600,
-    };
+    const { accountUsername, accountPassword, accountEmail } = req.body;
 
     // Server-side validation of non-empty fields
-    if (!newUser.username || !newUser.password || !newUser.email) {
+    if (!accountUsername || !accountPassword || !accountEmail) {
       return res.json({
         accountCreated: false,
         accountMsg: "All fields must be filled out!",
       });
       // Server-side validation of password length
-    } else if (newUser.password.length < 8) {
+    } else if (accountPassword.length < 8) {
       return res.json({
         accountCreated: false,
         accountMsg: "Password must be at least 8 characters",
@@ -115,7 +104,7 @@ app.post("/api/account", async (req, res) => {
     } else {
       // Make sure username isn't taken
       const foundUsername = await db.collection("users").findOne({
-        username: req.body.accountUsername,
+        username: accountUsername,
       });
 
       if (foundUsername !== null) {
@@ -127,7 +116,7 @@ app.post("/api/account", async (req, res) => {
 
       // Make sure email isn't taken
       const foundEmail = await db.collection("users").findOne({
-        email: req.body.accountEmail,
+        email: accountEmail,
       });
 
       if (foundEmail !== null) {
@@ -138,7 +127,13 @@ app.post("/api/account", async (req, res) => {
       }
 
       if (!foundUsername && !foundEmail) {
-        await db.collection("users").insertOne(newUser);
+        const hashedPassword = await bcrypt.hash(accountPassword, SALT_ROUNDS);
+        await db.collection("users").insertOne({
+          username: accountUsername,
+          password: hashedPassword,
+          email: accountEmail,
+          defaultMeditationTime: 600,
+        });
         res.json({
           accountCreated: true,
           accountMsg: "",
@@ -169,7 +164,8 @@ app.post("/api/login", async (req, res) => {
     });
 
     // If the username is not found or the login password doesn't match the user's password
-    if (!item || encrypt(req.body.loginPassword) !== item.password) {
+    const passwordMatch = item && await bcrypt.compare(req.body.loginPassword, item.password);
+    if (!passwordMatch) {
       return res.json({ loginAccepted: false });
     } else {
       req.session.username = req.body.loginUsername;
@@ -308,16 +304,18 @@ app.patch("/api/accountLoginModify", requireLogin, async (req, res) => {
     const item = await db.collection("users").findOne({
       username: req.session.username,
     });
-    if (item.password !== encrypt(req.body.accountOldPassword)) {
+    const oldPasswordMatch = await bcrypt.compare(req.body.accountOldPassword, item.password);
+    if (!oldPasswordMatch) {
       res.json({
         pwordChangeMsg: "Old Password Incorrect!",
       });
     } else {
+      const newHashedPassword = await bcrypt.hash(req.body.accountPassword, SALT_ROUNDS);
       await db.collection("users").updateOne(
         { username: req.session.username },
         {
           $set: {
-            password: encrypt(req.body.accountPassword),
+            password: newHashedPassword,
           },
         },
       );
