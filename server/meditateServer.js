@@ -205,6 +205,11 @@ app.get("/api/meditationTime", requireLogin, async (req, res) => {
 
 app.patch("/api/meditationTime", requireLogin, async (req, res) => {
   try {
+    const newTime = Number(req.body.defaultMeditationTime);
+    if (!Number.isInteger(newTime) || newTime < 1 || newTime > 86400) {
+      return res.status(400).json({ defaultMeditationTime: null });
+    }
+
     const item = await db.collection("users").findOne({
       username: req.session.username,
     });
@@ -213,7 +218,7 @@ app.patch("/api/meditationTime", requireLogin, async (req, res) => {
         { _id: item._id },
         {
           $set: {
-            defaultMeditationTime: req.body.defaultMeditationTime,
+            defaultMeditationTime: newTime,
           },
         },
       );
